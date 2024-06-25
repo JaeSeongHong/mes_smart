@@ -767,7 +767,7 @@ urlpatterns = [
 
     path('getAlivecheck/', views.getAlivecheck, name='getAlivecheck'),
 
-    path('recognize/', views.recognize, name='recognize'),
+    # path('recognize/', views.recognize, name='recognize'),
 
 
 

@@ -1,0 +1,105 @@
+{% include 'header.html' %}
+{% load static %}
+<div class="card m-2">
+    <div class="card-body p-2">
+        <div class="row no-gutters">
+            <div class="content-table col-12">
+                <table class="table table-sm text-center" style="min-width: 800px;">
+                    <thead id="bom_lookup_th">
+                    </thead>
+                    <tbody id="bom_lookup_detail_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 테이블 건수 조회 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <label class="mb-0">(<strong id="table_row-detail">0</strong>) 건 로딩</label>
+    </div>
+</div>
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script>
+
+    $(() => {
+        let columns = ['level', 'item', 'part', 'part_num', 'capacity', 'size', 'voltage', 'band',
+        'unit', 'tnb', 'lnr', 'required_amount', 'location', 'manufacturer', 'customer', 'etc',
+            'weight', 'standard', 'package', 'storage', 'item_name' ];
+        console.log(window.opener.$('#bom-lookup-tbody .clicked').attr('id'));
+        let id_BOM = window.opener.$('#bom-lookup-tbody .clicked').attr('id');
+        let now_tr = window.opener.$('#bom-lookup-tbody #' + id_BOM);
+        let now_tr_details = window.opener.$('#bom-lookup-tbody #' + id_BOM).data('details');
+
+        console.log('this id = ', id_BOM);
+        console.log(now_tr);
+        console.log(now_tr_details)
+
+
+        // header 생성
+
+        let thead = `<tr>
+                <th>순번</th>
+                <th>브랜드</th>
+                <th>제품군</th>
+                <th>품명</th>
+                <th>품번</th>
+                <th>나이스번호</th>
+                <th>품명상세</th>
+                <th>형태</th>
+                <th>소요량</th>
+                </tr>`
+        $('#bom_lookup_th').html(thead);
+
+        // input 생성
+        // {#console.log('data.id : ' + $(this).attr('id'));#}
+        api_gp('/bom/select/?master__id=' + id_BOM, 'GET', {}, (detail_data) => {
+            console.table(detail_data);
+            $('#table_row-detail').text(detail_data.length); // 로딩된 데이터 갯수 세기
+
+            let detail_rows = "";
+            let detail_list_num = 1;
+            // {#console.log(now_columns);#}
+
+            // 테이블 동적생성
+
+            for (let i = 0; i < detail_data.length; i++) {
+                let detail_item = detail_data[i];
+
+                let detail_row = `<tr id='${detail_item.id}' style='cursor:pointer;'>
+                 <td>${nullapply(detail_list_num++)}</td>
+                 <td>${nullapply(detail_item.item?.brand_name)}</td>
+                 <td>${nullapply(detail_item.item?.item_group_name)}</td>
+                 <td data-toggle=tooltip title=${detail_item.item.name}>${nullapply(detail_item.item.name.length > 10 ? detail_item.item.name.slice(0,10) + "..." :detail_item.item.name )}</td>
+                 <td data-toggle=tooltip title=${detail_item.item.code}>${nullapply(detail_item.item.code.length > 10 ? detail_item.item.code.slice(0,10) + "..." :detail_item.item.code )}</td>
+                 <td data-toggle=tooltip title=${detail_item.item.nice_number}>${nullapply(detail_item.item.nice_number.length > 10 ? detail_item.item.nice_number.slice(0,10) + "..." :detail_item.item.nice_number )}</td>
+                 <td data-toggle=tooltip title=${detail_item.item.detail}>${nullapply(detail_item.item.detail ? detail_item.item.detail.length > 10 ? detail_item.item.detail.slice(0,10) + "..." : detail_item.item.detail: "")}</td>
+
+                 <td>${nullapply(detail_item.item?.shape)}</td>
+                 <td>${nullapply(detail_item.required_amount)}</td>
+                </tr>`;
+
+                detail_row += "</tr>"
+                detail_rows += detail_row;
+            }
+            $('#bom_lookup_detail_tbody').html(detail_rows);
+            // {#$('#bom_lookup_detail_tbody > tr').on('click', function () {#}
+            // {#    // table click highlight#}
+            // {#    $(this).parent().find('tr').removeClass('clicked');#}
+            // {#    $(this).addClass('clicked');#}
+            // {#    for (let item in now_columns) {#}
+            // {#        if(item === 'item') {#}
+            // {#            $('#detail_form [name="' + item + '"]').val($(this).find('[name="' + item + '_id"]').text()).trigger('change');#}
+            // {#        } else {#}
+            // {#            $('#detail_form [name="' + item + '"]').val($(this).find('[name="' + item + '"]').text());#}
+            // {#        }#}
+            // {#    }#}
+            // {# });#}
+
+            });
+    });
+
+</script>

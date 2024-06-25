@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+<header>{% include 'header.html' %}</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {##}
+{#{% block title %}#}
+{#    <title>코드마스터</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+
+        <form
+                id="groupcodeid"
+                class="content-search row no-gutters align-items-center content-input-group"
+                method="GET"
+        >
+
+            <div class="content-title col-1 align-self-stretch">그룹코드</div>
+
+            <div class="col-11 d-flex">
+                <div class="content-input-group col-3 px-0">
+                    <div class="content-input-group-header">
+                        <label>그룹코드</label>
+                    </div>
+                    <div class="content-input-group-input" id="select_codegroup">
+                        <select
+                                name="code_group"
+                                class="form-control"
+                                id="code_search"
+                        ></select>
+                    </div>
+                </div>
+                <div class="col-1 px-0">
+                    <button
+                            class="btn button-search rounded-0 w-100 h-100 search"
+                            type="submit"
+                    >
+                        검색
+                    </button>
+                </div>
+                <div class="col-8 px-0 d-flex justify-content-end">
+                    <a
+                            class="btn button-custom h-100"
+                            href="javascript:show_groupcode_popup()"
+                    >그룹코드 관리</a
+                    >
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form id="code_master" class="content-content w-100" method="POST">
+            {% csrf_token %}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">상세코드</div>
+                <div class="col-11" id="detail_codemaster">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>그룹코드<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select name="group_code" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>상세코드<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="detail_code" placeholder="3자리" maxlength="3"
+                                       minlength="3"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>상세코드명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="detail_code_name"/>
+                            </div>
+                        </div>
+                        <div class="d-none content-input-group col-2">
+                            <div
+                                    class="content-input-group-header"
+                                    style="background-color: darkgrey"
+                            >
+                                <label>참조코드</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="reference_code"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-5">
+                            <div class="content-input-group-header">
+                                <label>코드설명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="code_account"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>사용구분<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control" name="code_use_division">
+                                    <option>사용</option>
+                                    <option>미사용</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-5">
+                            <div class="content-input-group-header">
+                                <label>기타</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="code_the_others"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters w-100 justify-content-end">
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100 add"
+                            type="button"
+                            onclick="codemaster_formsubmit()"
+                    >
+                        추가
+                    </button>
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="codemaster_edit()"
+                    >
+                        수정
+                    </button>
+                </div>
+                <div class="col-1 px-0">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="codemaster_delete()"
+                    >
+                        삭제
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:420px;">
+            <table
+                    id="codemaster_codemaster_data-table"
+                    class="table table-sm text-center"
+{#                    style="min-width: 1300px"#}
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>그룹코드</th>
+                    <th>상세코드</th>
+                    <th>그룹명</th>
+                    <th>상세코드명</th>
+                    <th class="d-none">참조코드</th>
+                    <th>코드설명</th>
+                    <th>사용구분</th>
+                    <th>등록자</th>
+                    <th>등록일</th>
+                    <th>최종 수정자</th>
+                    <th>최종 변경일</th>
+                    <th>기타</th>
+                </tr>
+                </thead>
+                <tbody id="codemaster_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <label class="mb-0"
+        >(<strong id="codemaster_table_row">0</strong>) 건 로딩</label
+        >
+    </div>
+</div>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 10,
+    };
+    let nation1 = new Pnations(nation_data1, code_master_search);  // 인스턴스 명
+
+    let code_group_id = null;
+    let detail_code = null;
+
+    function init() {
+        let enterprise_name = get_userinfo().enterprise_name;
+
+        api_get_codegroup_list((data) => {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                console.table(data);
+                let item = data[i];
+                if (enterprise_name == '(주)온교육') {
+                    if (item.code == '106' || item.code == '111' || item.code == '114' || item.code == '116' ||
+                        item.code == '117' || item.code == '119' || item.code == '122' || item.code == '123' ||
+                        item.code == '124' || item.code == '900')
+                        continue;
+                }
+
+                list +=
+                    // 그룹코드 add
+                    "<option value='" +
+                    item.id +
+                    "' >" +
+                    item.code +
+                    " (" +
+                    item.name +
+                    ")" +
+                    "</option>";
+            }
+            $('#detail_codemaster [name="group_code"]')
+                .html(list)
+                .select2({width: "100%"});
+        });
+
+        let cg = getParameters("code_group").split("+")[0]; //code_group 값만 추출.
+        if (cg == "선택") cg = "";
+
+
+
+        api_gp("/group_codes/", "GET", {}, (data) => {
+            console.table(data);
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (enterprise_name == '(주)온교육') {
+                    if (item.code == '106' || item.code == '111' || item.code == '114' || item.code == '116' ||
+                        item.code == '117' || item.code == '119' || item.code == '122' || item.code == '123' ||
+                        item.code == '124' || item.code == '900')
+                        continue;
+                }
+
+
+                if (cg == item.id) {
+                    list +=
+                        "<option value='" +
+                        item.code +
+                        "' selected>" +
+                        item.code +
+                        " (" +
+                        item.name +
+                        ")" +
+                        "</option>";
+                } else {
+                    // 그룹코드 sch
+                    list +=
+                        "<option value='" +
+                        item.code +
+                        "' >" +
+                        item.code +
+                        " (" +
+                        item.name +
+                        ")" +
+                        "</option>";
+                }
+
+            }
+            $("#code_search").html(list).select2({width: "100%"});
+        });
+    }
+
+    function show_groupcode_popup() {
+        var url = "/basic_information/codemaster/manage";
+        var name = "그룹코드 관리";
+        var option = "width=1000, height=920, location=no";
+        window.open(url, name, option);
+    }
+
+    // click on "검색" on the right side of "그룹코드"
+
+    $("#groupcodeid").submit(function (e) {
+        e.preventDefault();
+
+        nation1.page = 1;
+        code_group_id = null;
+        detail_code = null;
+
+        code_master_search();
+    });
+
+    function codemaster_formsubmit() {
+        var valid = true;
+        if ($("#detail_codemaster [name='group_code']").val() == "") {
+            valid = false;
+        }
+        if ($("#detail_codemaster [name='detail_code']").val() == "") {
+            valid = false;
+        }
+        if ($("#detail_codemaster [name='detail_code_name']").val() == "") {
+            valid = false;
+        }
+        if (
+            $("#detail_codemaster [name='code_use_division']").val() == "선택"
+        ) {
+            valid = false;
+        }
+        if (valid) {
+            let code = $('#code_master [name="group_code"]').text();
+            if (code.length < 2) {
+                alert("그룹코드를 선택해 주세요.");
+                return false;
+            }
+            if (!$.isNumeric($("#detail_codemaster [name='detail_code']").val())) {
+                alert("상세코드는 숫자만 가능합니다.");
+                return false;
+            }
+
+            // {#let code_group = code[0];#}
+            let code_group = $('#code_master [name="group_code"]').val();
+            console.log(code_group);
+            let detail_code = $('#code_master [name="detail_code"]').val();
+            let detail_code_name = $(
+                '#code_master [name="detail_code_name"]'
+            ).val();
+            let reference_code = $('#code_master [name="reference_code"]').val();
+            let code_account = $('#code_master [name="code_account"]').val();
+            let code_use_division =
+                $('#code_master [name="code_use_division"]').val().length < 3
+                    ? true
+                    : false;
+            let code_the_others = $(
+                '#code_master [name="code_the_others"]'
+            ).val();
+
+            let allData = {
+                code: parseInt(detail_code),
+                name: detail_code_name,
+                explain: code_account,
+                enable: code_use_division,
+                etc: code_the_others,
+                group: code_group,
+                ref_detail_code: reference_code,
+            };
+
+            {#console.table(allData);#}
+            api_gp('/codes/', 'POST', allData, (data) => {
+                alert("상세코드" + detail_code + " 를 추가했습니다.");
+                nation1.page = 1;
+                code_group_id = data.id;
+                code_master_search();
+            });
+
+            return true;
+        } else {
+            alert("필수항목을 입력해 주세요.");
+            return false;
+        }
+    }
+
+    function draw_codemaster_table(done) {
+        console.table(done);
+
+        let data = done.results;
+        $("#codemaster_table_row").text(done.count); // 로딩된 데이터 갯수 세기
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        let rows = "";
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let created_date = item.created_at;
+            let updated_date = item.updated_at;
+
+            let ref_code = item.ref_group_code + item.ref_detail_code;
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";
+
+            // id 값이 필요한 부분에 property attribute 추가
+
+            row +=
+                "<td name='code_group' property='" +
+                item.group.id +
+                "'>" +
+                pad(item.group.code) +
+                "</td>";
+            row += "<td name='detail_code'>" + pad(item.code, 3) + "</td>";
+            row += "<td name='code_group_name'>" + item.group.name + "</td>";
+            row += "<td name='detail_code_name'>" + item.name + "</td>";
+            row += "<td class='d-none' name='reference_code'>" + nullapply(ref_code) + "</td>";
+            row += "<td name='code_account'>" + nullapply(item.explain) + "</td>";
+            row +=
+                "<td name='code_use_division'>" +
+                (item.enable ? "사용" : "미사용") +
+                "</td>";
+            row += "<td name='created_by'>" + item.created_by + "</td>";
+            row +=
+                "<td name='created_at'>" +
+                created_date.substring(0, 4) +
+                "-" +
+                created_date.substring(5, 7) +
+                "-" +
+                created_date.substring(8, 10) +
+                "</td>";
+            row += "<td name='updated_by'>" + item.updated_by + "</td>";
+            row +=
+                "<td name='updated_at'>" +
+                updated_date.substring(0, 4) +
+                "-" +
+                updated_date.substring(5, 7) +
+                "-" +
+                updated_date.substring(8, 10) +
+                "</td>";
+            row +=
+                "<td name='code_the_others'>" +
+                (item.etc ? item.etc : "") +
+                "</td>";
+
+            row += "</tr>";
+
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+        $("#codemaster_tbody").html(rows);
+
+        // click check
+        if (code_group_id != null){
+            $("#codemaster_tbody #" + code_group_id).addClass('clicked');
+        }
+
+        $("#codemaster_tbody > tr").on("click", function () {
+            $("#detail_codemaster [name='group_code']")
+                .val($(this).find("[name='code_group']").attr("property"))
+                .trigger("change");
+            $("#detail_codemaster [name='detail_code']").val(
+                $(this).find("[name='detail_code']").text()
+            );
+            $("#detail_codemaster [name='detail_code_name']").val(
+                $(this).find("[name='detail_code_name']").text()
+            );
+            $("#detail_codemaster [name='reference_code']").val(
+                $(this).find("[name='reference_code']").text()
+            );
+            $("#detail_codemaster [name='code_account']").val(
+                $(this).find("[name='code_account']").text()
+            );
+            $("#detail_codemaster [name='code_use_division']").val(
+                $(this).find("[name='code_use_division']").text()
+            );
+            $("#detail_codemaster [name='code_the_others']").val(
+                $(this).find("[name='code_the_others']").text()
+            );
+            code_group_id = $(this).attr("id");
+            detail_code = $(this).find("[name='detail_code']").text();
+
+            // table click highlight
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+        });
+
+        spinner();
+    }
+
+    $(function () {
+        refresh();
+    });
+
+    function refresh() {
+        init();
+        code_master_search();
+
+        // Table export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#codemaster_codemaster_data-table"), "코드마스터"));
+    }
+
+    function code_master_search() {
+        let value = parseInt($("#groupcodeid [name='code_group']").val());
+        value = isNaN(value) ? null : value;
+
+        let query = "?page=" + nation1.page;
+        if (value == '' || value == null || value == '선택'){
+        } else { query += "&group=" + value; }
+
+        api_gp("/codes/" + query, "GET", {}, (done) => {
+            draw_codemaster_table(done);
+        });
+    }
+
+
+    function codemaster_edit() {
+        if (code_group_id == null) {
+            alert("상세코드를 먼저 선택하십시오.");
+        } else {
+            var valid = true;
+            //필수항목을 누락했거나 잘못 작성한 경우
+            if ($("#detail_codemaster [name='group_code']").val() == "") {
+                valid = false;
+            }
+            if ($("#detail_codemaster [name='detail_code']").val() == "") {
+                valid = false;
+            }
+            if ($("#detail_codemaster [name='detail_code_name']").val() == "") {
+                valid = false;
+            }
+            if (
+                $("#detail_codemaster [name='code_use_division']").val() == "선택"
+            ) {
+                valid = false;
+            }
+
+            if (valid) {
+
+                let group_code = $('#code_master [name="group_code"]').val();
+                let detail_code = $('#code_master [name="detail_code"]').val();
+                let detail_code_name = $('#code_master [name="detail_code_name"]').val();
+                let reference_code = $('#code_master [name="reference_code"]').val();
+                let code_account = $('#code_master [name="code_account"]').val();
+                let code_use_division = ($('#code_master [name="code_use_division"]').val().length < 3 ? true : false);
+                let code_the_others = $(
+                    '#code_master [name="code_the_others"]'
+                ).val();
+
+                let allData = {
+                    group: group_code,
+                    code: detail_code,
+                    name: detail_code_name,
+                    reference_code: reference_code,
+                    enable: code_use_division,
+                    explain: code_account,
+                    etc: code_the_others,
+                };
+
+                api_gp('/codes/' + code_group_id + '/', 'PATCH', allData, (done) => {
+                    alert("수정하였습니다.");
+                    code_master_search();
+                });
+
+            }else{
+                alert("필수항목을 입력해 주세요.");
+            }
+        }
+    }
+
+    function codemaster_delete() {
+        if (code_group_id == null) {
+            alert("상세코드를 먼저 선택하십시오.");
+        } else {
+            var del = confirm(
+                "상세코드: " + detail_code + "을(를) 삭제하시겠습니까?"
+            );
+
+            if (del) {
+                api_gp('/codes/' + code_group_id + '/', 'DELETE', {}, () => {
+                    alert("삭제하였습니다.");
+                    nation1.page = 1;
+                    code_group_id = null;
+                    code_master_search();
+                });
+
+            }
+        }
+    }
+
+    function codemaster_code_not_use() {
+        let allData = {
+            enable: false,
+        };
+        api_patch_detail_codemaster(code_group_id, allData, () => {
+            alert("미사용 처리 되었습니다.");
+            code_master_search();
+        });
+    }
+
+    //상세코드가 3자리로 고정될 수 있게 함.
+    function pad(n, width) {
+        n = n + "";
+        return n.length >= 3 ? n : new Array(3 - n.length + 1).join("0") + n;
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+</script>
+
+
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

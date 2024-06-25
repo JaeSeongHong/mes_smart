@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}
+
+</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+{{ it.media }}
+<!-- {#{% block title %}#}
+{#    <title>자재재고실사 조정</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">품번</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.it_code_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">품명</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.it_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+
+                                </div>
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+                <div class="col-sm-6">
+                    <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="material_adjust_data-table" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in column %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="material-adjust-tbody"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+            <div class="col-sm-6">
+            <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="material_adjust_data-table_sub" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>조정일자</th>
+                                        <th>기존재고</th>
+                                        <th>조정수량</th>
+                                        <th>조정후수량</th>
+                                        <th>조정창고</th>
+                                        <th>조정사유</th>
+                                        <th>실사조정자</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="material-adjust-tbody_sub"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#ma_adjust_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="ma_adjust_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="material_adjust_form">
+                            <div class="form-row">
+                                {% comment %}<div class="col-md-6 mb-3" id="id_it_code_form_div">
+                                    <label><strong>*</strong>품번</label>
+                                    <div class="input-group">
+                                        {{ it.it_code_form }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="id_it_name_form_div">
+                                    <label><strong>*</strong>품명</label>
+                                    <div class="input-group">
+                                        {{ it.it_name_form }}
+                                    </div>
+                                </div>{% endcomment %}
+
+                                {% for item in column %}
+                                    {% if item.edit_flag %}
+
+
+                                        {% if item.tag == "input" %}
+                                    <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="text" class="{{ item.class_name|safe }}"
+                                           name="{{ item.label_en|safe }}"
+                                           autocomplete="off"
+                                            {% if item.attr != None %} {{ item.attr|safe }} {% endif %}
+                                            {% if item.event != None %} {{ item.event|safe }} {% endif %}/>
+                                     </div>
+                                        {% elif item.tag == "btn" %}
+                                            <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="button" class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" onclick="{{ item.event|safe }}" {{ item.attr }}/>
+                                     </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="col-md-6 mb-3" id="id_it_location_add_div">
+                                    <label for="">창고구분</label>
+                                    <div>
+                                    {{ it.it_location_add }}
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                        {% for item in column %}
+                            {% if item.tag == "button" %}
+                                <div class="{{ item.class_name|safe }}" onclick="{{ item.event|safe }}">{{ item.label }}</div>
+                            {% endif %}
+                        {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/api_materials.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+<script>
+
+    let main_table = null;
+    let sub_table = null;
+    let re_column = []
+    let re_invisual_col = []
+    let re_name = []
+    let hidden_name = []
+    let material_adjust_id_idx = null;
+    let material_adjust_amount;
+
+    {% for item in column %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            re_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+
+    $(".datepicker").datepicker("setDate", "today");
+
+    $(function () {
+        let stock_pos = re_column.indexOf('stock');
+         main_table = $('#material_adjust_data-table').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                    {
+                        targets: 0,
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },{
+                        targets: [stock_pos],
+                        render: function (data, type, row, meta) {
+                            if (type === 'display' && typeof data === 'number') {
+                              return data.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                            }
+
+                            return data;
+                        }
+                },
+                    {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                ],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+                        // 클릭 로우 색상
+                        setRowColor(this, 'M');
+                        // subtable open
+                        //setInput_api(data,re_column, re_name, hidden_name);
+
+                        material_adjust_id_idx = data[data.length-1];
+                        open_adjust_subtables(material_adjust_id_idx);
+                        //console.log(data);
+                    });
+                }
+                });
+         sub_table = $('#material_adjust_data-table_sub').DataTable({
+        "columnDefs": [
+            {
+                    "targets": [1, 2, 3], // 반입수량, 불량수량
+                    render: function(data, type, row) {
+                        if (type === 'display' && typeof data === 'number') {
+                          return data.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                        }
+                        return data;
+                      }
+                  },
+            {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                  ]
+         })
+        refresh();
+
+    });
+
+    function refresh() {
+
+        search();
+    }
+
+    function material_adjust_load_table() {
+        api_gp("/items/adjust/status/", "GET", {}, (data) => {
+            main_table_draw(data);
+        });
+    }
+
+    function main_table_draw(done) {
+
+        let data = done.results;
+        console.log(data);
+        main_table.rows().remove().draw();
+        main_table.rows.add(formatDataArray(data, re_column)).draw();
+        spinner();
+
+    }
+
+
+    function search(ordering){
+
+        let item_code_search = $('#item_code_search :selected').val();
+
+
+        let query = "?page=1&";
+
+        if (item_code_search === '' || item_code_search == null){
+        } else { query += "item_code=" + item_code_search + "&"; }
+
+
+        api_gp("/items/adjust/status/" + query + "/", "GET", {}, (done) => {
+            main_table_draw(done);
+        });
+    }
+
+
+    function material_adjust_add() {
+        let data = material_adjust_get_form_data();
+        let amount = $("#material_adjust_form [name=amount]").val()
+        if (material_adjust_id_idx == null || material_adjust_id_idx.length < 1){
+            alert("품목을 선택해주세요")
+        }else if(amount == null || amount.length < 1){
+            alert("조정수량을 입력해주세요")
+        }else {
+            api_gp("/items/adjust/", "POST", data, (data) => {
+            alert("성공적으로 반영하였습니다.");
+            material_adjust_load_table();
+            });
+        }
+
+    }
+
+    function material_adjust_get_form_data() {
+        let current_amount_int = parseFloat($("#material_adjust_form [name=amount]").val().replace(/,/g, ''));
+        let current_create_at = $("#material_adjust_form [name=created_at]").val();
+        let reason = $("#material_adjust_form [name=reason]").val();
+        let location_name = $("#id_it_location_add").val();
+
+        if (location_name == null || location_name.length < 1){
+            location_name = get_cookie('location')
+        }
+
+        return {
+            item: material_adjust_id_idx,
+            reason: nullapply(reason),
+            current_amount: current_amount_int,
+            location: location_name,
+            created_at: current_create_at
+        };
+
+    }
+
+    function open_adjust_subtables(item){
+        let query = "?page=1&";
+        api_gp("/items/adjust/"+query + "/", "GET", {"item_id": item}, (done) => {
+
+            console.log(done);
+            sub_table.rows().remove().draw();
+
+            sub_table.rows.add(formatData_subtable(done)).draw();
+            //선택 row 색상 표시
+             setRowColor(this, 'S');
+
+                    });
+
+    }
+
+    function formatData_subtable(results) {
+
+          return results.map(result => [
+            result.created_at,
+            result.previous_amount,
+            result.current_amount - result.previous_amount,
+            result.current_amount,
+            result.location.name,
+            result.reason,
+            result.created_by,
+            result.id
+          ]);
+        }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

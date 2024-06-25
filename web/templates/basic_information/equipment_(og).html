@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html>
+<header>
+    {% include "header.html" %}
+    <style>
+        .dwe_specific {
+            /*
+        {#display: none;#}  */
+        }
+    </style>
+</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#}
+{##}
+{#{% block title %}#}
+{#    <title>설비 기준정보관리</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="content-title col-1 align-self-stretch">검색</div>
+            <form class="col-11" id="equipment-search_form">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>공장구분</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control factory_select"
+                                    id="factory_search_select"
+                                    name="factory"
+                            >
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>공정구분</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control process_select"
+                                    id="process_search_select"
+                                    name="process"
+                            >
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-2 px-0">
+                        <div class="content-input-group-header">
+                            <label>사용구분</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select class="form-control" name="enable">
+                                <option value="">선택</option>
+                                <option value="true">사용</option>
+                                <option value="false">미사용</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="content-input-group col-8 px-0">
+                        <div class="content-input-group-header">
+                            <label>설비명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" name="name"/>
+                        </div>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button
+                                class="btn button-search rounded-0 w-100 h-100"
+                                type="submit"
+                        >
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form class="content-content w-100" id="equipment_main-form">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">내용</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설비코드<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="code"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-9">
+                            <div class="content-input-group-header">
+                                <label>설비명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="name"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설비상세<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="detail"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>공장구분<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control factory_select"
+                                        name="factory"
+                                ></select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>공정구분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control process_select"
+                                        name="process"
+                                ></select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>작업장</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control workshop_select"
+                                        name="workshop"
+                                ></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제작업체<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="made_by"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설비타입</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control type_select"
+                                        name="type"
+                                ></select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설비순번</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="order"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설비그룹</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="group"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>구입일자<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input
+                                        class="form-control datepicker"
+                                        autocomplete="off"
+                                        name="buy_at"
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header col-2">
+                                <label>가동일자</label>
+                            </div>
+                            <div class="content-input-group-input col-10">
+                                <input
+                                        class="form-control datepicker"
+                                        autocomplete="off"
+                                        name="op_at"
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header col-2">
+                                <label>폐기일자</label>
+                            </div>
+                            <div class="content-input-group-input col-10">
+                                <input
+                                        class="form-control datepicker"
+                                        autocomplete="off"
+                                        name="kill_at"
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>사용유무<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control" name="enable">
+                                    <option>사용</option>
+                                    <option>미사용</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="etc"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters dwe_specific">
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>등급</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="dwe_rating"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header col-2">
+                                <label>제조국</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="dwe_making_country"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header col-2">
+                                <label>제조번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="dwe_making_number"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>구입가격</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="dwe_price"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>폐기사유</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="dwe_kill_reason"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters dwe_specific">
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>정관리자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="dwe_admin_master"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header col-2">
+                                <label>부관리자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="dwe_admin_vice"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header col-3">
+                                <label>이미지 업로드</label>
+                            </div>
+                            <div
+                                    class="content-input-group-input"
+                                    style="border: #bebebe solid 1px"
+                            >
+                                <input
+                                        type="file"
+                                        id="file-selector"
+                                        class="dwe-image-selector"
+                                        style="line-height: 24px"
+                                        accept=".png, .jpg, .jpeg"
+                                />
+                                <input
+                                        class="form-control dwe-image-delete"
+                                        style="width: 48%"
+                                        id="filename"
+                                        readonly
+                                />
+                                <button
+                                        type="button"
+                                        class="btn button-custom2 dwe-image-delete"
+                                        style="width: 48%; float: right"
+                                >
+                                    파일 삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters w-100 justify-content-end">
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="equipment_add()"
+                    >
+                        추가
+                    </button>
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="equipment_edit()"
+                    >
+                        수정
+                    </button>
+                </div>
+                <div class="col-1 px-0">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="equipment_remove()"
+                    >
+                        삭제
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:420px;">
+            <table
+                    id="equipment_data-table"
+                    class="table table-sm text-center"
+                    style="min-width: 1300px"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>설비코드</th>
+                    <th>설비명</th>
+                    <th>설비상세</th>
+                    <th>공장구분</th>
+                    <th>공정구분</th>
+                    <th>작업장</th>
+                    <th>제작업체</th>
+                    <th>설비타입</th>
+                    <th>설비순번</th>
+
+                    <th class="dwe_specific">이미지</th>
+                    <th class="dwe_specific">설비대장</th>
+                    <th class="dwe_specific">파일관리</th>
+                    <th class="dwe_specific">등급</th>
+                    <th class="dwe_specific">제조국</th>
+                    <th class="dwe_specific">제조번호</th>
+                    <th class="dwe_specific">구입가격</th>
+                    <th class="dwe_specific">폐기사유</th>
+                    <th class="dwe_specific">정관리자</th>
+                    <th class="dwe_specific">부관리자</th>
+
+                    <th>설비그룹</th>
+                    <th>구입일자</th>
+                    <th>가동일자</th>
+                    <th>폐기일자</th>
+                    <th>사용유무</th>
+                    <th>비고</th>
+                </tr>
+                </thead>
+                <tbody id="equipment_main-tbody">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                    <td class="dwe_specific"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 테이블 건수 조회 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <label class="mb-0"
+        >(<strong id="equipment_table_row">0</strong>) 건 로딩</label
+        >
+    </div>
+</div>
+<script>
+    var equip_id_idx;
+    var equip_columns = [
+        "code",
+        "name",
+        "detail",
+        "factory",
+        "process",
+        "workshop",
+        "made_by",
+        "type",
+        "order",
+        "group",
+        "buy_at",
+        "op_at",
+        "kill_at",
+        "enable",
+        "etc",
+    ];
+    var equip_filters = ["factory", "process", "enable", "name"];
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+    $(".datepicker").datepicker("setDate", "today");
+
+    $("#equipment-search_form").submit(function (e) {
+        equipment_load_table();
+        e.preventDefault();
+    });
+
+    let gData;
+
+    function equipment_load_table() {
+        function mock(data) {
+            gData = data;
+
+            $("#equipment_table_row").text(data.length); // 로딩된 데이터 갯수 세기
+
+            let rows = "";
+            let list_num = 1;
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+
+                // append it
+                let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                row += "<td>" + list_num++ + "</td>";
+                row += "<td data-item='code'>" + item.code + "</td>";
+                row += "<td data-item='name'>" + item.name + "</td>";
+                row += "<td data-item='detail'>" + nullapply(item.detail) + "</td>";
+                row +=
+                    "<td data-item='factory' property='" +
+                    (item.factory ? item.factory.id : "") +
+                    "'>" +
+                    (item.factory ? item.factory.name : "") +
+                    "</td>";
+                row +=
+                    "<td data-item='process' property='" +
+                    (item.process ? item.process.id : "") +
+                    "'>" +
+                    (item.process ? item.process.name : "") +
+                    "</td>";
+                row +=
+                    "<td data-item='workshop' property='" +
+                    (item.workshop ? item.workshop.id : "") +
+                    "'>" +
+                    (item.workshop ? item.workshop.name : "") +
+                    "</td>";
+                row += "<td data-item='made_by'>" + item.made_by + "</td>";
+                row +=
+                    "<td data-item='type' property='" +
+                    (item.type ? item.type.id : "") +
+                    "'>" +
+                    (item.type ? item.type.name : "") +
+                    "</td>";
+                row +=
+                    "<td data-item='order'>" +
+                    (item.order ? item.order : "") +
+                    "</td>";
+
+                if (dwe) {
+                    row +=
+                        "<td data-item='dwe_image'>" +
+                        (nullapply(item.dwe_image)
+                            ? "<a href='" +
+                            nullapply(item.dwe_image) +
+                            "' onclick=\"window.open(this.href, '_blank', 'width=800, height=600'); return false;\">이미지</a>"
+                            : "") +
+                        "</td>";
+
+                    row += "<td><a href='#' class='dwe_popup_form'>설비대장</a></td>";
+                    row += "<td><a href='#' class='dwe_popup_file'>파일관리</a></td>";
+                    row +=
+                        "<td data-item='dwe_rating'>" +
+                        nullapply(item.dwe_rating) +
+                        "</td>";
+                    row +=
+                        "<td data-item='dwe_making_country'>" +
+                        nullapply(item.dwe_making_country) +
+                        "</td>";
+                    row +=
+                        "<td data-item='dwe_making_number'>" +
+                        nullapply(item.dwe_making_number) +
+                        "</td>";
+                    row +=
+                        "<td data-item='dwe_price'>" +
+                        nullapply(item.dwe_price) +
+                        "</td>";
+                    row +=
+                        "<td data-item='dwe_kill_reason'>" +
+                        nullapply(item.dwe_kill_reason) +
+                        "</td>";
+                    row +=
+                        "<td data-item='dwe_admin_master'>" +
+                        nullapply(item.dwe_admin_master) +
+                        "</td>";
+                    row +=
+                        "<td data-item='dwe_admin_vice'>" +
+                        nullapply(item.dwe_admin_vice) +
+                        "</td>";
+                }
+
+                row +=
+                    "<td data-item='group'>" +
+                    (item.group ? item.group : "") +
+                    "</td>";
+                row +=
+                    "<td data-item='buy_at'>" +
+                    (item.buy_at ? item.buy_at : "") +
+                    "</td>";
+                row +=
+                    "<td data-item='op_at'>" +
+                    (item.op_at ? item.op_at : "") +
+                    "</td>";
+                row +=
+                    "<td data-item='kill_at'>" +
+                    (item.kill_at ? item.kill_at : "") +
+                    "</td>";
+                row +=
+                    "<td data-item='enable'>" +
+                    (item.enable ? "사용" : "미사용") +
+                    "</td>";
+                row +=
+                    "<td data-item='etc'>" + (item.etc ? item.etc : "") + "</td>";
+                // row += "<td data-item='created_by'>" + item.created_by + "</td>";
+                // row += "<td data-item='created_at'>" + item.created_at.substring(0, 4) + "/" + item.created_at.substring(5, 7) + "/" + item.created_at.substring(8, 10) + "</td>";
+                // row += "<td data-item='updated_by'>" + item.updated_by + "</td>";
+                // row += "<td data-item='updated_at'>" + item.updated_at.substring(0, 4) + "/" + item.updated_at.substring(5, 7) + "/" + item.updated_at.substring(8, 10) + "</td>";
+
+                // {#row += "<td class='d-none' data-item='factory_id'>" + (item.factory ? item.factory.id : "") + "</td>";#}
+                // {#row += "<td class='d-none' data-item='process_id'>" + (item.process ? item.process.id : "") + "</td>";#}
+                // {#row += "<td class='d-none' data-item='workshop_id'>" + (item.workshop ? item.workshop.id : "") + "</td>";#}
+                // {#row += "<td class='d-none' data-item='type_id'>" + (item.type ? item.type.id : "") + "</td>";#}
+
+                row += "</tr>";
+
+                rows += row;
+            }
+            spinner();
+            $("#equipment_main-tbody").html(rows);
+
+            $(".dwe_popup_form").on("click", function () {
+                let _id = $(this).parent().parent().attr("id");
+                let raw = gData.filter((x) => x.id === parseInt(_id));
+                if (raw.length === 0) return;
+                let _data = raw[0];
+                let url = "/basic_information/equipment/form/";
+                let option = "width=840, height=1260, location=no";
+                let handle = window.open(url, String(_id), option);
+                handle.window.item = JSON.stringify({
+                    name: _data.name,
+                    type: _data.type ? _data.type.name : "",
+                    dwe_rating: _data.dwe_rating,
+                    dwe_making_country: _data.dwe_making_country,
+                    code: _data.code,
+                    made_by: _data.made_by,
+                    dwe_making_number: _data.dwe_making_number,
+                    _id: _data.order,
+                    buy_at: _data.buy_at,
+                    dwe_price: _data.dwe_price,
+                    detail: _data.detail,
+                    kill_at: _data.kill_at,
+                    dwe_kill_reason: _data.dwe_kill_reason,
+                    etc: _data.etc,
+                    dwe_image: _data.dwe_image,
+                });
+            });
+
+            $(".dwe_popup_file").on("click", function () {
+                let _id = $(this).parent().parent().attr("id");
+                let raw = gData.filter((x) => x.id === parseInt(_id));
+                if (raw.length === 0) return;
+                let _data = raw[0];
+                let url = "/basic_information/equipment/files/?id=" + _data.id;
+                let option = "width=1000, height=600, location=no";
+                let handle = window.open(url, String(_id + "_file"), option);
+            });
+
+            $(".dwe-image-delete")
+                .filter("button")
+                .on("click", function () {
+                    $(".dwe-image-selector").css("display", "inline-block");
+                    $(".dwe-image-delete").css("display", "none");
+                });
+
+            $("#equipment_main-tbody > tr").on("click", function () {
+                equip_columns.forEach((item) => {
+                    if (
+                        item === "factory" ||
+                        item === "process" ||
+                        item === "workshop" ||
+                        item === "type"
+                    ) {
+                        $("#equipment_main-form [name='" + item + "']")
+                            .val(
+                                $(this)
+                                    .find("[data-item='" + item + "']")
+                                    .attr("property")
+                            )
+                            .trigger("change");
+                    } else {
+                        $("#equipment_main-form [name='" + item + "']").val(
+                            $(this)
+                                .find("[data-item='" + item + "']")
+                                .text()
+                        );
+                    }
+                });
+
+                let dwe_image = $(this).find("[data-item='dwe_image']");
+                if (dwe_image.text() !== "") {
+                    // 동원엔텍 버튼 / 이미지 업로드 처리
+                    $(".dwe-image-selector").css("display", "none");
+                    $(".dwe-image-delete").css("display", "inline-block");
+                    let furls = decodeURI(dwe_image.children().attr("href")).split(
+                        "/"
+                    );
+                    $("#filename").val(furls[furls.length - 1].split(".")[0]);
+                } else {
+                    $(".dwe-image-selector").css("display", "inline-block");
+                    $(".dwe-image-delete").css("display", "none");
+                }
+
+                let fileSelector = document.getElementById("file-selector");
+                fileSelector.value = "";
+
+                equip_id_idx = $(this).attr("id");
+            });
+
+            // table click highlight
+            $("#equipment_main-tbody tr").on("click", function () {
+                $(this).parent().find("tr").removeClass("clicked");
+                $(this).addClass("clicked");
+            });
+
+            //Table pagination
+            $('#equipment_data-table + .pagination-container').remove();
+            $(function () {
+                //Table pagination
+                $('#equipment_main-tbody').paginathing({
+                    perPage: 10,
+                    insertAfter: "#equipment_data-table"
+                });
+            });
+        }
+
+        // filter
+        let query_params = "?";
+        equip_filters.forEach((item) => {
+            let val = $('#equipment-search_form [name="' + item + '"]').val();
+            console.log(item, " = ", val);
+            if (item === "enable" && val === "사용")
+                query_params += "&" + item + "=" + (val === "사용");
+            if (item === "name")
+                query_params += "&" + "search=" + val;
+            else if (val !== "") query_params += "&" + item + "=" + val;
+        });
+        console.log("query_params = ", query_params);
+
+        api_gp("/facilities/" + query_params, "GET", {}, (data) => {
+            mock(data);
+            // {#console.log('----------mock(data)_end-----------');#}
+        });
+    }
+
+    function equipment_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                list +=
+                    "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // factory dropdown
+        // TODO enable 사용 필터 리팩토링
+        api_gp("/codes_select/?group=104&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".factory_select");
+        });
+
+        // process dropdown
+        api_gp("/codes_select/?group=109&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".process_select");
+        });
+
+        // workshop dropdown
+        api_gp("/codes_select/?group=110&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".workshop_select");
+        });
+
+        // type dropdown
+        api_gp("/codes_select/?group=111&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".type_select");
+        });
+
+        // main table
+        equipment_load_table();
+    }
+
+    function equipment_get_form_data() {
+        let form = new FormData();
+
+        equip_columns.forEach((item) => {
+            if (item === "enable") {
+                form.append(
+                    item,
+                    $('#equipment_main-form [name="' + item + '"]').val() === "사용"
+                );
+            } else {
+                form.append(
+                    item,
+                    $('#equipment_main-form [name="' + item + '"]').val()
+                );
+            }
+        });
+
+        if (dwe && $(".dwe-image-delete").css("display") === "none") {
+            // 동원엔텍 이미지 처리
+            let fileSelector = document.getElementById("file-selector");
+            let file = fileSelector.files[0];
+            if (file === undefined) file = "";
+            form.append("dwe_image", file);
+            fileSelector.value = "";
+        }
+
+        return form;
+    }
+
+    function equipment_add() {
+        let data = equipment_get_form_data();
+        $.ajax({
+            type: "POST",
+            url: "/facilities/",
+            headers: {
+                Authorization: get_token(),
+            },
+            processData: false,
+            contentType: false,
+            data: data,
+        })
+            .done(function (json) {
+                alert("성공적으로 등록하였습니다.");
+                equipment_load_table();
+            })
+            .fail(function (xhr, status, errorThrown) {
+                // console.log(xhr, status, errorThrown);
+                console.log(xhr.responseText);
+                alert(xhr.responseText);
+            })
+            .always(function (xhr, status) {
+                console.log(xhr, status);
+            });
+    }
+
+    function equipment_edit() {
+        let data = equipment_get_form_data();
+        $.ajax({
+            type: "PATCH",
+            url: "/facilities/" + equip_id_idx + "/",
+            headers: {
+                Authorization: get_token(),
+            },
+            processData: false,
+            contentType: false,
+            data: data,
+        })
+            .done(function (json) {
+                alert("성공적으로 수정하였습니다.");
+                equipment_load_table();
+            })
+            .fail(function (xhr, status, errorThrown) {
+                // console.log(xhr, status, errorThrown);
+                console.log(xhr.responseText);
+                alert(xhr.responseText);
+            })
+            .always(function (xhr, status) {
+                console.log(xhr, status);
+            });
+    }
+
+    function equipment_remove() {
+        api_gp("/facilities/" + equip_id_idx + "/", "DELETE", {}, (data) => {
+            alert("성공적으로 삭제하였습니다.");
+            equipment_load_table();
+        });
+    }
+
+    let dwe = false;
+    $(function () {
+        refresh();
+
+        if (get_userinfo().enterprise_name === "(주)동원엔텍") dwe = true;
+        if (!dwe) {
+            $(".dwe_specific").css("display", "none");
+        } else {
+            equip_columns.push(
+                "dwe_admin_master",
+                "dwe_admin_vice",
+                "dwe_rating",
+                "dwe_making_country",
+                "dwe_making_number",
+                "dwe_price",
+                "dwe_kill_reason"
+            );
+            $(".dwe-image-delete").css("display", "none");
+            $("#equipment_data-table > thead > tr > th:nth-child(10)").text(
+                "자산번호"
+            );
+            $("#equipment_data-table > thead > tr > th:nth-child(4)").text(
+                "설비사양"
+            );
+            $(
+                "#equipment_main-form > div.row.no-gutters.w-100.mb-2 > div.col-11 > div:nth-child(3) > div:nth-child(3) > div.content-input-group-header > label"
+            ).text("자산번호");
+            $(
+                "#equipment_main-form > div.row.no-gutters.w-100.mb-2 > div.col-11 > div:nth-child(2) > div:nth-child(1) > div.content-input-group-header > label"
+            ).text("설비사양");
+        }
+
+        // Table export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#equipment_data-table"), "설비기준정보")
+        );
+    });
+
+    function refresh() {
+        equipment_init();
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

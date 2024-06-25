@@ -1,0 +1,454 @@
+<!DOCTYPE HTML>
+<html>
+<header>
+    {% include "header.html" %}
+</header>
+<body>
+
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {#{% block title %}#}
+{#    <title>대여품목 관리</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px" />
+  </div>
+    <!-- 검색 -->
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <form class="content-search row no-gutters align-items-center content-input-group" id="rental_item_search" onsubmit="return rental_item_search_submit(event)">
+                <div class="content-title col-1 align-self-stretch">
+                    검색
+                </div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3 px-0">
+                            <div class="content-input-group-header">
+                                <label>대여품목 코드</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control rental_item_code" name="rental_code_search">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3 px-0">
+                            <div class="content-input-group-header">
+                                <label>대여품목명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item-dropdown-product" name="rental_name_search">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3 px-0">
+                            <div class="content-input-group-header">
+                                <label>대여품 구분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control type-dropdown" name="rental_class_search">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3 px-0">
+                            <div class="content-input-group-header">
+                                <label>공장구분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control factory-dropdown" name="factory_class_search">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+<!-- {#                    <div class="row no-gutters">#}
+{#                        <div class="content-input-group col-3 px-0" style="display:none;"> <!-- 주석처리 -->#}
+{#                            <div class="content-input-group-header" style="background-color: darkgrey;">#}
+{#                                <label>모델명</label>#}
+{#                            </div>#}
+{#                            <div class="content-input-group-input">#}
+{#                                <select class="form-control model-dropdown" name="model_name_search">#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <div class="content-input-group col-3 px-0" style="display:none;"> <!-- 주석처리 -->#}
+{#                            <div class="content-input-group-header" style="background-color: darkgrey;">#}
+{#                                <label>버전</label>#}
+{#                            </div>#}
+{#                            <div class="content-input-group-input">#}
+{#                                <select class="form-control rev-dropdown" name="version_search">#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#}
+{##}
+{#                    </div>#} -->
+
+                </div>
+                <div class="col-1 px-0 ml-auto mt-2">
+                    <button class="btn button-search rounded-0 w-100 h-100">검색</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 내용 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <form class="content-content w-100" id="rental_item_detail">
+                <div class="row no-gutters w-100 mb-2">
+                    <div class="col-1 content-title">
+                        대여품 관리
+                    </div>
+                    <div class="col-11">
+                        <div class="row no-gutters">
+<!-- {#                            <div class="content-input-group col-3 px-0">#}
+{#                                <div class="content-input-group-header">#}
+{#                                    <label>대여품목 코드</label>#}
+{#                                </div>#}
+{#                                <div class="content-input-group-input">#}
+{#                                    <select class="form-control" name="rental_code" id="rental_code">#}
+{#                                    </select>#}
+{#                                </div>#}
+{#                            </div>#} -->
+                            <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>대여품목명</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select class="form-control item-dropdown-product" name="rental_name">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>대여품 구분</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select class="form-control type-dropdown" name="rental_class">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>공장구분</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select class="form-control factory-dropdown" name="factory_class">
+                                    </select>
+                                </div>
+                            </div>
+<!-- {#                            <div class="content-input-group col-3 px-0" style="display:none;"> #}
+{#                                <div class="content-input-group-header" style="background-color: darkgrey;">#}
+{#                                    <label>모델명</label>#}
+{#                                </div>#}
+{#                                <div class="content-input-group-input">#}
+{#                                    <select class="form-control model-dropdown" name="model_name">#}
+{#                                    </select>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                            <div class="content-input-group col-3 px-0" style="display:none;"> #}
+{#                                <div class="content-input-group-header" style="background-color: darkgrey;">#}
+{#                                    <label>버전</label>#}
+{#                                </div>#}
+{#                                <div class="content-input-group-input">#}
+{#                                    <select class="form-control rev-dropdown" name="version">#}
+{#                                    </select>#}
+{#                                </div>#}
+{#                            </div>#} -->
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>시리얼 넘버</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="serial">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>주의사항</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="caution">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-2">
+                                <div class="content-input-group-header">
+                                    <label>평균 대여기간</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="days">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end ml-auto">
+                        <div class="col pl-2 pr-0">
+                            <a class="btn button-custom2 w-100" role="button" onclick="rental_item_add()">추가</a>
+                        </div>
+                        <div class="col pl-2 pr-0">
+                            <a class="btn button-custom2 w-100" role="button" onclick="rental_item_edit()">수정</a>
+                        </div>
+                        <div class="col pl-2 pr-0">
+                            <a class="btn button-custom2 w-100" role="button" onclick="rental_item_remove()">삭제</a>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-table col-12">
+                <table class="table table-sm text-center" style="min-width: 1300px;" id="rental_item_data-table">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>대여품목코드</th>
+                        <th>대여품목명</th>
+                        <th>모델명</th>
+<!-- {#                        <th>버전</th>#} -->
+                        <th>시리얼 넘버</th>
+                        <th>대여품 구분</th>
+                        <th>공장 구분</th>
+                        <th>대여시 주의사항</th>
+                        <th>평균 대여기간</th>
+                        <th>대여품 등록인</th>
+                        <th>대여품 등록일</th>
+                    </tr>
+                    </thead>
+                    <tbody id="rental_item_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <label class="mb-0">(<strong id="rental_item_table_row">0</strong>) 건 로딩</label>
+        </div>
+    </div>
+    <script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/api_rental.js' %}" type="text/javascript"></script>
+    <script>
+        var rental_item_id_idx; // 임시
+            // {#let id_idx;#}
+
+
+        // {#function rental_ite
+            
+
+        $(function () {
+            refresh();
+
+            // Table Export
+            $(parent.document).find("#excel-export").click(() => init_excel_export($('#rental_item_data-table'), '대여품목관리'));
+        });
+
+        function refresh() {
+
+            // {#// 대여품목 코드#}
+            // {#api_gp('/rental/master/', 'GET', {}, (data) => {#}
+            //     {#console.log(data);#}
+            // {#    rental_item_makeOptions(data, false, 'id', 'id', 'code', $('#rental_item_search .rental_item_code'));#}
+            // {# });#}
+
+            // {#// 대여품목명#}
+            // {#api_gp('/rental/master/', 'GET', {}, (data) => {#}
+            // {#    console.log(data);#}
+            // {#    rental_item_makeOptions(data, false, 'item.name', 'item.name', 'code', $('#rental_code'));#}
+            // {# }, handle_error, (xhr, status) => {});#}
+
+             // table GET
+            rental_item_load_table();
+
+            rental_item_init();
+        }
+
+        function rental_item_search_submit(e) {
+        e.preventDefault();
+        var myform = document.forms['rental_item_search'];
+        var my_arr = [];
+        my_arr.push(myform['rental_code_search'].value);
+        my_arr.push(myform['rental_name_search'].value);
+        // {#my_arr.push(myform['model_name_search'].value);#}
+        // {#my_arr.push(myform['version_search'].value);#}
+        my_arr.push(myform['rental_class_search'].value);
+        my_arr.push(myform['factory_class_search'].value);
+        // {#console.table(my_arr);#}
+
+        rental_master_search(my_arr, (data) => {
+            rental_item_draw_table(data);
+        });
+
+        return false;
+    }
+
+        function rental_item_load_table() {
+            rental_master_list((data) => {
+                rental_item_draw_table(data);
+            });
+        }
+    function rental_item_draw_table(data) {
+    // {#console.log(data);#}
+
+    $('#rental_item_table_row').text(data.length); // 로딩된 데이터 갯수 세기
+    // {#console.table(data);#}
+    let rows = "";
+    let list_num = 1;
+    for (let i = 0; i < data.length; i++) {
+        let item = data[i];
+        let created_date = item.created_at;
+        let updated_date = item.updated_at;
+
+        // append it
+        let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+        row += "<td>" + (list_num++) + "</td>";
+        row += "<td name='rental_code'>" + item.code + "</td>";
+        row += "<td name='rental_name' property='" + (item.item ? item.item.id : "") + "'>" + (item.item ? item.item.name : "") + "</td>";
+        row += "<td name='model'>" + (item.item.model ? item.item.model.name : "") + "</td>";
+        // {#row += "<td name='version'>" + (item.item ? item.item.version.name : "") + "</td>";#}
+        row += "<td name='serial'>" + item.serial + "</td>";
+        row += "<td name='rental_class' property='" + (item.rental_class ? item.rental_class.id : "") + "'>" + (item.rental_class ? item.rental_class.name : "") + "</td>";
+        row += "<td name='factory_class' property='" + (item.factory_class ? item.factory_class.id : "") + "'>" + (item.factory_class.name ? item.factory_class.name : "") + "</td>";
+        row += "<td name='caution'>" + item.caution + "</td>";
+        row += "<td name='days'>" + item.days + "</td>";
+        row += "<td name='created_by'>" + item.created_by + "</td>";
+        row += "<td name='created_at'>" + created_date.substring(0, 4) + "-" + created_date.substring(5, 7) + "-" + created_date.substring(8, 10) + "</td>";
+
+        // {#row += "<td class='d-none' name='rental_name_id'>" + item.item.id + "</td>";#}
+        // {#row += "<td class='d-none' name='rental_class_id'>" + (item.rental_class ? item.rental_class.id : "") + "</td>";#}
+        // {#row += "<td class='d-none' name='factory_class_id'>" + (item.factory_class ? item.factory_class.id : "") + "</td>";#}
+
+        row += "</tr>";
+
+        rows += row;
+    }
+    spinner();
+    $('#rental_item_tbody').html(rows);
+    $('#rental_item_tbody > tr').on('click', function () {
+        $("#rental_item_detail [name='rental_code']").val($(this).find("[name='rental_code']").text()).trigger('change');
+        $("#rental_item_detail [name='rental_name']").val($(this).find("[name='rental_name']").attr('property')).trigger('change');
+        // {#$("#rental_item_detail [name='model_name']").val($(this).find("[name='model_name']").text()).trigger('change');#}
+        // {#$("#rental_item_detail [name='version']").val($(this).find("[name='version']").text()).trigger('change');#}
+        $("#rental_item_detail [name='rental_class']").val($(this).find("[name='rental_class']").attr('property')).trigger('change');
+        $("#rental_item_detail [name='factory_class']").val($(this).find("[name='factory_class']").attr('property')).trigger('change');
+        $("#rental_item_detail [name='serial']").val($(this).find("[name='serial']").text());
+        $("#rental_item_detail [name='caution']").val($(this).find("[name='caution']").text());
+        $("#rental_item_detail [name='days']").val($(this).find("[name='days']").text());
+        rental_item_id_idx = $(this).attr('id');
+
+        // table click highlight
+        $(this).parent().find('tr').removeClass('clicked');
+        $(this).addClass('clicked');
+    });
+
+    //Table pagination
+    $('.pagination-container').remove();
+    $('.table tbody').paginathing();
+}
+
+
+  function rental_item_init() {
+    function make_dropdown(data, selectors) {
+        let list = "<option value=''>선택</option>";
+        if (selectors.includes('.rental_item_code')) {
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                list += "<option value='" + item.id + "'>" + item.code + "</option>";
+            }
+        } else {
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                list += "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+        }
+
+        $(selectors).html(list);
+        $(selectors).select2({
+            width: '100%',
+        });
+    }
+    // 대여품목 코드
+    api_gp('/rental/master/', 'GET', {}, (data) => {
+        // {#console.log(data);#}
+        make_dropdown(data,'#rental_item_search .rental_item_code');
+    });
+
+    api_gp('/items_select/', 'GET', {}, (data) => {
+        make_dropdown(data, '#rental_item_search .item-dropdown-product, #rental_item_detail .item-dropdown-product');
+    });
+
+    api_gp('/codes_select/?group=116&enable=true', 'GET', {}, (data) => {
+        make_dropdown(data, '#rental_item_search .model-dropdown, #rental_item_detail .model-dropdown');
+    });
+
+    api_gp('/codes_select/?group=117&enable=true', 'GET', {}, (data) => {
+        make_dropdown(data, '#rental_item_search .rev-dropdown, #rental_item_detail .rev-dropdown');
+    });
+
+    api_gp('/codes_select/?group=104&enable=true', 'GET', {}, (data) => {
+        make_dropdown(data, '#rental_item_search .factory-dropdown, #rental_item_detail .factory-dropdown');
+    });
+
+    api_gp('/codes_select/?group=122&enable=true', 'GET', {}, (data) => {
+        make_dropdown(data, '#rental_item_search .type-dropdown, #rental_item_detail .type-dropdown');
+    });
+
+}
+
+
+    function rental_item_get_form_data() {
+        return {
+            item: $("#rental_item_detail [name='rental_name']").val(),
+            rental_class: $("#rental_item_detail [name='rental_class']").val(),
+            factory_class: $("#rental_item_detail [name='factory_class']").val(),
+            serial: $("#rental_item_detail [name='serial']").val(),
+            caution: $("#rental_item_detail [name='caution']").val(),
+            days: $("#rental_item_detail [name='days']").val()
+        };
+    }
+
+    function rental_item_add() {
+        let data = rental_item_get_form_data();
+        api_gp('/rental/master/', 'POST', data, (data) => {
+            alert("성공적으로 등록하였습니다.");
+            rental_item_load_table();
+        });
+    }
+
+    function rental_item_edit() {
+        let data = rental_item_get_form_data();
+        // {#console.log(rental_item_id_idx);#}
+        // {#console.table(data);#}
+        api_gp('/rental/master/' + rental_item_id_idx + '/', 'PATCH', data, (data) => {
+            alert("성공적으로 수정하였습니다.");
+            rental_item_load_table();
+        });
+    }
+
+    function rental_item_remove() {
+        let data = rental_item_get_form_data();
+        api_gp('/rental/master/' + rental_item_id_idx + '/', 'DELETE', data, (data) => {
+            alert("성공적으로 삭제하였습니다.");
+            rental_item_load_table();
+        });
+    }
+
+
+    function spinner(){
+     $("#spinner").remove();
+    }
+    </script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

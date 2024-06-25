@@ -1,0 +1,232 @@
+{% include 'header.html' %}
+{% load static %}
+<div class="card m-2">
+    <div class="card-body p-2">
+        <div class="row no-gutters">
+            <div class="col-2 form-control text-center" id="bom_code"></div>
+            <div class="col-2 form-control text-center" id="product_name"></div>
+        </div>
+    </div>
+</div>
+<div class="card m-2">
+    <div class="card-body p-2">
+            <form
+                class="content-search row no-gutters align-items-center content-input-group"
+                id="material_input_main-search-form"
+            >
+                <div class="content-title col-1 align-self-stretch">검색</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-11 px-0">
+                            <div class="content-input-group-header">
+                                <label>입고기간</label>
+                            </div>
+                            <div class="input-group input-daterange">
+                                <input
+                                        type="text"
+                                        class="form-control created_at_after datepicker"
+                                        id="fr_date"
+                                        autocomplete="off"
+                                />
+                                <div class="input-group-addon px-3">~</div>
+                                <input
+                                        type="text"
+                                        class="form-control created_at_before datepicker"
+                                        id="to_date"
+                                        autocomplete="off"
+                                />
+                            </div>
+                        </div>
+                        <div class="col-1 px-0">
+                            <button
+                                    class="btn button-search rounded-0 w-100 h-100"
+                                    type="submit"
+                            >
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+    </div>
+</div>
+<div class="card m-2">
+    <div class="card-body p-2">
+            <div class="content-table col-12 p-2" style="height: auto">
+                <table class="table table-sm text-center" style="min-width: 800px;">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>작업날짜</th>
+                        <th>작업수량</th>
+                        <th>불량수량</th>
+                        <th>첨부파일</th>
+                        <th>비고</th>
+                    </tr>
+                    </thead>
+                    <tbody id="log_lookup_detail_tbody">
+                    </tbody>
+                </table>
+
+                <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                     style="margin-top: -20px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row no-gutters d-flex justify-content-end">
+    <div class="col-2 px-0 mr-2">
+        <button
+                type="button"
+                class="btn button-custom2 w-100"
+                id="delete"
+        >
+            작업일지 삭제
+        </button>
+    </div>
+</div>
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let columns = ['level', 'item', 'part', 'part_num', 'capacity', 'size', 'voltage', 'band',
+    'unit', 'tnb', 'lnr', 'required_amount', 'location', 'manufacturer', 'customer', 'etc',
+        'weight', 'standard', 'package', 'storage', 'item_name' ];
+    console.log(window.opener.$('#bom-lookup-tbody .clicked').attr('id'));
+    let id_BOM = window.opener.$('#bom-lookup-tbody .clicked').attr('id');
+    let now_tr = window.opener.$('#bom-lookup-tbody #' + id_BOM);
+    let now_tr_details = window.opener.$('#bom-lookup-tbody #' + id_BOM).data('details');
+    let log_id = null;
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+
+    let nation1 = new Pnations(nation_data1, log_search);  // 인스턴스 명
+
+    $('#bom_code').html(window.opener.$('#bom-lookup-tbody .clicked [name=bom_number]').text())
+    $('#product_name').html(window.opener.$('#bom-lookup-tbody .clicked [name=product_name]').text())
+
+    $("#material_input_main-search-form").submit(function (e) {
+        e.preventDefault();
+        nation1.page = 1;
+        log_search();
+    });
+
+    $('#delete').on('click', function (e) {
+        e.preventDefault();
+
+        if (log_id == null){
+            alert('작업일지를 선택해 주세요.')
+            return
+        }
+
+        let ans = confirm('작업일지를 삭제하시겠습니까?');
+
+        if (ans) {
+            api_delete_BOMlog(log_id, ()=>{
+                alert('삭제되었습니다')
+                refresh()
+            })
+        }
+    })
+
+    refresh()
+
+    function refresh() {
+        log_search();
+        log_id = null;
+    }
+
+    function log_search() {
+        let fr_date = $("#fr_date").val();
+        let to_date = $("#to_date").val();
+
+        let query = "?page=" + nation1.page + "&master=" + id_BOM + "&";
+
+        if (fr_date == null || fr_date == '') {
+        } else {
+            query += "fr_date=" + fr_date + "&";
+        }
+
+        if (to_date == null || to_date == ''){
+        } else {
+            query += "to_date=" + to_date + "&";
+        }
+
+        api_gp("/bom/log/" + query, "GET", {}, (data) => {
+            draw_log_table(data);
+        });
+    }
+
+    function draw_log_table(done) {
+            console.table(done);
+            $('#table_row-detail').text(done.length); // 로딩된 데이터 갯수 세기
+
+            let data = done.results;
+
+            let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+            let rows = "";
+
+            // 테이블 동적생성
+
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+
+                let row = "<tr id='" + item.id + "'>"
+                row += "<td>" + (num+i) + "</td>"
+                row += "<td name='work_date'>" + (item.work_date ? item.work_date : '') + "</td>"
+                row += "<td name='amount'>" + (item.amount ? item.amount.toLocaleString() : 0) + "</td>"
+                row += "<td name='faulty_amount'>" + (item.faulty_amount ? item.faulty_amount.toLocaleString() : 0) + "</td>"
+                row += "<td name='file' style='border-left: none' class='align-middle'>" + (nullapply(item.file) ? "<a href='" + nullapply(item.file) + "' onclick=\"window.open(this.href, '_blank', 'width=800, height=600'); return false;\"><img src='../../../static/img/pdf_icon.png' width='20' height='20'></a>" : "") + "</td>";
+                row += "<td name='etc'>" + item.etc + "</td>"
+                row += "</tr>"
+                rows += row;
+            }
+            nation1.nation_display(done);
+            $('#log_lookup_detail_tbody').html(rows);
+
+            if (log_id != null){
+                $("#" + log_id).addClass('clicked');
+            }
+
+            $('#log_lookup_detail_tbody > tr').on('click', function () {
+                // table click highlight
+                $(this).parent().find('tr').removeClass('clicked');
+                $(this).addClass('clicked');
+
+                log_id = $(this).attr('id');
+            })
+
+        }
+
+    function api_delete_BOMlog(log_id, done_callback) {
+    $.ajax({
+        type: "delete",
+        url: "/bom/log/" + log_id + "/",
+        headers: {
+        "Authorization": get_token()     // TODO: improve when replace it with something other one
+        },
+        xhrFields: {withCredentials: true},
+    })
+        .done(function () {
+            // add cookie
+            done_callback();
+        })
+        .fail(handle_error);
+    }
+
+</script>

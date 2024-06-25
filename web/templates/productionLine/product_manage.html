@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} {##} {#{% block title %}#} {#
+    <title>온습도 모니터링 장비관리</title>#} {#{% endblock title %}#}
+    block content %}#} -->
+
+{% comment %}<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>{% endcomment %}
+
+<!-- 내용 -->
+<form class="card m-2" id="monitoring_manage_main-form">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-content w-100">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">장비등록</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>장비명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="device_id"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>데이터 주소<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="mac_id"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>공장명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control factory_select"
+                                        id="factory_id"
+                                ></select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>작업장</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control work_select"
+                                        id="workshop_id"
+                                ></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>모델명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="model_id"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-9">
+                            <div class="content-input-group-header">
+                                <label>기타</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="etc_id"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters w-100 justify-content-end">
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="refresh_data(); return false;"
+                    >
+                        초기화
+                    </button>
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="add(); return false;"
+                    >
+                        등록
+                    </button>
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="modify(); return false;"
+                    >
+                        수정
+                    </button>
+                </div>
+                <div class="col-1 px-0">
+                    <button
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="remove(); return false;"
+                    >
+                        삭제
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:420px;">
+            <table
+                    id="manage_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>장비명</th>
+                    <th>데이터 주소</th>
+                    <th>공장명</th>
+                    <th>작업장</th>
+                    <th>모델명</th>
+                    <th>등록일</th>
+                    <th>기타</th>
+                </tr>
+                </thead>
+                <tbody id="manage_tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let device_id = null;
+
+    $(function () {
+        refresh();
+
+        // Table export
+    });
+
+
+    function refresh() {
+        init_drop_down();
+        init_manage_table();
+    }
+
+
+    function init_drop_down() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택 및 검색</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                list +=
+                    "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // 공장명
+        api_gp("/codes_select/?group=104&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".factory_select");
+        });
+
+        // 작업장
+        api_gp("/codes_select/?group=110&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".work_select");
+        });
+    }
+
+
+    function init_manage_table() {
+        api_gp("/production/device", "GET", {}, (done) => {
+            load_manage_table(done);
+        });
+    }
+
+
+    function load_manage_table(done){
+        console.table(done);
+
+        let rows = "";
+        let list_num = 1;
+
+        for (let i = 0; i < done.length; i++) {
+            let item = done[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (list_num++) + "</td>";  // 순번
+            row += `<td data-toggle='tooltip' title=${item.device} name='device'>` + (item.device.length > 10 ? item.name.slice(0,10)+ "..." : item.device) + "</td>";  // 장비명
+            row += `<td data-toggle='tooltip' title=${item.mac} name='mac'>` + (item.mac.length > 10 ? item.mac.slice(0,10)+ "..." : item.mac) + "</td>";  // MAC Adds
+
+
+            row += "<td name='factory' property='" + (item.factory_id ? item.factory_id : "") + "'>"
+                + (item.factory_id ? item.factory_name : "") + "</td>";  // 공장명
+
+            row += "<td name='workshop' property='" + (item.workshop_id ? item.workshop_id : "") + "'>"
+                + (item.workshop_id ? item.workshop_name : "") + "</td>";  // 작업장
+
+            row += `<td data-toggle='tooltip' title=${nullapply(item.model)} name='model'>` + (item.model ? item.model.length >10 ? item.model.slice(0,10) +"...": item.model: "") + "</td>";  // 모델명
+            row += "<td name='created_at'>" + item.created_at + "</td>";  // 등록일
+            row += "<td name='etc'>" + (item.etc ? item.etc : "") + "</td>";  // 기타
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        $('#manage_table + .pagination-container').remove();
+        $(function () {
+            //Table pagination
+            $('#manage_tbody').paginathing({
+                perPage: 10,
+                insertAfter: "#manage_table"
+            });
+        });
+
+        device_id = null;
+
+        $('#manage_tbody').html(rows);
+        $('#manage_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            device_id = $(this).attr("id");
+
+            $('#device_id').val( $(this).find("[name='device']").attr('title'));
+            $('#mac_id').val( $(this).find("[name='mac']").attr('title') );
+
+            $("#factory_id").val($(this).find("[name=factory]").attr("property")).trigger("change");
+            $("#workshop_id").val($(this).find("[name=workshop]").attr("property")).trigger("change");
+
+            $('#model_id').val( $(this).find("[name='model']").attr('title') );
+            $('#etc_id').val( $(this).find("[name='etc']").text() );
+        });
+    }
+
+
+    function refresh_data(){
+        $('#device_id').val("");
+        $('#mac_id').val("");
+
+        $("#factory_id").val(null).trigger("change");
+        $("#workshop_id").val(null).trigger("change");
+
+        $('#model_id').val("");
+        $('#etc_id').val("");
+
+        init_manage_table();
+    }
+
+
+    function add(){
+        if ($('#device_id').val() == "") {
+            alert("장비명을 작성해 주세요.");
+            return;
+        }
+
+        if ($('#mac_id').val() == "") {
+            alert("MAC ADDS를 작성해 주세요.");
+            return;
+        }
+
+        let data = get_data();
+
+        api_gp("/production/device/", "POST", data, (done) => {
+            alert("성공적으로 등록하였습니다.");
+            init_manage_table();
+        });
+    }
+
+
+    function modify(){
+        if (device_id == null){
+            alert("장비를 먼저 선택해 주세요.");
+            return;
+        }
+
+        if ($('#device_id').val() == "") {
+            alert("장비명을 작성해 주세요.");
+            return;
+        }
+
+        if ($('#mac_id').val() == "") {
+            alert("MAC ADDS를 작성해 주세요.");
+            return;
+        }
+
+        let data = get_data();
+
+        api_gp("/production/device/" + device_id + "/", "PATCH", data, (done) => {
+            alert("성공적으로 수정하였습니다.");
+            init_manage_table();
+        });
+    }
+
+
+    function remove() {
+        if (device_id == null){
+            alert("장비를 먼저 선택해 주세요.");
+            return;
+        }
+
+        api_gp("/production/device/" + device_id + "/", "DELETE", {}, (done) => {
+            alert("성공적으로 삭제하였습니다.");
+            refresh_data();
+        });
+    }
+
+
+    function get_data() {
+        let device = $('#device_id').val();
+        let mac = $('#mac_id').val();
+
+        let factory = $('#factory_id').val();
+        let workshop = $('#workshop_id').val();
+
+        let model = $('#model_id').val();
+        let etc = $('#etc_id').val();
+
+
+        return {
+            device: device,
+            mac: mac,
+
+            factory : factory,
+            workshop : workshop,
+
+            model : model,
+            etc : etc,
+        };
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

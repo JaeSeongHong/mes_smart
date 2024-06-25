@@ -1,0 +1,157 @@
+{% load static %}
+
+<script>
+    let toggle = true;
+
+    function toggle_click() {
+        //console.log("버튼을 누르셨습니다.");
+        if (toggle == true) {
+            let msg = tabID + "," + "fold";
+
+            $('#mes_toggle').val(msg);
+            {#$("#mes_toggle").hide();#}
+
+            $("#toggle").text("+");
+            $("#sub_detail").hide();
+            toggle = false;
+
+        } else {
+            let msg = tabID + "," + "spread";
+            $('#mes_toggle').val(msg);
+            {#$("#mes_toggle").show();#}
+
+            $("#toggle").text("-");
+            $("#sub_detail").show();
+            toggle = true;
+        }
+    }
+
+</script>
+
+
+    <div class="sidebar-menu">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <a href="#"><img src="{% static 'srtdash/assets/images/icon/img.png' %}" alt="logo" id="logo"></a>
+                </div>
+            </div>
+            <div class="main-menu">
+                <div class="menu-inner">
+                    <nav>
+                        <ul class="metismenu" id="menu">
+
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+
+</div>
+
+
+
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+
+<script>
+
+    $(document).ready(function () {
+        // 로고이미지 변경
+        let e_id = get_cookie("enterprise_id");
+        if (e_id === "1"){
+
+        }else{
+            let tmp = "{% static 'srtdash/assets/images/icon/img.png' %}"
+            tmp = tmp.replace("img", e_id);
+
+            $(".logo img").attr("src", tmp);
+        }
+
+        //메뉴 그리기
+        getMenuList();
+
+    });
+
+function getMenuList() {
+
+    api_gp(`/getMenulist/`, "GET", {}, (done) => {
+          menuDraw(done);
+                })
+
+    }
+
+function menuDraw(menuData) {
+    let row = '';
+    let rows = '';
+
+    for (let i = 0; i < menuData.length; i++) {
+        let unit = menuData[i];
+
+        if(unit.type === "L"){
+            if(i > 0){
+                row += "</ul></li>"
+            }
+
+            if(i == 0){
+                row += '<li class="active" data-target="#sub-menu-1" aria-expanded="true">'
+            }else{
+                row += '<li data-target="#sub-menu-' + i + '" aria-expanded="false">'
+            }
+
+            row += '<a href="javascript:void(0)"><i class="' + unit.i_class + '"> </i><span>'+unit.name +'</span></a>';
+
+            if(i==0){
+                row += '<ul id="sub-menu-1"  class="">'
+            }else{
+                row += '<ul id="sub-menu-' + i + '" class="collapse">'
+            }
+
+            // Add the `collapse` class to the created element
+            //row = $(row).addClass('collapse').prop('outerHTML');
+        }else{
+            if(i == 1){
+                row += '<li class="'+unit.code+'">'
+            }else{
+                row += '<li class="'+unit.code+'">'
+            }
+            row += "<a href='#' onclick='url_click(\"" + unit.path + "\", \"" + unit.code + "\");'>" + unit.name + "</a></li>";
+        }
+    };
+
+    rows += row;
+    rows += "</ul></li>";
+    $("#menu").html(rows);
+
+    // 부모 li 태그를 클릭할 때마다 aria-expanded 속성 값 변경
+    $('li[data-target]').on('click', function() {
+        let isExpanded = $(this).attr('aria-expanded') === 'true';
+        $(this).attr('aria-expanded', !isExpanded);
+        let active = $(this).attr('class') === 'active';
+        if (active){
+            $(this).attr('class', '')
+        }else {
+            $(this).attr('class', 'active')
+        }
+
+        let tar = $(this).attr('data-target');
+
+        if($(tar).hasClass('collapse')){
+
+            $(tar).removeClass('collapse')
+            }else{
+                $(tar).addClass('collapse')
+
+            }
+    });
+
+    $('li:not([data-target])').on('click', function() {
+              let parentUl = $(this).closest('ul');
+              if (parentUl.hasClass('collapse')) {
+                parentUl.removeClass('collapse');
+              } else {
+                parentUl.addClass('collapse');
+              }
+            });
+}
+
+
+</script>

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+{# 외주등록 #}
+
+{% load static %}
+
+<body style="overflow: hidden;">
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="content-title col-1 align-self-stretch">검색</div>
+            <form id="search_form" class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>거래처</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control customer_search"
+                                    id="customer_search"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>출고일자</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <div class="input-group input-daterange">
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="out_from"
+                                        autocomplete="off"
+                                />
+                                <div class="input-group-addon px-3">~</div>
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="out_to"
+                                        autocomplete="off"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>품명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control item_search"
+                                    id="item_search"></select>
+                        </div>
+                    </div>
+
+                    <div class="col-1 px-0">
+                        <button
+                                class="btn button-search rounded-0 w-100 h-100"
+                                type="button"
+                                onclick="return search_submit(event);"
+                        >
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 외주항목 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <div class="row no-gutters w-100 mb-2">
+            <div class="col-1 content-title">외주항목</div>
+            <div class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>품번<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control item_code"
+                                    id="item_code"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>품명<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control item_name"
+                                    id="item_name"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>품명상세</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="item_detail"/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>자재구분</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="item_division"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>출고수량<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="item_quantity" onkeyup="_chkNumber(this, 3)"/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>출고일자<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control datepicker" id="item_out_date"/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>거래처<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input d-flex">
+                            <select
+                                    class="form-control customer_search"
+                                    id="item_customer"></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>비고</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="item_remark"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="row no-gutters w-100 mt-3 justify-content-end">
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="refresh_data();"
+                >
+                    초기화
+
+                </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="add();"
+                >
+                    출고등록
+                </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="modify();"
+                >
+                    출고수정
+                </button>
+            </div>
+            <div class="col-1 px-0">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="remove();"
+                >
+                    출고삭제
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 상세 항목 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: scroll; height:253px;">
+            <table
+                    id="outsourcing_table"
+                    class="table table-sm text-center"
+            >
+                <thead id="outsourcing_out_thead">
+                <tr>
+                    <th>순번</th>
+                    <th>외주번호</th>
+                    <th>거래처</th>
+                    <th>출고일자</th>
+                    <th>품번</th>
+                    <th>품명</th>
+                    <th>품명상세</th>
+                    <th>자재구분</th>
+                    <th>출고수량</th>
+                    <th>비고</th>
+                </tr>
+                </thead>
+                <tbody id="outsourcing_out_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let outsourcing_item_id = null;
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+
+    let nation1 = new Pnations(nation_data1, search);  // 인스턴스 명
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $(function () {
+        let now = new Date();
+        let first_date = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        $("#make_from").datepicker("setDate", first_date);
+        $("#make_to").datepicker("setDate", "today");
+
+        refresh();
+
+        // Table export
+        {% comment %}
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#detail_table"), "거래처기준정보")
+        );
+        {% endcomment %}
+    });
+
+
+    function refresh() {
+        nation1.page = 1;
+        init_drop_down();
+        search();
+    }
+
+    function reset_item_info() {
+        $("#item_code").val(null).trigger("change").attr('disabled', false);  // 품번
+        $("#item_name").val(null).trigger("change").attr('disabled', false);  // 품명
+        $("#item_detail").val("");  // 품명상세
+        $("#item_division").val("");  // 단위
+        $("#item_quantity").val("");  // 수량
+        $("#item_out_date").val("");  // 단가
+        $('#item_customer').val(null).trigger("change");
+        $("#item_remark").val("");  // 비고
+    }
+
+    function reset_other_data() {
+        outsourcing_item_id = null;
+        reset_item_info();
+    }
+
+
+    function search(){
+        let customer_search = $('#customer_search :selected').val();
+        if (customer_search === undefined || customer_search === null) customer_search = ''
+
+        let out_from = $("#out_from").val();
+        let out_to = $("#out_to").val();
+
+        let item_name = $("#item_search :selected").val();
+
+        let query = "?page=" + nation1.page + "&";
+        if (customer_search === ''){} else query += "customer=" + customer_search + "&";
+
+        if (out_from === ''){} else query += "out_from=" + out_from + "&";
+        if (out_to === ''){} else query += "out_to=" + out_to + "&";
+
+        if (item_name === '' || item_name === undefined){} else query += "item_name=" + item_name + "&";
+
+        api_gp("/outsourcings/" + query + "/", "GET", {}, (done) => {
+            load_list_table(done);
+        });
+    }
+
+
+    function load_list_table(done) {
+        console.table(done)
+        let rows = "";
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+        let data = done.results;
+        {#console.log(data);#}
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num+i) + "</td>";  // 순번
+
+            row += "<td name='outsourcing_code'>" + item.outsourcing_code + "</td>";
+
+            row += "<td class='d-none' name='customer_id'>" + item.customer.id + "</td>";
+            row += "<td name='customer_name'>" + item.customer.name + "</td>";
+
+            row += "<td name='out_at'>" + item.out_date + "</td>";
+
+            row += "<td class='d-none' name='item_id'>" + item.item.id + "</td>";  // 품번 id
+            row += "<td name='item_code'>" + item.item.code + "</td>";
+            row += "<td name='item_name'>" + item.item.name + "</td>";
+
+            row += "<td name='item_detail'>" + (item.item_detail ? item.item_detail : '') + "</td>";
+            row += "<td name='item_division'>" +  (item.item_division ? item.item_division : '') + "</td>";
+            row += "<td name='out_quantity'>" + item.quantity + "</td>";
+            row += "<td name='remarks'>" + (item.remarks ? item.remarks : '') + "</td>";  // 작성자
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+
+        if (outsourcing_item_id != null){
+            $('#outsourcing_out_tbody #' + outsourcing_item_id).addClass('clicked')
+        }
+
+        $('#outsourcing_out_tbody').html(rows);
+        $('#outsourcing_out_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            outsourcing_item_id = $(this).attr('id')
+
+            $("#item_code").val($(this).find('[name=item_id]').text()).trigger("change").attr('disabled', true);  // 품번
+            $("#item_name").val($(this).find('[name=item_id]').text()).trigger("change").attr('disabled', true);  // 품명
+            $("#item_detail").val($(this).find('[name=item_detail]').text());  // 품명상세
+            $("#item_division").val($(this).find('[name=item_division]').text());
+            $("#item_quantity").val($(this).find('[name=out_quantity]').text());  // 수량
+            $("#item_out_date").val($(this).find('[name=out_at]').text());
+            $('#item_customer').val($(this).find('[name=customer_id]').text()).trigger("change");
+            $("#item_remark").val($(this).find('[name=remarks]').text());  // 비고
+        });
+    }
+
+    function init_drop_down() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === ".item_code") {
+                    list +=
+                        "<option value='" + item.id + "'" +
+                        " data-detail='" + (item.detail ? item.detail : "") + "'" +  // 품명상세
+                        " data-unit='" + (item.unit ? item.unit.name : "") + "'" +  // 단위
+                        "'>" + item.code + "</option>";
+                } else if (selectors === ".item_name") {
+                    list +=
+                        "<option value='" + item.id + "'" +
+                        " data-detail='" + (item.detail ? item.detail : "") + "'" +  // 품명상세
+                        " data-unit='" + (item.unit ? item.unit.name : "") + "'" +  // 단위
+                        "'>" + item.name + "</option>";
+                } else if (selectors === ".item_search") {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                } else {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // 거래처 코드
+        api_gp('/customers_part/', 'GET', {}, (done) => {
+            make_dropdown(done, ".customer_search");
+        });
+
+        // 품번, 품명
+        api_gp("/items_part/", "GET", {}, (done) => {
+            make_dropdown(done, ".item_code");
+            make_dropdown(done, ".item_name");
+            make_dropdown(done, ".item_search");
+            // console.table(done);
+
+            $('#item_code').on('select2:select', function (e) {  // 품번 선택시
+                let select2_data = e.params.data;
+                if (select2_data.id === '') {
+                    reset_item_info();
+
+                } else {
+                    let id = $(this).val();
+                    $("#item_name").val(id).trigger('change');
+
+                    let detail = $(this).find("option:selected").data("detail");  // 품명상세
+                    $("#item_detail").val(detail).trigger('change');
+
+                    let unit = $(this).find("option:selected").data("unit");  // 품명단위
+                    $("#item_unit").val(unit).trigger('change');
+                }
+            });
+
+            $('#item_name').on('select2:select', function (e) {
+                let select2_data = e.params.data;
+                if (select2_data.id === '') {
+                    reset_item_info();
+
+                } else {
+                    let id = $(this).val();
+                    $("#item_code").val(id).trigger('change');
+
+                    let detail = $(this).find("option:selected").data("detail");  // 품명상세
+                    $("#item_detail").val(detail).trigger('change');
+
+                    let unit = $(this).find("option:selected").data("unit");  // 품명단위
+                    $("#item_unit").val(unit).trigger('change');
+                }
+            });
+
+            spinner();
+        });
+    }
+
+    function getData(){
+        return {
+            item : $('#item_code').val(),
+            customer : $('#item_customer').val(),
+
+            item_detail : ($('#item_detail').val() ? $('#item_detail').val() : ''),
+            item_division : ($('#item_division').val() ? $('#item_division').val() : ''),
+
+            quantity : $('#item_quantity').val(),
+            remarks : ($('#item_remark').val() ? $('#item_remark').val() : ''),
+
+            out_date : $("#item_out_date").val(),
+
+            in_status : "",
+        }
+    }
+
+    function api_outsourcing_post(allData, done_callback){
+        $.ajax({
+            url: "/outsourcings/",
+            data: allData,
+            type: "POST",
+            headers: {
+                "Authorization": get_token()
+            },
+            xhrFields: {withCredentials: true},
+        })
+        .done(function (json) {
+            // add cookie
+            done_callback(json);
+        })
+        .fail(handle_error);
+    }
+
+    function api_outsourcing_patch(allData, done_callback){
+        $.ajax({
+            url: "/outsourcings/" + outsourcing_item_id + "/",
+            data: allData,
+            type: "PATCH",
+            headers: {
+                "Authorization": get_token()
+            },
+            xhrFields: {withCredentials: true},
+        })
+        .done(function (json) {
+            // add cookie
+            done_callback(json);
+        })
+        .fail(handle_error);
+    }
+
+    function api_outsourcing_delete(done_callback){
+        $.ajax({
+            url: "/outsourcings/" + outsourcing_item_id + "/",
+            data: {id: outsourcing_item_id},
+            type: "DELETE",
+            headers: {
+                "Authorization": get_token()
+            },
+            xhrFields: {withCredentials: true},
+        })
+        .done(function (json) {
+            // add cookie
+            done_callback(json);
+        })
+        .fail(handle_error);
+    }
+
+    function add(){
+        let item_code = $('#item_code').val()
+        if (item_code == null) {
+            alert('품번은 필수 입력 항목입니다.')
+            return
+        }
+
+        let item_name = $('#item_name').val()
+        if (item_name == null) {
+            alert('품명은 필수 입력 항목입니다.')
+            return
+        }
+
+        let item_quantity = $('#item_quantity').val()
+        if (item_quantity == null) {
+            alert('출고수량은 필수 입력 항목입니다.')
+           return
+        }
+
+        let item_out_date = $('#item_out_date').val()
+        if (item_out_date == null) {
+            alert('출고일자는 필수 입력 항목입니다.')
+            return
+        }
+
+        let item_customer = $('#item_customer').val()
+        if (item_customer == null) {
+            alert('거래처는 필수 입력 항목입니다.')
+            return
+        }
+
+        let data = getData()
+
+        api_outsourcing_post(data, (done)=>{
+            alert('등록되었습니다.');
+            search()
+        })
+    }
+
+    function modify(){
+        if (outsourcing_item_id == null){
+            alert('외주항목을 선택해 주세요.')
+            return
+        }
+
+        let item_code = $('#item_code').val()
+        if (item_code == null) {
+            alert('품번은 필수 입력 항목입니다.')
+            return
+        }
+
+        let item_name = $('#item_name').val()
+        if (item_name == null) {
+            alert('품명은 필수 입력 항목입니다.')
+            return
+        }
+
+        let item_quantity = $('#item_quantity').val()
+        if (item_quantity == null) {
+            alert('출고수량은 필수 입력 항목입니다.')
+           return
+        }
+
+        let item_out_date = $('#item_out_date').val()
+        if (item_out_date == null) {
+            alert('출고일자는 필수 입력 항목입니다.')
+            return
+        }
+
+        let item_customer = $('#item_customer').val()
+        if (item_customer == null) {
+            alert('거래처는 필수 입력 항목입니다.')
+            return
+        }
+
+        let data = getData()
+        data.id = outsourcing_item_id
+
+        console.log(data)
+
+        api_outsourcing_patch(data, (done)=>{
+            alert('수정되었습니다.');
+            search()
+        })
+    }
+
+    function remove(){
+        if (outsourcing_item_id == null){
+            alert('외주항목을 선택해 주세요.')
+            return
+        }
+
+        api_outsourcing_delete((done)=>{
+            alert('삭제되었습니다.');
+            search()
+        })
+    }
+
+    function refresh_data() {  // 초기화 (
+        search();
+        reset_other_data();
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+    function search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+
+        reset_other_data();
+
+        search();
+        return false;
+    }
+
+</script>
+

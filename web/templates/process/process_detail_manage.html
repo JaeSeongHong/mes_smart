@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+
+{#<title>생산일정등록</title>#}
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+
+<!-- 생산제품 BOM -->
+        <!-- 검색 -->
+       <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center">
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+
+                                <label>브랜드</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control brand-dropdown" id="search_brand">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제품군</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item_group-dropdown" id="search_item_group">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품번</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item-code-dropdown-search" id="search_item-code">
+                                </select>
+                            </div>
+                        </div>
+                              <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>나이스번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control nice_number-dropdown-search" id="search_item-nice">
+                                </select>
+                            </div>
+
+                    </div>
+
+                        <div class="content-input-group col-4 mt-2">
+                            <div class="content-input-group-input input-group">
+                                <input class="form-control" id="multiSearch" placeholder="검색어를 입력해주세요
+                                "/>
+                              <div class="input-group-append">
+                         <button class="btn btn-outline-secondary" type="button" onClick="nation1.page = 1; bom_search()"> 🔍</button>
+
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                  <div class="col-1 px-0">
+                      <button class="btn button-search w-100" onClick="nation1.page = 1; bom_search()">검색</button>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- 생산제품 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <div class="col-12 px-0">
+                <!-- 본문 -->
+                <div class="content-table col-12 px-0 mb-2" style="overflow-x:auto; overflow-y:hidden; height: 251px;">
+                    <table id="main_table" class="table table-sm text-center">
+                        <thead>
+                        <tr>
+                            <th>순번</th>
+                            <th>브랜드</th>
+                            <th>제품군</th>
+                            <th>품명</th>
+                            <th>품번</th>
+                            <th>나이스번호</th>
+                            <th>품명상세</th>
+                            <th>형태</th>
+                            <th>주문수량</th>
+                            <th>현재고</th>
+                            <th>과부족</th>
+                            <th>첨부파일</th>
+                        </tr>
+                        </thead>
+                        <tbody id="bom_tbody">
+                        </tbody>
+                    </table>
+
+                    <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                         style="margin-top: -20px;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 생산공정등록 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form class="content-content w-100" id="process_form">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">생산공정등록</div>
+                <div class="col-11" id="process_manage">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>생산수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input name="process_amount" class="form-control" onkeyup="_chkNumber(this, 3)"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>생산일정</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="input-group input-daterange">
+                                    <input
+                                            type="text"
+                                            class="form-control datepicker"
+                                            name="process_startdate"
+                                            id="process_startdate"
+                                            autocomplete="off"
+
+                                    />
+                                    <div class="input-group-addon px-3">~</div>
+                                    <input
+                                            type="text"
+                                            class="form-control datepicker"
+                                            name="process_enddate"
+                                            id="process_enddate"
+                                            autocomplete="off"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters w-100 justify-content-end">
+                <div class="col-1 px-0 mr-2">
+                    <div
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="process_add()"
+                    >등록</div
+                    >
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <div
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="process_remove()"
+                    >삭제</div
+                    >
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 생산공정 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <div class="col-12 px-0">
+            <!-- 본문 -->
+            <div class="content-table col-12 px-0 mb-2" style="overflow-x:auto; overflow-y:hidden; height: 251px;">
+                <table id="process_table" class="table table-sm text-center">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>식별코드</th>
+                        <th>브랜드</th>
+                        <th>제품군</th>
+                        <th>품명</th>
+                        <th>품번</th>
+                        <th>나이스번호</th>
+                        <th>품명상세</th>
+                        <th>형태</th>
+                        <th>생산수량</th>
+                        <th>생산일정</th>
+                        <th>생산일정등록일자</th>
+                        <th>연동장비</th>
+                    </tr>
+                    </thead>
+                    <tbody id="process_tbody">
+                    </tbody>
+                </table>
+
+                <div class="row no-gutters d-flex justify-content-center" id="item_nation2"
+                     style="margin-top: -20px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 세부공정등록 -->
+
+
+<!-- 세부공정 테이블 -->
+
+
+
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_process.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_customer.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+
+        page_size: 5,
+    };
+    let nation1 = new Pnations(nation_data1, bom_search);  // 인스턴스 명
+
+    let nation_data2 = {
+        cname : 'nation2',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation2',
+        range: 5,
+        page_size: 5,
+    };
+    let nation2 = new Pnations(nation_data2, process_search);  // 인스턴스 명
+
+    let nation_data3 = {
+        cname : 'nation3',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation3',
+        range: 5,
+        page_size: 5,
+    };
+    let nation3 = new Pnations(nation_data3, detail_search);  // 인스턴스 명
+
+    let bom_id = null;
+    let product_name = null;
+    let process_id = null;
+    let detail_id = null;
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+    $(".datepicker").datepicker("setDate", "today");
+
+    $(function () {
+        set_naming();
+        refresh();
+
+        // Todo hjlim : 추후 재검토
+        // Table Export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#process_manage_data-table"), "생산공정")
+        );
+    });
+
+
+    function set_naming(){
+        let enterprise_name = get_userinfo().enterprise_name;
+        if (enterprise_name == '(주)건강생활연구소'){
+            $("#n_bom_code1").text("코드");
+            $("#n_bom_code2").text("코드");
+        }
+        if (enterprise_name == '온교육') {
+            $("#n_bom_code1").text("품번");
+            $("#n_bom_code2").text("품번");
+        }
+    }
+
+
+    function refresh() {
+        init_data();
+        bom_search(); // 생산 제품 검색
+        process_search();  // 생산 공정 검색 (비완료인 것만)
+    }
+
+
+    function init_data() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택색 및 검색</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === '.bom-dropdown') {
+                    list += "<option value='" + item.bom_name + "'>" + item.bom_name + "</option>";
+                } else if (selectors === ".item-name-dropdown-search") {
+                    list +=
+                    "<option value='" + item.product_name + "'>" + item.product_name + "</option>";
+                } else if (selectors === ".item-code-dropdown-search") {
+                    list +=
+                    "<option value='" + item.bom_number + "'>" + item.bom_number + "</option>";
+                } else if (selectors === ".nice_number-dropdown-search") {
+                    list +=
+                    "<option value='" + item.nice_number + "'>" + item.nice_number + "</option>";
+                } else {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // 생산제품명
+        api_gp("/bom/master_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".item-code-dropdown-search");
+            make_dropdown(data, ".nice_number-dropdown-search");
+        });
+        // 브랜드
+        api_gp('/codes_select/?group=127&enable=true', 'GET', {}, (data) => {
+            make_dropdown(data, '.brand-dropdown-search');
+        });
+
+        // 제품군
+        api_gp('/codes_select/?group=128&enable=true', 'GET', {}, (data) => {
+            make_dropdown(data, '.item_group-dropdown-search');
+        });
+        $("#process_manage [name='process_amount']").val('0');
+        $("#process_startdate").datepicker("setDate", "today");
+        $("#process_enddate").datepicker("setDate", "today");
+
+        $("#sub_process_manage [name='sub_process_amount']").val('0');
+        $("#sub_process_startdate").datepicker("setDate", "today");
+        $("#sub_process_enddate").datepicker("setDate", "today");
+
+        api_gp("/codes_select/?group=127&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, "#search_brand");
+        });
+        api_gp("/codes_select/?group=128&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, "#search_item_group");
+        });
+
+    }
+
+    function bom_search() {
+        let query = "?page=" + nation1.page + "&";
+
+        {#let customer_search = $('#customer_search :selected').val();#}
+
+
+        let brand = ($('#search_brand :selected').val() ? $('#search_brand :selected').text() : "");
+        let item_group = ($('#search_item_group :selected').val() ? $('#search_item_group :selected').text() : "");
+        let nice_number = ($('#search_item-nice :selected').val() ? $('#search_item-nice :selected').text() : "");
+        let item_code = ($('#search_item-code :selected').val() ? $('#search_item-code :selected').text() : "");
+        let multiSearch = $("#multiSearch").val()
+        if (brand !== '') query += "brand=" + brand + "&";
+        if (item_group !== '') query += "item_group=" + item_group + "&";
+        if (nice_number !== '') query += "nice=" + nice_number + "&";
+        if (item_code !== '') query += "item_code=" + item_code + "&";
+        if (multiSearch !=='') query += 'search=' + multiSearch;
+
+        api_gp("/bom/master/" + query, 'GET', {}, (data) => {
+            bom_table_draw(data);
+        });
+    }
+
+    function bom_table_draw(done) {
+        {#console.table(done);#}
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+        let rows = "";
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let rack_stock = item.now_stock - item.order_amount;
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";
+            row += "<td class='d-none' name='bom_id'>" + item.id + "</td>";
+            row += "<td name='brand'>" + nullapply(item.brand?.name) + "</td>";
+            row += "<td name='family'>" + nullapply(item.item_group?.name) + "</td>";
+            row += `<td data-toggle=tooltip title=${item.bom_number}  name=bom_number>` + nullapply(item.bom_number.length > 10 ? item.bom_number.slice(0,10) + "..." : item.bom_number) + "</td>";  // BOM 코드
+            row += `<td data-toggle=tooltip title=${item.product_name}  name=product_name>` + nullapply(item.product_name.length > 10 ? item.product_name.slice(0,10) + "..." : item.product_name) + "</td>";  // 생산제품명
+            row += `<td data-toggle=tooltip title=${item.nice_number}  name=nice>` + nullapply(item.nice_number.length > 10 ? item.nice_number.slice(0,10) + "..." : item.nice_number) + "</td>";
+            row += `<td data-toggle=tooltip title=${item.detail}  name=detail>` + (item.detail ? item.detail.length > 10 ? item.detail.slice(0,10) + "..." : item.detail: "") + "</td>"; // 품명상세
+            row += "<td name='shape'>" + (item.shape ? item.shape : "") + "</td>"; // 품명상세
+            row += "<td name='order_cnt'>" + (item.order_amount ? item.order_amount.toLocaleString() : 0) + "</td>"; // 주문수량
+            row += "<td name='now_stock'>" + (item.now_stock ? item.now_stock.toLocaleString() : 0) + "</td>"; // 현재고
+            row += "<td name='rack_stock' style='"+
+                (rack_stock < 0 ? "background-color: #FFEEC7" : "") +
+                "'>" + rack_stock.toLocaleString() + "</td>"; // 부족수량
+
+
+            row += "<td name='file' data-tableexport-display=\"none\">" +
+                (nullapply(item.file) ? "<a href='" + nullapply(item.file) +
+                    "' onclick=\"writeLog(this.href); window.open(this.href, '_blank', 'width=800, height=600'); return false;\">" +
+                    "<img src='../../../static/img/pdf_icon.png' width='20' height='20'></a>" : "") + "</td>";
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        spinner();
+        nation1.nation_display(done);
+
+        $('#main_table + .pagination-container').remove();
+        $('#bom_tbody').html(rows);
+
+        // todo clear detail table
+
+        // click check
+        if (bom_id != null){
+            $("#bom_tbody #" + bom_id).addClass('clicked');
+        }
+
+        $('#bom_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            bom_id = $(this).attr("id");
+            product_name = $(this).find('[name="product_name"]').text();
+        });
+    }
+
+    function process_table_load(){
+        $("#process_manage [name='process_amount']").val('0');
+        $("#process_startdate").datepicker("setDate", "today");
+        $("#process_enddate").datepicker("setDate", "today");
+
+        nation2.page = 1;
+        process_id = null;
+
+        nation3.page = 1;
+        detail_id = null;
+
+        $("#detail_tbody").empty();
+        $("#item_nation3").empty();
+
+        process_search();
+    }
+
+
+    function process_search(){
+        let query = "?page=" + nation2.page + "&complete=0";
+        api_gp("/process/" + query, 'GET', {}, (done) => {
+            process_table_draw(done);
+        });
+    }
+
+    
+    function process_table_draw(done) {
+        console.table(done);
+
+        let data = done.results;
+        let num = (((nation2.page*1) - 1) * nation_data2["page_size"]) + 1 ;
+
+        let rows = "";
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";
+
+            row += "<td class='d-none' name='bom_id'>" + item.id + "</td>";
+            row += "<td name='item_code'>" + item.code + "</td>";  // 식별코드
+            row += "<td name='brand'>" + nullapply(item.bom_master?.brand?.name) + "</td>";
+            row += "<td name='family'>" + nullapply(item.bom_master?.item_group?.name) + "</td>";
+            row += `<td data-toggle=tooltip title=${item.bom_master.bom_number}  name=bom_number>` + nullapply(item.bom_master.bom_number.length > 10 ? item.bom_master.bom_number.slice(0,10) + "..." : item.bom_master.bom_number) + "</td>";  // BOM 코드
+            row += `<td data-toggle=tooltip title=${item.bom_master.product_name}  name=product_name>` + nullapply(item.bom_master.product_name.length > 10 ? item.bom_master.product_name.slice(0,10) + "..." : item.bom_master.product_name) + "</td>";  // 생산제품명
+            row += `<td data-toggle=tooltip title=${item.bom_master.nice_number}  name=nice>` + nullapply(item.bom_master.nice_number.length > 10 ? item.bom_master.nice_number.slice(0,10) + "..." : item.bom_master.nice_number) + "</td>";
+            row += `<td data-toggle=tooltip title=${item.bom_master.detail}  name=detail>` + (item.detail ? item.bom_master.detail.length > 10 ? item.bom_master.detail.slice(0,10) + "..." : item.bom_master.detail: "") + "</td>"; // 품명상세
+            {#row += "<td name='shape'>" + (item.shape ? item.shape : "") + "</td>"; // 품명상세#}
+            row += "<td name='shape'>" + (item.bom_master?.shape ? item.bom_master.shape : "") + "</td>";  // 품명상세
+            row += "<td name='product_amount'>" + item.amount + "</td>"; // 생산수량
+
+            row += "<td class='d-none' name='process_fr'>" + (item.fr_date ? item.fr_date : "") + "</td>";
+            row += "<td class='d-none' name='process_to'>" + (item.to_date ? item.to_date : "") + "</td>";
+            row += "<td name='process_date'>" +
+                (item.fr_date ? item.fr_date : "") + " ~ " +
+                (item.to_date ? item.to_date : "")+ "</td>"; // 생산일정
+
+            row += "<td name='process_in_day'>" + item.created_at + "</td>"; // 생산공정등록일자
+            row += "<td name='process_sensor'>" + nullapply(item.sensor) + "</td>"; // 생산공정등록일자
+            row += "</tr>";
+            rows += row;
+        }
+
+        spinner();
+
+        nation2.nation_display(done);
+        $('#process_tbody').html(rows);
+
+        // click check
+        if (process_id != null){
+            $("#process_tbody #" + process_id).addClass('clicked');
+        }
+
+        $('#process_tbody > tr').on('click', function () {
+
+            // 생산수량
+            $("#process_manage [name='process_amount']").val( $(this).find("[name='product_amount']").text() );
+
+            // 생산일정
+            $("#process_manage [name='process_startdate']").val( $(this).find("[name='process_fr']").text() );
+            $("#process_manage [name='process_enddate']").val( $(this).find("[name='process_to']").text() );
+
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            process_id = $(this).attr("id");
+            {#bom_id = $(this).attr("item_code");#}
+            {#product_name = $(this).attr("name");#}
+
+            // 세부공정 Load
+            detail_table_load();
+        });
+    }
+
+
+    function detail_table_load() {
+        nation3.page = 1;
+        detail_id = null;
+
+        $("#detail_tbody").empty();
+        $("#item_nation3").empty();
+
+        detail_search();
+    }
+
+
+    function detail_search() {
+        let query = "?page=" + nation3.page + "&process=" + process_id;
+
+        api_gp("/process/sub/" + query, "GET", {}, (done) => {
+
+        });
+    }
+
+
+
+
+    function search_submit(e) {
+        e.preventDefault();
+
+        nation1.page = 1;
+        bom_id = null;
+
+        bom_search();
+        return false;
+    }
+
+
+    function process_manage_get_form_data() {
+
+        return {
+            code: bom_id,
+            name: product_name,
+            {#customer: $("#process_form [name='customer_name']").val(),#}
+
+            bom_master: bom_id,
+            fr_date: $("#process_startdate").datepicker("option", "minDate").val(),
+            to_date: $("#process_enddate").datepicker("option", "maxDate").val(),
+            amount: parseFloat($("#process_manage [name='process_amount']").val().replace(/,/g, "")),
+        };
+    }
+
+
+    function process_add(){
+
+        if (bom_id == null){
+            alert("생산 제품을 먼저 선택해 주세요.");
+            return;
+        }
+
+        let data = process_manage_get_form_data();
+        if (data === false) return;
+
+        api_gp("/process/", "POST", data, (done1) => {
+            alert("등록하였습니다.");
+            process_table_load();
+        });
+    }
+
+
+    {% comment %}function process_edit(){
+
+        if (process_id == null){
+            alert("생산 공정을 먼저 선택해 주세요.");
+            return;
+        }
+
+        let data = process_manage_get_form_data();
+
+        api_gp("/process/" + process_id + "/", "PATCH", data, (done1) => {
+            alert("수정하였습니다.");
+
+            // 초기화
+            process_id = null;
+            $("#process_manage [name='process_amount']").val('0');
+            $("#process_startdate").datepicker("setDate", "today");
+            $("#process_enddate").datepicker("setDate", "today");
+
+            // 생산 공정 테이블 Load
+            api_gp("/process/?complete=0", "GET", {}, (done2) => {
+                process_table_draw(done2);
+
+            }, handle_error, () => {
+
+            });
+
+            // 세부 공정 테이블 빈칸
+            $('#sub_process_table + .pagination-container').remove();
+            $('#detail_tbody').html("");
+
+        });
+    }{% endcomment %}
+
+
+    function process_remove(){
+
+        if (process_id == null){
+            alert("생산 공정을 먼저 선택해 주세요.");
+            return;
+        }
+
+        let result = confirm("생산공정을 정말로 삭제하시겠습니까?");
+        if (result) {
+            api_gp("/process/" + process_id + "/", "DELETE", {}, (done1) => {
+                alert("삭제하였습니다.");
+                process_table_load();
+            });
+        }
+    }
+
+
+    function sub_process_manage_get_form_data() {
+        return {
+            amount: parseFloat($("#sub_process_manage [name='sub_process_amount']").val()),
+            fr_date: $("#sub_process_startdate").datepicker("option", "minDate").val(),
+            to_date: $("#sub_process_enddate").datepicker("option", "maxDate").val(),
+        };
+    }
+
+    function sub_process_edit(){
+
+        if (detail_id == null){
+            alert("세부 공정을 먼저 선택해 주세요.");
+            return;
+        }
+
+        let data = sub_process_manage_get_form_data();
+
+        api_gp("/process/sub/" + detail_id + "/", "PATCH", data, (done) => {
+            alert("수정하였습니다.");
+            detail_search();
+        });
+    }
+
+
+    function writeLog(_file) {
+        let userinfo = get_userinfo();
+        let file = decodeURI(_file);
+        let user = userinfo["name"];
+        let enterprise = userinfo["enterprise_name"];
+
+        {#console.log("print");#}
+        {#console.table(userinfo);#}
+
+        $.ajax({
+            url: "/write_log/",
+            type: "POST",
+            dataType: "json",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}', 'user': user, 'enterprise': enterprise, 'file': file,
+            },
+            success: function (data) {
+                // alert(data.message);
+                location.reload();
+            },
+            error: function (data) {
+                // alert(data.message);
+            },
+        });
+    }
+
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>
+
+</body>
+</html>

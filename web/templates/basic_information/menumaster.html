@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<header>
+    <meta charset="UTF-8">
+    {% include "header.html" %}
+
+
+
+
+    <style>
+
+        #modules {
+          padding: 20px;
+          background: #eee;
+          margin-bottom: 20px;
+          z-index: 1;
+          border-radius: 10px;
+        }
+
+        #rightmodules {
+          padding: 20px;
+          background: #eee;
+          margin-bottom: 20px;
+          z-index: 1;
+          border-radius: 10px;
+        }
+
+        #dropzone {
+          padding: 20px;
+          background: #eee;
+          min-height: 100px;
+          margin-bottom: 20px;
+          z-index: 0;
+          border-radius: 10px;
+        }
+
+        #rightdropzone {
+          padding: 20px;
+          background: #eee;
+          min-height: 100px;
+          margin-bottom: 20px;
+          z-index: 0;
+          border-radius: 10px;
+        }
+
+        .active {
+          outline: 1px solid red;
+        }
+
+        .hover {
+          outline: 1px solid blue;
+        }
+
+        .drop-item {
+          cursor: pointer;
+          margin-bottom: 10px;
+          background-color: rgb(255, 255, 255);
+          padding: 5px 10px;
+          border-radisu: 3px;
+          border: 1px solid rgb(204, 204, 204);
+          position: relative;
+        }
+
+        .drop-item .remove {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+        }
+
+    </style>
+{% load static %}
+
+
+</header>
+<body>
+{{ ep.media }}
+{% csrf_token %}
+<div class="col-lg-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+
+        <!-- top grid -->
+            <div class="row">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="media" style="display: flex;">
+                            <div class="media-body col-sm-1">
+                                <p>업체코드 : </p>
+                            </div>
+                            <div class="col-sm-2 form-group">
+                                {{ ep.enterprise_name_ac }}
+                            </div>
+                            <div class="media-body col-sm-1">
+                                <p>사용자 : </p>
+                            </div>
+                            <div class="col-sm-2 form-group">
+                                <select class="form-control form-control-sm" id="id_client_name">
+
+                                </select>
+                            </div>
+                            <div>
+                                <ul class="notification-area pull-right">
+                                    <li class="refresh" id="page_refresh"><i class="fa fa-refresh"></i></li>
+
+                                </ul>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    </div>
+                </div>
+
+        </div>
+
+        <!-- left grid -->
+            <div class="row">
+                <div class="col-md-5 mt-5">
+            <div class="card">
+                <div class="card-body" style="display: flex;">
+
+                <div class="col-sm-4 text-md-center">
+                  <div id="modules" style="flex: 1;">
+                      {% for item in allMenu %}
+                          <p class="drag"><a class="btn btn-warning mb-3" data-value={{ item.id }}>{{ item.name }}</a></p>
+                      {% endfor %}
+                  </div>
+                </div>
+                <div class="col-sm-8">
+                  <div>
+                      <ul class="list-group" id="dropzone">
+                        {% comment %}{% for item in useMenu %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center" data-value={{ item.id }}>
+                              <button type="button" class="btn btn-info selected"><span class="ti-support mb-3"></span>
+                          </button>
+                              <strong>{{ item.alias_name }}</strong>
+                              <input class="form-control ml-1 mr-1" type="text" value="영업">
+                          <button type="button" class="btn btn-default btn-xs remove"><span class="ti-trash mb-3"></span>
+                          </button>
+                          </li>
+                      {% endfor %}{% endcomment %}
+                      </ul>
+                  </div>
+                  <button class="btn btn-primary pull-right" onclick="lmenuSubmit()">저장</button>
+                </div>
+                </div>
+            </div>
+            </div>
+
+                <!-- right grid -->
+            <div class="col-md-7 mt-5">
+                <div class="card">
+                    <div class="card-body" style="display: flex;">
+                        <div class="col-sm-4">
+                            <div>
+                      <ul class="list-group" id="rightdropzone">
+
+                      </ul>
+                            </div>
+                            <button class="btn btn-primary pull-leht" onclick="rmenuSubmit()">저장</button>
+                        </div>
+                        <div class="col-sm-8">
+                            <div id="rightmodules" style="display: flex; flex-wrap: wrap; height: 750px; overflow-y: auto;">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+
+        </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+</body>
+</html>
+
+<script>
+    let click_Lmenu = null;
+    $(document).ready(function () {
+
+        $(document).on('click', 'button.remove', function() {
+             $(this).parent().detach();
+        });
+
+        $(document).on('click', 'button.selected', function() {
+             showSubmenu($(this));
+        });
+
+        //drag Setting
+        dropNdrag();
+
+        //select2 Event
+        selectEvent();
+
+    });
+
+    function dropNdrag(){
+        $('.drag').draggable({
+          appendTo: 'body',
+          helper: 'clone'
+        });
+
+        $('#dropzone').droppable({
+          activeClass: 'active',
+          hoverClass: 'hover',
+          accept: ":not(.ui-sortable-helper)", // Reject clones generated by sortable
+          drop: function (e, ui) {
+            {% comment %}let $el = $('<div class="drop-item"><details><summary>' + ui.draggable.text() + '</summary><div><label>More Data</label><input type="text" /></div></details></div>');
+            $el.append($('<button type="button" class="btn btn-default btn-xs remove"><span class="ti-trash mb-3"></span></button>').click(function () { $(this).parent().detach(); }));
+            $(this).append($el);{% endcomment %}
+            let dropText = ui.draggable.text();
+            let targetText = e.target.innerText
+
+            let chk = validationChk(dropText, targetText);
+
+            if (chk){
+                let dataValue = $(ui.draggable.html()).data('value')
+                let $el = $('<li class="list-group-item d-flex justify-content-between align-items-center" data-value="'+dataValue+'">');
+                $el.append($('<button type="button" class="btn btn-info"><span class="ti-support mb-3"></span></button>').click(function () { showSubmenu(); }));
+                //$el.append('<strong>'+ dropText + '</strong>');
+                $el.append('<input class="form-control ml-1 mr-1" type="text" value='+dropText+'>');
+                $el.append($('<button type="button" class="btn btn-default btn-xs remove"><span class="ti-trash mb-3"></span></button></li>').click(function () { $(this).parent().detach(); }));
+                $(this).append($el);
+            }
+
+
+          }
+        }).sortable({
+          items: '.drop-item',
+          sort: function() {
+            // gets added unintentionally by droppable interacting with sortable
+            // using connectWithSortable fixes this, but doesn't allow you to customize active/hoverClass options
+            $( this ).removeClass( "active" );
+          }
+        });
+
+        $('#rightdropzone').droppable({
+          activeClass: 'active',
+          hoverClass: 'hover',
+          accept: ":not(.ui-sortable-helper)", // Reject clones generated by sortable
+          drop: function (e, ui) {
+
+            let dropText = ui.draggable.text();
+            let targetText = e.target.innerText
+
+            let chk = validationChk(dropText, targetText);
+
+            if (chk){
+                let dataValue = $(ui.draggable.html()).data('value')
+                let $el = $('<li class="list-group-item d-flex justify-content-between align-items-center" data-value="'+dataValue+'">');
+
+                $el.append('<strong>'+ dropText + '</strong>');
+                $el.append($('<button type="button" class="btn btn-default btn-xs remove"><span class="ti-trash mb-3"></span></button></li>').click(function () { $(this).parent().detach(); }));
+                $(this).append($el);
+            }
+
+
+          }
+        }).sortable({
+          items: '.drop-item',
+          sort: function() {
+            // gets added unintentionally by droppable interacting with sortable
+            // using connectWithSortable fixes this, but doesn't allow you to customize active/hoverClass options
+            $( this ).removeClass( "active" );
+          }
+        });
+    }
+
+    function validationChk(dropText, targetText){
+        let s = targetText.split('\n')
+        let result = true;
+        s.forEach(function (item){
+            if(dropText == item){
+                alert("이미 등록되어 있는 메뉴입니다.")
+                result = false
+                return
+            }
+        });
+        return result;
+    }
+
+    function showSubmenu(unit){
+        let client = $('#id_enterprise_name_ac').val();
+
+        let user_id = $("#id_client_name option:selected").val();
+        let parentMenuid = unit.closest('li').data('value');
+        click_Lmenu = parentMenuid;
+
+        let formchk = formDataChk(client, user_id)
+
+        if (formchk){
+            let formData = {};
+            formData['client'] = client;
+            formData['user_id'] = user_id;
+            formData['parent_id'] = parentMenuid;
+            api_gp(`/basic_information/getsublist`, "GET", formData, (done) => {
+                    rightMenuDraw(done);
+
+                })
+        }
+    }
+
+    function lmenuSubmit(){
+        let formData = {};
+        let idList = [];
+        let nameList = [];
+        let client = $('#id_enterprise_name_ac').val();
+
+        let user_id = $("#id_client_name option:selected").val();
+
+        let formchk = formDataChk(client, user_id);
+
+        if (formchk){
+            $('#dropzone li').each(function(index) {
+                let menuId = $(this).data('value');
+                let menuName = $(this).find('input').val();
+
+                idList.push(menuId);
+                nameList.push(menuName);
+            });
+
+        //formData['menuid'] = idList;
+
+            let allData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            menuid: idList,
+            alias: nameList,
+            user_id: user_id,
+            client: client
+        }
+
+        api_gp(`/basic_information/menuauth_create/`, "post", allData, (done) => {
+                     done = done.success
+            if(done){
+                alert('등록완료')
+            }
+
+                })
+        }
+
+
+    }
+
+    function selectEvent(){
+
+        $('#id_enterprise_name_ac').on('select2:select', function(e) {
+        // 이벤트 발생 시 실행될 코드
+
+        let selectedValue = e.params.data.id;
+        api_gp(`/autocomplete/menumaster/client_name_ac`, "GET", {'enterPrise_id': selectedValue}, (done) => {
+                   let data = done.results
+            let option = ''
+
+
+            $("#id_client_name").html('')
+
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                option = new Option(item.text, item.id, true, true);
+                $("#id_client_name").append(option).select2().trigger('change');
+
+            }
+            option = new Option('선택', '', true, true);
+            $("#id_client_name").append(option)
+
+            $('#id_client_name').change(function() {
+                  let user_id = $(this).val();
+
+                if(user_id.length >= 1){
+                    getUseLmenulist(user_id);
+                }
+
+                });
+
+                })
+      });
+    }
+    function rightMenuDraw(data){
+        let useSubMenu = data.usesubmenu;
+
+        let rSubList = ''
+        $('#rightdropzone').empty();
+        useSubMenu.forEach(function (sub){
+
+           rSubList = $('<li class="list-group-item d-flex justify-content-between align-items-center" data-value="'+sub.id+'">');
+           // rSubList.append('<strong>'+ sub.fields.name + '</strong>');
+           rSubList.append('<input class="form-control ml-1 mr-1" type="text" value="'+sub.alias+'">');
+           rSubList.append($('<button type="button" class="btn btn-default btn-xs remove"><span class="ti-trash mb-3"></span></button></li>').click(function () { $(this).parent().detach(); }));
+           $('#rightdropzone').append(rSubList);
+        })
+
+        let allSubMenu = JSON.parse(data.allsubmenu);
+        let rAllSubList = '';
+        $('#rightmodules').empty();
+
+        allSubMenu.forEach(function (allsub){
+            rAllSubList = $('<div class="mr-3">');
+            rAllSubList.append('<p class="drag"><a class="btn btn-warning mb-3" data-value="'+allsub.pk+'">'+allsub.fields.name+'</a></p></div>');
+            $('#rightmodules').append(rAllSubList);
+        })
+
+        // drag 기능 활성화
+        dropNdrag();
+
+    }
+
+    function formDataChk(client, user_id){
+
+        if (client === undefined || client === null){
+            alert("고객사를 선택해주세요");
+            return false
+        }
+
+        if (user_id === undefined || user_id === null) {
+            alert("사용자를 선택해주세요");
+            return false
+        }
+
+        return true
+    }
+
+    function getUseLmenulist(user_id){
+        let client = $('#id_enterprise_name_ac').val();
+        api_gp(`/basic_information/getlmenulist/`, "GET", {'client': client, 'user_id': user_id}, (done) => {
+
+            let data = done.results
+                    drawListbyUser(data);
+
+                })
+    }
+
+    function drawListbyUser(data){
+
+        let rSubList = ''
+        $('#dropzone').empty();
+        data.forEach(function (sub){
+
+           rSubList = $('<li class="list-group-item d-flex justify-content-between align-items-center" data-value="'+sub.id+'">');
+           rSubList.append($('<button type="button" class="btn btn-info selected"><span class="ti-support mb-3"></span></button>').click(function () { showSubmenu($(this)); }));
+           //rSubList.append('<strong>'+ sub.fields.name + '</strong>');
+           rSubList.append('<input class="form-control ml-1 mr-1" type="text" value="'+sub.alias+'">');
+           rSubList.append($('<button type="button" class="btn btn-default btn-xs remove"><span class="ti-trash mb-3"></span></button></li>').click(function () { $(this).parent().detach(); }));
+           $('#dropzone').append(rSubList);
+
+        })
+
+
+    }
+
+    function rmenuSubmit(){
+
+        let idList = [];
+        let nameList = [];
+        let client = $('#id_enterprise_name_ac').val();
+
+        let user_id = $("#id_client_name option:selected").val();
+
+        let formchk = formDataChk(client, user_id);
+
+        if (formchk){
+            $('#rightdropzone li').each(function(index) {
+                let menuId = $(this).data('value');
+                let menuName = $(this).find('input').val();
+
+                idList.push(menuId);
+                nameList.push(menuName);
+            });
+
+            let allData = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                menuid: idList,
+                alias: nameList,
+                user_id: user_id,
+                client: client,
+                parent_id: click_Lmenu
+        }
+
+        api_gp(`/basic_information/menuauth_create/`, "post", allData, (done) => {
+                    done = done.success
+            if(done){
+                alert('등록완료')
+            }
+
+                })
+        }
+    }
+
+</script>

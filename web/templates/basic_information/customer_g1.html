@@ -1,0 +1,628 @@
+<!DOCTYPE HTML>
+<html>
+<header>
+    {% include "header.html" %}
+</header>
+<body>
+
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {##}
+{#{% block title %}#}
+{#    <title>거래처 기준정보관리</title>#}
+{#{% endblock title %}#}
+
+{#{% block content %}#} -->
+
+    <!-- 검색 -->
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center content-input-group">
+                <div class="content-title col-1 align-self-stretch">
+                    검색
+                </div>
+                <form id="customer_search_form" class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-2 px-0">
+                            <div class="content-input-group-header" >
+                                <label>거래구분</label>
+                            </div>
+                            <div class="content-input-group-input" id="customer_type_search">
+                                <select name='customer_division' class='form-control' id='customer_search1'>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3 px-0">
+                            <div class="content-input-group-header">
+                                <label>거래처 명</label>
+                            </div>
+                            <div class="content-input-group-input" id="customer_name_search">
+                                <select name='customer_name' class='form-control' id='customer_search2'>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-1 px-0">
+                            <button class="btn button-search rounded-0 w-100 h-100" type="submit">검색</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 내용 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <form id="detail_customer" class="content-content w-100"> <!-- TODO: submit 시 validation 구현 -->
+                {% csrf_token %}
+                <div class="row no-gutters w-100 mb-2">
+                    <div class="col-1 content-title">
+                        내용
+                    </div>
+                    <div class="col-11">
+                        <div class="row no-gutters">
+                            <div class="content-input-group col-2">
+                                <div class="content-input-group-header">
+                                    <label>거래처코드<strong>*</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="customer_code">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>거래처명<strong>*</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="customer_name">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-2">
+                                <div class="content-input-group-header">
+                                    <label>대표자명<strong>*</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="customer_owner_name">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>업태</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="business_conditions">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-2">
+                                <div class="content-input-group-header">
+                                    <label>종목</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="business_event">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row no-gutters">
+                            <div class="content-input-group col-2">
+                                <div class="content-input-group-header">
+                                    <label>우편번호</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="office_post_code">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-4">
+                                <div class="content-input-group-header">
+                                    <label>주소</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="office_address">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>회사전화번호<strong>*</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="office_phone">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>팩스번호</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="office_fax_number">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row no-gutters">
+                            <div class="content-input-group col-6">
+                                <div class="content-input-group-header">
+                                    <label>E-mail</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="email">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-2">
+                                <div class="content-input-group-header">
+                                    <label>사용구분<strong>*</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select class="form-control" name="customer_use_division">
+                                        <option>사용</option>
+                                        <option>미사용</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row no-gutters w-100 justify-content-end">
+                    <div class="col-1 px-0 mr-2">
+                        <button type="button" class="btn button-custom2 w-100" onclick="document.getElementById('file-selector').click();">엑셀 업로드</button>
+                        <input type="file" id="file-selector" style="display: none;" accept=".xlsx, .xls">
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100 add" type="submit">추가</button>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100" type="button" onclick="customer_edit();">수정</button>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-custom2 w-100" type="button" onclick="customer_unuse();">삭제</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-table col-12">
+                <table id="customer_data-table" class="table table-sm text-center" style="min-width: 1300px;">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>거래처코드</th>
+                        <th>거래처명</th>
+                        <th>대표자명</th>
+                        <th>업태</th>
+                        <th>종목</th>
+                        <th>우편번호</th>
+                        <th>주소</th>
+                        <th>회사전화번호</th>
+                        <th>팩스번호</th>
+                        <th>E-mail</th>
+                        <th>사용구분</th>
+                        <th>등록자</th>
+                        <th>등록일</th>
+                        <th>최종변경자</th>
+                        <th>최종변경일</th>
+                    </tr>
+                    </thead>
+                    <tbody id="customer_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <label class="mb-0">(<strong id="customer_table_row">0</strong>) 건 로딩</label>
+        </div>
+    </div>
+    <script src="{% static 'js/api_customer.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+    <script>
+        $('#detail_customer [name="business_event"]').keydown(function(e) {
+            let code = e.keyCode || e.which;
+            if (code === 9) {
+                addrPostCodeFinder(
+                    document.querySelector('#detail_customer [name="office_post_code"]'),
+                    document.querySelector('#detail_customer [name="office_address"]')
+                );
+            }
+        });
+        $('#detail_customer [name="office_post_code"]').on('click', function () {
+            addrPostCodeFinder(
+                document.querySelector('#detail_customer [name="office_post_code"]'),
+                document.querySelector('#detail_customer [name="office_address"]')
+            );
+        })
+
+        var customer_id;
+
+        $('#customer_search_form').submit(function (e) {
+            customer_load_table();
+            e.preventDefault();
+        })
+
+        // validation Test Code
+        function validationTest(el) {
+            return true;
+            let valid = true;
+            $(el).find('input').each(function () {
+//            console.log($(this).attr('name') + ' : ' + $(this).parent().prev().find('strong').length);
+                let now = $(this);
+                if ($(this).parent().prev().find('strong').length) {
+                    if (now.val() == "") {
+                        now.css({'border': '1px solid red'});
+                        valid = false;
+//                    console.log('validation false');
+                    } else {
+                        now.css({'border': '1px solid green'});
+//                    console.log('validation true');
+                    }
+                }
+            });
+
+            $(el).find('select').each(function () {
+//            console.log($(this).attr('name') + ' : ' + $(this).parent().prev().find('strong').length);
+                let now = $(this);
+                if ($(this).parent().prev().find('strong').length) {
+                    if (now.val() == "선택") {
+                        if (now.attr('aria-hidden')) {  // check select2
+                            now.next().css({'border': '1px solid red'});
+                        }
+                        now.css({'border': '1px solid red'});
+                        valid = false;
+//                    console.log('validation false');
+                    } else {
+                        if (now.attr('aria-hidden')) {  // check select2
+                            now.next().css({'border': '1px solid green'});
+                        }
+                        now.css({'border': '1px solid green'});
+//                    console.log('validation true');
+                    }
+                }
+            });
+
+            return valid;
+        }
+
+        function customer_makeOptions() {
+            // 거래 구분 select
+            let code = $('#customer_search1').val();
+            console.log('code = ', code);
+            if (code == "" || code == undefined)
+                code = "";
+            else
+                code = code.split('+')[0];
+
+            api_get_specific_code_list(108, (data) => {
+                {#console.table(data);#}
+                let list = "<option value=''>선택</option>";
+                for (let i = 0; i < data.length; i++) {
+                    let item = data[i];
+                    if (code == item.id) {
+                        list += "<option value='" + item.id + "' selected>" + item.name + "</option>";
+                        }
+                    else
+                        list += "<option value='" + item.id +"'>" + item.name + "</option>";
+                }
+                $('#customer_search1, #detail_customer [name="customer_division"]').html(list).select2({
+                    width: '100%',
+                });
+            });
+
+            // 거래처 명 select
+            let customer = $('#customer_search2').val(); //customer 값만 추출.
+            console.log('customer = ', customer);
+            if (customer == "선택" || customer == undefined || customer == null)
+                customer = "";
+            else
+                customer = customer.split('+')[0];
+
+            api_get_customer((data) => {
+                // {#console.table(data);#}
+                let list = "<option value=''>선택</option>";
+                for (let i = 0; i < data.length; i++) {
+                    let item = data[i];
+                    if (customer == item.name)
+                        list += "<option selected>" + item.name + "</option>";
+                    else
+                        list += "<option>" + item.name + "</option>";
+                }
+                $('#customer_search2').html(list).select2({
+                    width: '100%',
+                });
+            });
+        }
+
+        $('#detail_customer').submit((e) => {
+            e.preventDefault();
+            if (validationTest('#detail_customer')) {
+                let allData = get_data();
+
+                api_gp('/customers/', 'POST', allData,
+                    (data) => {
+                        alert("등록 완료.");
+                        customer_load_table();
+                    });
+
+            } else {
+                return false;
+            }
+        });
+
+        function customer_load_table() {
+            let code = $('#customer_search1').val();
+            // {#console.log('code = ', code);#}
+            if (code == "" || code == undefined || code == null)
+                code = "";
+            else
+                code = code.split('+')[0];
+            let customer = $('#customer_search2').val(); //customer 값만 추출.
+            // {#console.log('customer = ', customer);#}
+            if (customer == "" || customer == undefined || code == null)
+                customer = "";
+            else
+                customer = customer.split('+')[0];
+
+            // 검색 결과를 필터링하여 테이블에 가져옴
+            api_get_detail_customer(code, customer, (data) => {
+
+                // {#console.table(data);#}
+                $('#customer_table_row').text(data.length); // 로딩된 데이터 갯수 세기
+                let rows = "";
+                let list_num = 1;
+                for (let i = 0; i < data.length; i++) {
+
+                    let item = data[i];
+                    let created_date = item.created_at;
+                    let updated_date = item.updated_at;
+                    if (item.customer_code != 0) {
+                        // append it
+                        let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                        row += "<td>" + (list_num++) + "</td>";
+                        row += "<td name='customer_code'>" + item.code + "</td>";
+                        row += "<td name='customer_name'>" + item.name + "</td>";
+                        row += "<td name='customer_owner_name'>" + item.owner_name + "</td>";
+                        row += "<td name='business_conditions'>" + (item.business_conditions ? item.business_conditions : "") + "</td>";
+                        row += "<td name='business_event'>" + (item.business_event ? item.business_event : "") + "</td>";
+                        row += "<td name='office_post_code'>" + (item.postal_code ? item.postal_code : "") + "</td>";
+                        row += "<td name='office_address'>" + (item.address ? item.address : "") + "</td>";
+                        row += "<td name='office_phone'>" + (item.office_phone ? item.office_phone : "") + "</td>";
+                        row += "<td name='office_fax_number'>" + (item.office_fax ? item.office_fax : "") + "</td>";
+                        row += "<td name='email'>" + (item.email ? item.email : "") + "</td>";
+                        row += "<td name='customer_use_division'>" + (item.enable ? "사용" : "미사용") + "</td>";
+                        row += "<td name='created_by'>" + item.created_by + "</td>";
+                        row += "<td name='created_at'>" + created_date.substring(0, 4) + "-" + created_date.substring(5, 7) + "-" + created_date.substring(8, 10) + "</td>";
+                        row += "<td name='updated_by'>" + item.updated_by + "</td>";
+                        row += "<td name='updated_at'>" + updated_date.substring(0, 4) + "-" + updated_date.substring(5, 7) + "-" + updated_date.substring(8, 10) + "</td>";
+
+                        row += "</tr>";
+
+                        rows += row;
+                    }
+                }
+                $('#customer_tbody').html(rows);
+                $('#customer_tbody > tr').on('click', function () {
+                    $("#detail_customer [name='customer_code']").val($(this).find("[name='customer_code']").text());
+                    $("#detail_customer [name='customer_name']").val($(this).find("[name='customer_name']").text());
+                    // {#console.log('customer_division id : ', $(this).find("[name='customer_division']").attr('property'));#}
+                    $("#detail_customer [name='customer_division']").val($(this).find("[name='customer_division']").attr('property')).trigger('change');
+                    $("#detail_customer [name='licensee_number']").val($(this).find("[name='licensee_number']").text());
+                    $("#detail_customer [name='customer_owner_name']").val($(this).find("[name='customer_owner_name']").text());
+                    $("#detail_customer [name='business_conditions']").val($(this).find("[name='business_conditions']").text());
+                    $("#detail_customer [name='business_event']").val($(this).find("[name='business_event']").text());
+                    $("#detail_customer [name='office_post_code']").val($(this).find("[name='office_post_code']").text());
+                    $("#detail_customer [name='office_address']").val($(this).find("[name='office_address']").text());
+                    $("#detail_customer [name='office_phone']").val($(this).find("[name='office_phone']").text());
+                    $("#detail_customer [name='office_fax_number']").val($(this).find("[name='office_fax_number']").text());
+                    $("#detail_customer [name='person_in_charge']").val($(this).find("[name='person_in_charge']").text());
+                    $("#detail_customer [name='charge_phone']").val($(this).find("[name='charge_phone']").text());
+                    $("#detail_customer [name='email']").val($(this).find("[name='email']").text());
+                    $("#detail_customer [name='customer_use_division']").val($(this).find("[name='customer_use_division']").text());
+                    $("#detail_customer [name='customer_note']").val($(this).find("[name='customer_note']").text());
+                    customer_id = $(this).attr('id');
+                });
+
+                // table click highlight
+                $('.content-table tbody tr').on('click', function () {
+                    $(this).parent().find('tr').removeClass('clicked');
+                    $(this).addClass('clicked');
+                });
+            });
+            customer_makeOptions();
+        }
+
+        function draw_table(data) {
+            // {#console.table(data);#}
+            $('#customer_table_row').text(data.length); // 로딩된 데이터 갯수 세기
+            let rows = "";
+            let list_num = 1;
+            for (let i = 0; i < data.length; i++) {
+
+                let item = data[i];
+                let created_date = item.created_at;
+                let updated_date = item.updated_at;
+                if (item.customer_code != 0) {
+                    // append it
+                    let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                    row += "<td>" + (list_num++) + "</td>";
+                    row += "<td name='customer_code'>" + item.code + "</td>";
+                    row += "<td name='customer_name'>" + item.name + "</td>";
+                    row += "<td name='customer_division'>" + (item.division ? item.division.name : "") + "</td>";
+                    row += "<td name='licensee_number'>" + item.licensee_number + "</td>";
+                    row += "<td name='customer_owner_name'>" + item.owner_name + "</td>";
+                    row += "<td name='business_conditions'>" + (item.business_conditions ? item.business_conditions : "") + "</td>";
+                    row += "<td name='business_event'>" + (item.business_event ? item.business_event : "") + "</td>";
+                    row += "<td name='office_post_code'>" + (item.postal_code ? item.postal_code : "") + "</td>";
+                    row += "<td name='office_address'>" + (item.address ? item.address : "") + "</td>";
+                    row += "<td name='office_phone'>" + (item.office_phone ? item.office_phone : "") + "</td>";
+                    row += "<td name='office_fax_number'>" + (item.office_fax ? item.office_fax : "") + "</td>";
+                    row += "<td name='person_in_charge'>" + (item.charge_name ? item.charge_name : "") + "</td>";
+                    row += "<td name='charge_phone'>" + (item.charge_phone ? item.charge_phone : "") + "</td>";
+                    row += "<td name='email'>" + (item.email ? item.email : "") + "</td>";
+                    row += "<td name='customer_use_division'>" + (item.enable ? "사용" : "미사용") + "</td>";
+                    row += "<td name='customer_note'>" + (item.etc ? item.etc : "") + "</td>";
+                    row += "<td name='created_by'>" + item.created_by + "</td>";
+                    row += "<td name='created_at'>" + created_date.substring(0, 4) + "-" + created_date.substring(5, 7) + "-" + created_date.substring(8, 10) + "</td>";
+                    row += "<td name='updated_by'>" + item.updated_by + "</td>";
+                    row += "<td name='updated_at'>" + updated_date.substring(0, 4) + "-" + updated_date.substring(5, 7) + "-" + updated_date.substring(8, 10) + "</td>";
+
+                    row += "<td class='d-none' name='customer_division_id'>" + (item.division ? item.division.id : "") + "</td>";
+
+                    row += "</tr>";
+
+                    rows += row;
+                }
+            }
+            $('#customer_tbody').html(rows);
+            $('#customer_tbody > tr').on('click', function () {
+                $("#detail_customer [name='customer_code']").val($(this).find("[name='customer_code']").text());
+                $("#detail_customer [name='customer_name']").val($(this).find("[name='customer_name']").text());
+                $("#detail_customer [name='customer_division']").val($(this).find("[name='customer_division_id']").text()).trigger('change');
+                $("#detail_customer [name='licensee_number']").val($(this).find("[name='licensee_number']").text());
+                $("#detail_customer [name='customer_owner_name']").val($(this).find("[name='customer_owner_name']").text());
+                $("#detail_customer [name='business_conditions']").val($(this).find("[name='business_conditions']").text());
+                $("#detail_customer [name='business_event']").val($(this).find("[name='business_event']").text());
+                $("#detail_customer [name='office_post_code']").val($(this).find("[name='office_post_code']").text());
+                $("#detail_customer [name='office_address']").val($(this).find("[name='office_address']").text());
+                $("#detail_customer [name='office_phone']").val($(this).find("[name='office_phone']").text());
+                $("#detail_customer [name='office_fax_number']").val($(this).find("[name='office_fax_number']").text());
+                $("#detail_customer [name='person_in_charge']").val($(this).find("[name='person_in_charge']").text());
+                $("#detail_customer [name='charge_phone']").val($(this).find("[name='charge_phone']").text());
+                $("#detail_customer [name='email']").val($(this).find("[name='email']").text());
+                $("#detail_customer [name='customer_use_division']").val($(this).find("[name='customer_use_division']").text());
+                $("#detail_customer [name='customer_note']").val($(this).find("[name='customer_note']").text());
+                customer_id = $(this).attr('id');
+            });
+
+            // table click highlight
+            $('.content-table tbody tr').on('click', function () {
+                $(this).parent().find('tr').removeClass('clicked');
+                $(this).addClass('clicked');
+            });
+        }
+
+        function customer_edit() {
+            if (customer_id == null) {
+                alert("테이블에서 항목을 먼저 선택하십시오.");
+            } else {
+                let allData = get_data();
+                api_patch_customer(customer_id, allData, () => {
+                    alert('업데이트 완료.');
+                    customer_load_table();
+                });
+
+                // table click highlight
+                $('.content-table tbody tr').on('click', function () {
+                    $(this).parent().find('tr').removeClass('clicked');
+                    $(this).addClass('clicked');
+                });
+            }
+        }
+
+        function customer_unuse() {
+            if (customer_id == null) {
+                alert('거래처를 먼저 선택하십시오.');
+            } else {
+                var del = confirm("거래처: " + customer_id + "을(를) 삭제 (미사용 처리)하시겠습니까?");
+
+                if (del) {
+                    let customer_use_division = false;
+
+                    let alldata = {
+                        "enable": customer_use_division,
+                    }
+
+                    api_patch_customer(customer_id, alldata, () => {
+                        alert('업데이트 완료.');
+                        customer_load_table();
+                    });
+                }
+            }
+
+        }
+
+        function get_data() {
+            let customer_code = $('#detail_customer [name="customer_code"]').val();
+            let customer_name = $('#detail_customer [name="customer_name"]').val();
+            let customer_owner_name = $('#detail_customer [name="customer_owner_name"]').val();
+            let business_conditions = $('#detail_customer [name="business_conditions"]').val();
+            let business_event = $('#detail_customer [name="business_event"]').val();
+            let office_post_code = $('#detail_customer [name="office_post_code"]').val();
+            let office_address = $('#detail_customer [name="office_address"]').val();
+            let office_phone = $('#detail_customer [name="office_phone"]').val();
+            let office_fax_number = $('#detail_customer [name="office_fax_number"]').val();
+            let email = $('#detail_customer [name="email"]').val();
+            let customer_use_division = $('#detail_customer [name="customer_use_division"]').val() == "사용";
+
+            return {
+                "code": customer_code,
+                "name": customer_name,
+                "owner_name": customer_owner_name,
+                "business_conditions": business_conditions,
+                "business_event": business_event,
+                "postal_code": office_post_code,
+                "address": office_address,
+                "office_phone": office_phone,
+                "office_fax": office_fax_number,
+                "email": email,
+                "enable": customer_use_division,
+            };
+        }
+
+        $(function () {
+            refresh();
+
+            // Table export
+            $(parent.document).find("#excel-export").click(() => init_excel_export($('#customer_data-table'), '거래처기준정보'));
+        });
+
+        function refresh() {
+            customer_makeOptions();
+            customer_load_table();
+
+            const fileSelector = document.getElementById('file-selector');
+            let trick = false;
+            fileSelector.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                let form = new FormData();
+                form.append("excel", file);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/customers/excel/',
+                    headers: {
+                        "Authorization": get_token()     // TODO: improve when replace it with something other one
+                    },
+                    processData: false,
+                    contentType: false,
+                    data: form
+                })
+                    .done(function (json) {
+                        // add cookie
+                        console.log(json);
+                        alert('등록 완료되었습니다.');
+                    })
+                    .fail(function (xhr, status, errorThrown) {
+                        // console.log(xhr, status, errorThrown);
+                        console.log(xhr.responseText);
+                        alert(xhr.responseText);
+                    })
+                    .always(function (xhr, status) {
+                        console.log(xhr, status);
+                        refresh();
+                    });
+
+                // trick = true;
+                // $("#file-selector").val("");
+            });
+        }
+    </script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

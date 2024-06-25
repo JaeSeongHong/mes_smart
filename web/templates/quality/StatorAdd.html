@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+<!-- 고정자검사 성적등록 -->
+
+<body style="overflow: hidden;">
+
+<!-- spinner -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="content-title col-1 align-self-stretch">조회</div>
+            <form id="search_form" class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>제품명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="sch_item_name" autocomplete='off'/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>테스트 일자</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <div class="input-group input-daterange">
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="created-at-after"
+                                        autocomplete="off"
+
+                                />
+                                <div class="input-group-addon px-3">~</div>
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="created-at-before"
+                                        autocomplete="off"
+
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button
+                                class="btn button-search rounded-0 w-100 h-100"
+                                type="button"
+                                onclick="return search_submit(event);"
+                        >
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 제품명 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:267px;">
+            <table
+                    id="list_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>관리번호</th>
+                    <th>제품명</th>
+                    <th>테스트 일자</th>
+                    <th>시리얼</th>
+                    <th>필드수</th>
+                    <th>최종변경자</th>
+                </tr>
+                </thead>
+                <tbody id="list_tbody"></tbody>
+
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 제품 상세입력 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <div class="row no-gutters w-100 mb-2">
+            <div class="col-1 content-title">등록</div>
+            <div class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>제품명<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="item_name" placeholder="직접입력" autocomplete='off'/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>테스트 일자<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input
+                                    type="text"
+                                    class="form-control datepicker"
+                                    id="test_date"
+                                    autocomplete="off"
+
+                            />
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>시리얼</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="serial" autocomplete='off'/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>필드수<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="field_cnt" placeholder='5~15' autocomplete='off' value="5"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- IMAGE Upload -->
+        <div class="row no-gutters col-12 card-body m-0 p-1"
+             style="background: #d0dff1;border:solid 1px #d9d9d9; color: #002060; font-weight: bold;">
+
+            <div class="col-6 d-flex" style="border-right: solid 1px #d9d9d9;">
+                <div class="col-10 pt-2 pl-2">
+                    고정자 동심도 측정 위치
+                </div>
+                <div class="col-2 m-0 p-0">
+                    <label for="imageFile1" class="btn btn-light"
+                          style="font-size:inherit; color: #002060; font-weight: bold;
+                          text-align: center; line-height: 90%;
+                          width:95%;height:90%; padding:.5em .75em .5em .75em;
+                          margin-top:3px;margin-bottom: 0px;"
+                    >업로드</label>
+                    <input class="d-none" id="imageFile1" type="file" accept="image/*">
+                </div>
+            </div>
+
+            <div class="col-6 d-flex justify-content-end">
+                <div class="col-2 m-0 p-0">
+                    <label for="imageFile2" class="btn btn-light"
+                          style="font-size:inherit; color: #002060; font-weight: bold;
+                          text-align: center; line-height: 90%;
+                          width:95%;height:90%; padding:.5em .75em .5em .75em;
+                          margin-top:3px;margin-bottom: 0px;"
+                    >업로드</label>
+                    <input class="d-none" id="imageFile2" type="file" accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Show -->
+        <div class="col-12 d-flex"
+            style="width:auto; border:solid 1px #d9d9d9; color: #002060; font-weight: bold;">
+
+            <div class="col-6 text-center" style="width:auto; height:400px; border-right: solid 1px #d9d9d9;"
+            >
+                <img class="col-12 align-center p-1" id="print1" src="" alt=""
+                    style="width:auto;height:400px;object-fit: scale-down;">
+            </div>
+
+            <div class="col-6 text-center" style="width:auto; height:400px;">
+                <img class="col-12 align-center p-1" id="print2" src="" alt=""
+                    style="width:auto;height:400px;object-fit: scale-down;">
+            </div>
+
+        </div>
+
+        <!-- 상세 테이블 -->
+        <div class="content-table col-12 mt-2" style="overflow: hidden; height:270px;">
+            <table
+                    id="detail_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+
+                </tr>
+                </thead>
+                <tbody id="detail_tbody">
+                <tr>
+                    <td style="width:70px;padding-top:7px;"> 측정부 </td>
+                    <td class='m-0 p-0'><input id='F01_measure_part' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F02_measure_part' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F03_measure_part' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F04_measure_part' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F05_measure_part' class='form-control text-center' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F06_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F07_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F08_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F09_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F10_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F11_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F12_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F13_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F14_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F15_measure_part' class='form-control text-center d-none' autocomplete='off'></td>
+                </tr>
+                <tr>
+                    <td style="width:70px;padding-top:7px;"> 상세 </td>
+                    <td class='m-0 p-0'><input id='F01_Detail' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F02_Detail' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F03_Detail' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F04_Detail' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F05_Detail' class='form-control text-center' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F06_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F07_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F08_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F09_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F10_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F11_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F12_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F13_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F14_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F15_Detail' class='form-control text-center d-none' autocomplete='off'></td>
+                </tr>
+                <tr>
+                    <td style="width:70px;padding-top:7px;"> 규격 </td>
+                    <td class='m-0 p-0'><input id='F01_standard' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F02_standard' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F03_standard' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F04_standard' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F05_standard' class='form-control text-center' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F06_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F07_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F08_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F09_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F10_standard' class='form-control text-center d-none' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F11_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F12_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F13_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F14_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F15_standard' class='form-control text-center d-none' autocomplete='off'></td>
+                </tr>
+                <tr>
+                    <td style="width:70px;padding-top:7px;"> 측정값 </td>
+                    <td class='m-0 p-0'><input id='F01_measure_value' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F02_measure_value' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F03_measure_value' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F04_measure_value' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F05_measure_value' class='form-control text-center' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F06_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F07_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F08_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F09_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F10_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F11_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F12_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F13_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F14_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F15_measure_value' class='form-control text-center d-none' autocomplete='off'></td>
+                </tr>
+                <tr>
+                    <td style="width:70px;padding-top:7px;"> 동심도 </td>
+                    <td class='m-0 p-0'><input id='F01_concentricity' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F02_concentricity' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F03_concentricity' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F04_concentricity' class='form-control text-center' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F05_concentricity' class='form-control text-center' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F06_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F07_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F08_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F09_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F10_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+
+                    <td class='m-0 p-0'><input id='F11_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F12_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F13_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F14_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                    <td class='m-0 p-0'><input id='F15_concentricity' class='form-control text-center d-none' autocomplete='off'></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- Button -->
+        <div class="row no-gutters w-100 mt-3 mb-2 justify-content-end">
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="search();"
+                >
+                    초기화
+
+                </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="add();"
+                >
+                    추가
+                </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="modify();"
+                >
+                    수정
+                </button>
+            </div>
+            <div class="col-1 px-0">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="remove();"
+                >
+                    삭제
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let max_field_cnt = 15;
+    let now_field_cnt = 5;
+    let stator_id = null;
+    let image1_url = null;
+    let image2_url = null;
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+
+    let nation1 = new Pnations(nation_data1, search);  // 인스턴스 명
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $("#created-at-after").datepicker("setDate", "today");
+    $("#created-at-before").datepicker("setDate", "today");
+    $("#test_date").datepicker("setDate", "today");
+
+
+    $("#field_cnt").change(function () {
+        draw_detail_table();
+    });
+
+
+    <!-- IMAGE Upload -->
+    var imageFile1 = document.querySelector('#imageFile1');
+
+    imageFile1.onchange = function () {
+        var fileList = this.files;
+        var reader = new FileReader();
+        reader.readAsDataURL(fileList[0]);
+
+        //로드 한 후
+        reader.onload = function (e) {
+            document.querySelector('#print1').src = e.target.result;
+        };
+    };
+
+    var imageFile2 = document.querySelector('#imageFile2');
+
+    imageFile2.onchange = function () {
+        var fileList = this.files;
+        var reader = new FileReader();
+        reader.readAsDataURL(fileList[0]);
+
+        //로드 한 후
+        reader.onload = function (e) {
+            document.querySelector('#print2').src = e.target.result;
+        };
+    };
+
+
+    $(function () {
+        refresh();
+
+    });
+
+
+    function refresh() {
+        nation1.page = 1;
+        search();
+    }
+
+
+    async function add() {
+        let form = get_form();
+
+        if (form == null) {
+            return;
+        }
+
+        let fileSelector1 = document.getElementById('imageFile1');
+        let image1 = fileSelector1.files[0];
+        if (image1 === undefined) image1 = '';
+        if (image1 == '') {
+
+            if (image1_url != null || image1_url != ''){
+
+                // 저장된 이미지를 저장하는 경우
+                try {
+                    let image1_type = get_url_extension(image1_url);
+                    let url1 = image1_url;
+                    let filename1 = url1.substring(url1.lastIndexOf('/') + 1);
+
+                    let response1 = await fetch(image1_url);
+                    let data1 = await response1.blob();
+                    let metadata1 = {
+                        type: 'image/' + image1_type
+                    };
+
+                    {#console.log('filename1 ', filename1);#}
+                    let file1 = new File([data1], filename1, metadata1);
+                    form.append("image1", file1);
+
+                } catch (e) {
+                    console.log("이미지를 불러오는데 예외가 발생했습니다.", e);
+                }
+            }
+        }else{
+            // 이미지를 새로 업로드 한 경우
+            let result1 = fileCheck(fileSelector1);
+            if (result1 == false){
+                return;
+            }
+
+            form.append("image1", image1);
+        }
+
+        let fileSelector2 = document.getElementById('imageFile2');
+        let image2 = fileSelector2.files[0];
+        if (image2 === undefined) image2 = '';
+        if (image2 == '') {
+
+            if (image2_url != null || image2_url != ''){
+
+                // 저장된 이미지를 저장하는 경우
+                try {
+                    let image2_type = get_url_extension(image2_url);
+                    let url2 = image2_url;
+                    let filename2 = url2.substring(url2.lastIndexOf('/') + 1);
+
+                    let response2 = await fetch(image2_url);
+                    let data2 = await response2.blob();
+                    let metadata2 = {
+                        type: 'image/' + image2_type
+                    };
+
+                    {#console.log('filename2 ', filename2);#}
+                    let file2 = new File([data2], filename2, metadata2);
+                    form.append("image2", file2);
+
+                } catch (e) {
+                    console.log("이미지를 불러오는데 예외가 발생했습니다.", e);
+                }
+            }
+        }else{
+            // 이미지를 새로 업로드 한 경우
+            let result2 = fileCheck(fileSelector2);
+            if (result2 == false){
+                return;
+            }
+
+            form.append("image2", image2);
+        }
+
+        api_stator_post(form, () => {
+            alert("추가하였습니다.");
+            search();
+
+        }, () => {
+            alert("예외가 발생했습니다.");
+        });
+    }
+
+
+    function modify(){
+
+        if (stator_id == null){
+            alert("수정할 리스트를 선택해 주세요.");
+            return;
+        }
+
+        let form = get_form();
+
+        if (form == null){
+            return;
+        }
+
+        // 이미지 업로드를 했는지 체크
+        let fileSelector1 = document.getElementById('imageFile1');
+        let image1 = fileSelector1.files[0];
+        if (image1 === undefined) image1 = '';
+
+        if (image1 != ''){
+            // 이미지를 새로 업로드 한경우
+            let result1 = fileCheck(fileSelector1);
+            if (result1 == false){
+                return;
+            }
+            form.append("image1", image1);
+        }
+
+        let fileSelector2 = document.getElementById('imageFile2');
+        let image2 = fileSelector2.files[0];
+        if (image2 === undefined) image2 = '';
+
+        if (image2 != ''){
+            // 이미지를 새로 업로드 한경우
+            let result2 = fileCheck(fileSelector2);
+            if (result2 == false){
+                return;
+            }
+            form.append("image2", image2);
+        }
+
+        api_stator_patch(stator_id, form, (done) => {
+            console.log(done);
+
+            selected_tr.find("td[name=code]").text((done['code'] ? done['code'] : ""));  // 관리번호
+            selected_tr.find("td[name=item_name]").text((done['item_name'] ? done['item_name'] : ""));  // 제품명
+            selected_tr.find("td[name=test_date]").text((done['test_date'] ? done['test_date'] : ""));  // 테스트일자
+            selected_tr.find("td[name=serial]").text((done['serial'] ? done['serial'] : ""));  // 시리얼
+            selected_tr.find("td[name=field_cnt]").text((done['field_cnt'] ? done['field_cnt'] : ""));  // 필드수
+            selected_tr.find("td[name=username]").text((done['updated_by'] ? done['updated_by']['username'] : ""));  // 최종변경자
+
+            alert("수정하였습니다.");
+
+        }, () => {
+            alert("에러");
+        });
+    }
+
+
+    function remove(){
+        if (stator_id == null){
+            alert("삭제할 리스트를 선택해 주세요.");
+            return;
+        }
+
+        api_gp("/Stator/" + stator_id + "/", "DELETE", {}, () => {
+                alert("삭제하였습니다.");
+                search();
+        }, () => {
+            alert("예외가 발생했습니다.");
+        });
+    }
+
+
+    function refresh_data() {
+        now_field_cnt = 5;
+        stator_id = null;
+        image1_url = null;
+        image2_url = null;
+
+        $('#item_name').val('');
+        $("#test_date").datepicker("setDate", "today");
+        $('#serial').val('');
+        $('#field_cnt').val('5');
+
+        $("#imageFile1").val('');
+        $("#imageFile2").val('');
+        $('#print1').attr('src', '');
+        $('#print2').attr('src', '');
+
+        refresh_filed();
+    }
+
+
+    function search() {
+        refresh_data();
+
+        let item_name = $('#sch_item_name').val();
+        let fr_date = $("#created-at-after").val();
+        let to_date = $("#created-at-before").val();
+
+        let query = "?page=" + nation1.page + "&";
+        if (item_name === null || item_name === ''){} else query += "item_name=" + item_name + "&";
+        if (fr_date === null || fr_date === ''){} else query += "fr_date=" + fr_date + "&";
+        if (to_date === null || to_date === ''){} else query += "to_date=" + to_date + "&";
+
+        console.log('query', query);
+
+        api_gp("/Stator/" + query + "/", "GET", {}, (done) => {
+            load_list_table(done);
+
+            spinner();
+        });
+    }
+
+
+    function load_list_table(done) {
+        {#console.table(data)#}
+        let rows = "";
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num+i) + "</td>";  // 순번
+            row += "<td class='d-none' name='list_id'>" + item.id + "</td>";  // id
+
+            row += "<td name='code'>" + (item.code ? item.code : "") + "</td>";  // 관리번호
+            row += "<td name='item_name'>" + (item.item_name ? item.item_name : "") + "</td>";  // 제품명
+            row += "<td name='test_date'>" + (item.test_date ? item.test_date : "") + "</td>";  // 테스트일자
+            row += "<td name='serial'>" + (item.serial ? item.serial : "") + "</td>";  // 시리얼
+            row += "<td name='field_cnt'>" + ((item.field_cnt >=5 && item.field_cnt <= 15) ? item.field_cnt : 5) + "</td>";  // 필드수
+            row += "<td name='username'>" + (item.updated_by.username ? item.updated_by.username : "") + "</td>";  // 작성자
+            row += "</tr>";
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+
+        $('#list_tbody').html(rows);
+        $('#list_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            selected_tr = $(this);
+            stator_id = $(this).find("[name='list_id']").text();
+
+            load_detail_table();
+        });
+    }
+
+
+    function load_detail_table(){
+        if (!stator_id) return;
+
+        api_gp('/Stator/?id=' + stator_id + "&", 'GET', {}, (data) => {
+            console.table(data);
+            let done = data.results;
+            console.table(done);
+            if (done[0].image1 != null){
+                document.querySelector('#print1').src = done[0].image1;
+                image1_url = done[0].image1;
+            }
+
+            if (done[0].image2 != null){
+                document.querySelector('#print2').src = done[0].image2;
+                image2_url = done[0].image2;
+            }
+
+            now_field_cnt = done[0].field_cnt;
+
+            load_detail_info(done);
+            draw_detail_table();
+        });
+    }
+
+
+    function load_detail_info(data) {
+        let item = data[0];
+
+        $('#item_name').val(item.item_name);
+        $('#test_date').val(item.test_date);
+        $('#serial').val(item.serial);
+        $('#field_cnt').val(item.field_cnt);
+
+        // 측정부
+        $('#F01_measure_part').val(item.F01_measure_part);
+        $('#F02_measure_part').val(item.F02_measure_part);
+        $('#F03_measure_part').val(item.F03_measure_part);
+        $('#F04_measure_part').val(item.F04_measure_part);
+        $('#F05_measure_part').val(item.F05_measure_part);
+
+        $('#F06_measure_part').val(item.F06_measure_part);
+        $('#F07_measure_part').val(item.F07_measure_part);
+        $('#F08_measure_part').val(item.F08_measure_part);
+        $('#F09_measure_part').val(item.F09_measure_part);
+        $('#F10_measure_part').val(item.F10_measure_part);
+
+        $('#F11_measure_part').val(item.F11_measure_part);
+        $('#F12_measure_part').val(item.F12_measure_part);
+        $('#F13_measure_part').val(item.F13_measure_part);
+        $('#F14_measure_part').val(item.F14_measure_part);
+        $('#F15_measure_part').val(item.F15_measure_part);
+
+        // 상세
+        $('#F01_Detail').val(item.F01_Detail);
+        $('#F02_Detail').val(item.F02_Detail);
+        $('#F03_Detail').val(item.F03_Detail);
+        $('#F04_Detail').val(item.F04_Detail);
+        $('#F05_Detail').val(item.F05_Detail);
+
+        $('#F06_Detail').val(item.F06_Detail);
+        $('#F07_Detail').val(item.F07_Detail);
+        $('#F08_Detail').val(item.F08_Detail);
+        $('#F09_Detail').val(item.F09_Detail);
+        $('#F10_Detail').val(item.F10_Detail);
+
+        $('#F11_Detail').val(item.F11_Detail);
+        $('#F12_Detail').val(item.F12_Detail);
+        $('#F13_Detail').val(item.F13_Detail);
+        $('#F14_Detail').val(item.F14_Detail);
+        $('#F15_Detail').val(item.F15_Detail);
+
+        // 규격
+        $('#F01_standard').val(item.F01_standard);
+        $('#F02_standard').val(item.F02_standard);
+        $('#F03_standard').val(item.F03_standard);
+        $('#F04_standard').val(item.F04_standard);
+        $('#F05_standard').val(item.F05_standard);
+
+        $('#F06_standard').val(item.F06_standard);
+        $('#F07_standard').val(item.F07_standard);
+        $('#F08_standard').val(item.F08_standard);
+        $('#F09_standard').val(item.F09_standard);
+        $('#F10_standard').val(item.F10_standard);
+
+        $('#F11_standard').val(item.F11_standard);
+        $('#F12_standard').val(item.F12_standard);
+        $('#F13_standard').val(item.F13_standard);
+        $('#F14_standard').val(item.F14_standard);
+        $('#F15_standard').val(item.F15_standard);
+
+        // 동심도
+        $('#F01_concentricity').val(item.F01_concentricity);
+        $('#F02_concentricity').val(item.F02_concentricity);
+        $('#F03_concentricity').val(item.F03_concentricity);
+        $('#F04_concentricity').val(item.F04_concentricity);
+        $('#F05_concentricity').val(item.F05_concentricity);
+
+        $('#F06_concentricity').val(item.F06_concentricity);
+        $('#F07_concentricity').val(item.F07_concentricity);
+        $('#F08_concentricity').val(item.F08_concentricity);
+        $('#F09_concentricity').val(item.F09_concentricity);
+        $('#F10_concentricity').val(item.F10_concentricity);
+
+        $('#F11_concentricity').val(item.F11_concentricity);
+        $('#F12_concentricity').val(item.F12_concentricity);
+        $('#F13_concentricity').val(item.F13_concentricity);
+        $('#F14_concentricity').val(item.F14_concentricity);
+        $('#F15_concentricity').val(item.F15_concentricity);
+
+        // ø
+        $('#F01_pi').val(item.F01_pi);
+        $('#F02_pi').val(item.F02_pi);
+        $('#F03_pi').val(item.F03_pi);
+        $('#F04_pi').val(item.F04_pi);
+        $('#F05_pi').val(item.F05_pi);
+
+        $('#F06_pi').val(item.F06_pi);
+        $('#F07_pi').val(item.F07_pi);
+        $('#F08_pi').val(item.F08_pi);
+        $('#F09_pi').val(item.F09_pi);
+        $('#F10_pi').val(item.F10_pi);
+
+        $('#F11_pi').val(item.F11_pi);
+        $('#F12_pi').val(item.F12_pi);
+        $('#F13_pi').val(item.F13_pi);
+        $('#F14_pi').val(item.F14_pi);
+        $('#F15_pi').val(item.F15_pi);
+
+        // 진동
+        $('#F01_vibration').val(item.F01_vibration);
+        $('#F02_vibration').val(item.F02_vibration);
+        $('#F03_vibration').val(item.F03_vibration);
+        $('#F04_vibration').val(item.F04_vibration);
+        $('#F05_vibration').val(item.F05_vibration);
+
+        $('#F06_vibration').val(item.F06_vibration);
+        $('#F07_vibration').val(item.F07_vibration);
+        $('#F08_vibration').val(item.F08_vibration);
+        $('#F09_vibration').val(item.F09_vibration);
+        $('#F10_vibration').val(item.F10_vibration);
+
+        $('#F11_vibration').val(item.F11_vibration);
+        $('#F12_vibration').val(item.F12_vibration);
+        $('#F13_vibration').val(item.F13_vibration);
+        $('#F14_vibration').val(item.F14_vibration);
+        $('#F15_vibration').val(item.F15_vibration);
+
+        // 측정부
+        $('#F01_measure_div').val(item.F01_measure_div);
+        $('#F02_measure_div').val(item.F02_measure_div);
+        $('#F03_measure_div').val(item.F03_measure_div);
+        $('#F04_measure_div').val(item.F04_measure_div);
+        $('#F05_measure_div').val(item.F05_measure_div);
+
+        $('#F06_measure_div').val(item.F06_measure_div);
+        $('#F07_measure_div').val(item.F07_measure_div);
+        $('#F08_measure_div').val(item.F08_measure_div);
+        $('#F09_measure_div').val(item.F09_measure_div);
+        $('#F10_measure_div').val(item.F10_measure_div);
+
+        $('#F11_measure_div').val(item.F11_measure_div);
+        $('#F12_measure_div').val(item.F12_measure_div);
+        $('#F13_measure_div').val(item.F13_measure_div);
+        $('#F14_measure_div').val(item.F14_measure_div);
+        $('#F15_measure_div').val(item.F15_measure_div);
+
+        // 측정값
+        $('#F01_measure_value').val(item.F01_measure_value);
+        $('#F02_measure_value').val(item.F02_measure_value);
+        $('#F03_measure_value').val(item.F03_measure_value);
+        $('#F04_measure_value').val(item.F04_measure_value);
+        $('#F05_measure_value').val(item.F05_measure_value);
+
+        $('#F06_measure_value').val(item.F06_measure_value);
+        $('#F07_measure_value').val(item.F07_measure_value);
+        $('#F08_measure_value').val(item.F08_measure_value);
+        $('#F09_measure_value').val(item.F09_measure_value);
+        $('#F10_measure_value').val(item.F10_measure_value);
+
+        $('#F11_measure_value').val(item.F11_measure_value);
+        $('#F12_measure_value').val(item.F12_measure_value);
+        $('#F13_measure_value').val(item.F13_measure_value);
+        $('#F14_measure_value').val(item.F14_measure_value);
+        $('#F15_measure_value').val(item.F15_measure_value);
+    }
+
+
+    function draw_detail_table() {
+        let field_cnt = $('#field_cnt').val();
+
+        // 숫자 변환
+        let num = parseInt(field_cnt);
+
+        if (isNaN(num) == true) {
+            $('#field_cnt').val(now_field_cnt);
+        } else {
+            // 5~15 까지만 허용하도록 구현
+            if (num >= 5 && num <= max_field_cnt) {
+                $('#field_cnt').val(num);
+                now_field_cnt = num;
+
+                display_detail_table(num);
+            } else {
+                $('#field_cnt').val(now_field_cnt);
+            }
+        }
+    }
+
+
+    function display_detail_table(num){
+        if (num >= 5 && num <= max_field_cnt  ){
+            // do noting
+        }else{
+            num = 5
+        }
+
+        for ( let i = 5 ; i <= num ; i++){
+            let n = numFormat(i);
+            $('#F' + n + '_measure_part').removeClass('d-none');
+            $('#F' + n + '_Detail').removeClass('d-none');
+            $('#F' + n + '_standard').removeClass('d-none');
+            $('#F' + n + '_concentricity').removeClass('d-none');
+            $('#F' + n + '_pi').removeClass('d-none');
+            $('#F' + n + '_vibration').removeClass('d-none');
+            $('#F' + n + '_measure_div').removeClass('d-none');
+            $('#F' + n + '_measure_value').removeClass('d-none');
+        }
+        for ( let i = num+1 ; i <= max_field_cnt ; i++){
+            let n = numFormat(i);
+            $('#F' + n + '_measure_part').addClass('d-none');
+            $('#F' + n + '_Detail').addClass('d-none');
+            $('#F' + n + '_standard').addClass('d-none');
+            $('#F' + n + '_concentricity').addClass('d-none');
+            $('#F' + n + '_pi').addClass('d-none');
+            $('#F' + n + '_vibration').addClass('d-none');
+            $('#F' + n + '_measure_div').addClass('d-none');
+            $('#F' + n + '_measure_value').addClass('d-none');
+        }
+    }
+
+
+    function get_form(){
+        let form = new FormData();
+        let item_name = $('#item_name').val();
+        if (item_name == null || item_name == ''){
+            alert("제품명을 입력해 주세요.");
+            return null;
+        }
+
+        let test_date = $('#test_date').val();
+        if (test_date == null || test_date == ''){
+            alert("테스트 일자를 입력해 주세요.");
+            return null;
+        }
+
+        let serial = $('#serial').val();
+        if (serial == null || serial == ''){
+            alert("시리얼을 입력해 주세요.");
+            return null;
+        }
+
+        let field_cnt = $('#field_cnt').val();
+        if (field_cnt == null || field_cnt == ''){
+            alert("필드수를 입력해 주세요.");
+            return null;
+        }
+
+        // 측정부
+        let F01_measure_part = ($('#F01_measure_part').val() ? $('#F01_measure_part').val(): '');
+        let F02_measure_part = ($('#F02_measure_part').val() ? $('#F02_measure_part').val(): '');
+        let F03_measure_part = ($('#F03_measure_part').val() ? $('#F03_measure_part').val(): '');
+        let F04_measure_part = ($('#F04_measure_part').val() ? $('#F04_measure_part').val(): '');
+        let F05_measure_part = ($('#F05_measure_part').val() ? $('#F05_measure_part').val(): '');
+
+        let F06_measure_part = ($('#F06_measure_part').val() ? $('#F06_measure_part').val(): '');
+        let F07_measure_part = ($('#F07_measure_part').val() ? $('#F07_measure_part').val(): '');
+        let F08_measure_part = ($('#F08_measure_part').val() ? $('#F08_measure_part').val(): '');
+        let F09_measure_part = ($('#F09_measure_part').val() ? $('#F09_measure_part').val(): '');
+        let F10_measure_part = ($('#F10_measure_part').val() ? $('#F10_measure_part').val(): '');
+
+        let F11_measure_part = ($('#F11_measure_part').val() ? $('#F11_measure_part').val(): '');
+        let F12_measure_part = ($('#F12_measure_part').val() ? $('#F12_measure_part').val(): '');
+        let F13_measure_part = ($('#F13_measure_part').val() ? $('#F13_measure_part').val(): '');
+        let F14_measure_part = ($('#F14_measure_part').val() ? $('#F14_measure_part').val(): '');
+        let F15_measure_part = ($('#F15_measure_part').val() ? $('#F15_measure_part').val(): '');
+
+
+        // 상세
+        let F01_Detail = ($('#F01_Detail').val() ? $('#F01_Detail').val(): '');
+        let F02_Detail = ($('#F02_Detail').val() ? $('#F02_Detail').val(): '');
+        let F03_Detail = ($('#F03_Detail').val() ? $('#F03_Detail').val(): '');
+        let F04_Detail = ($('#F04_Detail').val() ? $('#F04_Detail').val(): '');
+        let F05_Detail = ($('#F05_Detail').val() ? $('#F05_Detail').val(): '');
+
+        let F06_Detail = ($('#F06_Detail').val() ? $('#F06_Detail').val(): '');
+        let F07_Detail = ($('#F07_Detail').val() ? $('#F07_Detail').val(): '');
+        let F08_Detail = ($('#F08_Detail').val() ? $('#F08_Detail').val(): '');
+        let F09_Detail = ($('#F09_Detail').val() ? $('#F09_Detail').val(): '');
+        let F10_Detail = ($('#F10_Detail').val() ? $('#F10_Detail').val(): '');
+
+        let F11_Detail = ($('#F11_Detail').val() ? $('#F11_Detail').val(): '');
+        let F12_Detail = ($('#F12_Detail').val() ? $('#F12_Detail').val(): '');
+        let F13_Detail = ($('#F13_Detail').val() ? $('#F13_Detail').val(): '');
+        let F14_Detail = ($('#F14_Detail').val() ? $('#F14_Detail').val(): '');
+        let F15_Detail = ($('#F15_Detail').val() ? $('#F15_Detail').val(): '');
+
+        // 규격
+        let F01_standard = ($('#F01_standard').val() ? $('#F01_standard').val(): '');
+        let F02_standard = ($('#F02_standard').val() ? $('#F02_standard').val(): '');
+        let F03_standard = ($('#F03_standard').val() ? $('#F03_standard').val(): '');
+        let F04_standard = ($('#F04_standard').val() ? $('#F04_standard').val(): '');
+        let F05_standard = ($('#F05_standard').val() ? $('#F05_standard').val(): '');
+
+        let F06_standard = ($('#F06_standard').val() ? $('#F06_standard').val(): '');
+        let F07_standard = ($('#F07_standard').val() ? $('#F07_standard').val(): '');
+        let F08_standard = ($('#F08_standard').val() ? $('#F08_standard').val(): '');
+        let F09_standard = ($('#F09_standard').val() ? $('#F09_standard').val(): '');
+        let F10_standard = ($('#F10_standard').val() ? $('#F10_standard').val(): '');
+
+        let F11_standard = ($('#F11_standard').val() ? $('#F11_standard').val(): '');
+        let F12_standard = ($('#F12_standard').val() ? $('#F12_standard').val(): '');
+        let F13_standard = ($('#F13_standard').val() ? $('#F13_standard').val(): '');
+        let F14_standard = ($('#F14_standard').val() ? $('#F14_standard').val(): '');
+        let F15_standard = ($('#F15_standard').val() ? $('#F15_standard').val(): '');
+
+        // 측정값
+        let F01_measure_value = ($('#F01_measure_value').val() ? $('#F01_measure_value').val(): '');
+        let F02_measure_value = ($('#F02_measure_value').val() ? $('#F02_measure_value').val(): '');
+        let F03_measure_value = ($('#F03_measure_value').val() ? $('#F03_measure_value').val(): '');
+        let F04_measure_value = ($('#F04_measure_value').val() ? $('#F04_measure_value').val(): '');
+        let F05_measure_value = ($('#F05_measure_value').val() ? $('#F05_measure_value').val(): '');
+
+        let F06_measure_value = ($('#F06_measure_value').val() ? $('#F06_measure_value').val(): '');
+        let F07_measure_value = ($('#F07_measure_value').val() ? $('#F07_measure_value').val(): '');
+        let F08_measure_value = ($('#F08_measure_value').val() ? $('#F08_measure_value').val(): '');
+        let F09_measure_value = ($('#F09_measure_value').val() ? $('#F09_measure_value').val(): '');
+        let F10_measure_value = ($('#F10_measure_value').val() ? $('#F10_measure_value').val(): '');
+
+        let F11_measure_value = ($('#F11_measure_value').val() ? $('#F11_measure_value').val(): '');
+        let F12_measure_value = ($('#F12_measure_value').val() ? $('#F12_measure_value').val(): '');
+        let F13_measure_value = ($('#F13_measure_value').val() ? $('#F13_measure_value').val(): '');
+        let F14_measure_value = ($('#F14_measure_value').val() ? $('#F14_measure_value').val(): '');
+        let F15_measure_value = ($('#F15_measure_value').val() ? $('#F15_measure_value').val(): '');
+
+        // 동심도
+        let F01_concentricity = ($('#F01_concentricity').val() ? $('#F01_concentricity').val(): '');
+        let F02_concentricity = ($('#F02_concentricity').val() ? $('#F02_concentricity').val(): '');
+        let F03_concentricity = ($('#F03_concentricity').val() ? $('#F03_concentricity').val(): '');
+        let F04_concentricity = ($('#F04_concentricity').val() ? $('#F04_concentricity').val(): '');
+        let F05_concentricity = ($('#F05_concentricity').val() ? $('#F05_concentricity').val(): '');
+
+        let F06_concentricity = ($('#F06_concentricity').val() ? $('#F06_concentricity').val(): '');
+        let F07_concentricity = ($('#F07_concentricity').val() ? $('#F07_concentricity').val(): '');
+        let F08_concentricity = ($('#F08_concentricity').val() ? $('#F08_concentricity').val(): '');
+        let F09_concentricity = ($('#F09_concentricity').val() ? $('#F09_concentricity').val(): '');
+        let F10_concentricity = ($('#F10_concentricity').val() ? $('#F10_concentricity').val(): '');
+
+        let F11_concentricity = ($('#F11_concentricity').val() ? $('#F11_concentricity').val(): '');
+        let F12_concentricity = ($('#F12_concentricity').val() ? $('#F12_concentricity').val(): '');
+        let F13_concentricity = ($('#F13_concentricity').val() ? $('#F13_concentricity').val(): '');
+        let F14_concentricity = ($('#F14_concentricity').val() ? $('#F14_concentricity').val(): '');
+        let F15_concentricity = ($('#F15_concentricity').val() ? $('#F15_concentricity').val(): '');
+
+        form.append("item_name", item_name);
+        form.append("test_date", test_date);
+        form.append("serial", serial);
+        form.append("field_cnt", field_cnt);
+
+        // 측정부
+        form.append("F01_measure_part", F01_measure_part);
+        form.append("F02_measure_part", F02_measure_part);
+        form.append("F03_measure_part", F03_measure_part);
+        form.append("F04_measure_part", F04_measure_part);
+        form.append("F05_measure_part", F05_measure_part);
+
+        form.append("F06_measure_part", F06_measure_part);
+        form.append("F07_measure_part", F07_measure_part);
+        form.append("F08_measure_part", F08_measure_part);
+        form.append("F09_measure_part", F09_measure_part);
+        form.append("F10_measure_part", F10_measure_part);
+
+        form.append("F11_measure_part", F11_measure_part);
+        form.append("F12_measure_part", F12_measure_part);
+        form.append("F13_measure_part", F13_measure_part);
+        form.append("F14_measure_part", F14_measure_part);
+        form.append("F15_measure_part", F15_measure_part);
+
+        // 상세
+        form.append("F01_Detail", F01_Detail);
+        form.append("F02_Detail", F02_Detail);
+        form.append("F03_Detail", F03_Detail);
+        form.append("F04_Detail", F04_Detail);
+        form.append("F05_Detail", F05_Detail);
+
+        form.append("F06_Detail", F06_Detail);
+        form.append("F07_Detail", F07_Detail);
+        form.append("F08_Detail", F08_Detail);
+        form.append("F09_Detail", F09_Detail);
+        form.append("F10_Detail", F10_Detail);
+
+        form.append("F11_Detail", F11_Detail);
+        form.append("F12_Detail", F12_Detail);
+        form.append("F13_Detail", F13_Detail);
+        form.append("F14_Detail", F14_Detail);
+        form.append("F15_Detail", F15_Detail);
+
+        // 규격
+        form.append("F01_standard", F01_standard);
+        form.append("F02_standard", F02_standard);
+        form.append("F03_standard", F03_standard);
+        form.append("F04_standard", F04_standard);
+        form.append("F05_standard", F05_standard);
+
+        form.append("F06_standard", F06_standard);
+        form.append("F07_standard", F07_standard);
+        form.append("F08_standard", F08_standard);
+        form.append("F09_standard", F09_standard);
+        form.append("F10_standard", F10_standard);
+
+        form.append("F11_standard", F11_standard);
+        form.append("F12_standard", F12_standard);
+        form.append("F13_standard", F13_standard);
+        form.append("F14_standard", F14_standard);
+        form.append("F15_standard", F15_standard);
+
+        // 측정값
+        form.append("F01_measure_value", F01_measure_value);
+        form.append("F02_measure_value", F02_measure_value);
+        form.append("F03_measure_value", F03_measure_value);
+        form.append("F04_measure_value", F04_measure_value);
+        form.append("F05_measure_value", F05_measure_value);
+
+        form.append("F06_measure_value", F06_measure_value);
+        form.append("F07_measure_value", F07_measure_value);
+        form.append("F08_measure_value", F08_measure_value);
+        form.append("F09_measure_value", F09_measure_value);
+        form.append("F10_measure_value", F10_measure_value);
+
+        form.append("F11_measure_value", F11_measure_value);
+        form.append("F12_measure_value", F12_measure_value);
+        form.append("F13_measure_value", F13_measure_value);
+        form.append("F14_measure_value", F14_measure_value);
+        form.append("F15_measure_value", F15_measure_value);
+
+        // 동심도
+        form.append("F01_concentricity", F01_concentricity);
+        form.append("F02_concentricity", F02_concentricity);
+        form.append("F03_concentricity", F03_concentricity);
+        form.append("F04_concentricity", F04_concentricity);
+        form.append("F05_concentricity", F05_concentricity);
+
+        form.append("F06_concentricity", F06_concentricity);
+        form.append("F07_concentricity", F07_concentricity);
+        form.append("F08_concentricity", F08_concentricity);
+        form.append("F09_concentricity", F09_concentricity);
+        form.append("F10_concentricity", F10_concentricity);
+
+        form.append("F11_concentricity", F11_concentricity);
+        form.append("F12_concentricity", F12_concentricity);
+        form.append("F13_concentricity", F13_concentricity);
+        form.append("F14_concentricity", F14_concentricity);
+        form.append("F15_concentricity", F15_concentricity);
+
+        return form;
+    }
+
+
+    function numFormat(variable) {
+        variable = Number(variable).toString();
+        if (Number(variable) < 10 && variable.length == 1) variable = "0" + variable;
+        return variable;
+    }
+
+
+    function refresh_filed(){
+        // 측정부
+        $('#F01_measure_part').val('');
+        $('#F02_measure_part').val('');
+        $('#F03_measure_part').val('');
+        $('#F04_measure_part').val('');
+        $('#F05_measure_part').val('');
+
+        $('#F06_measure_part').val('');
+        $('#F07_measure_part').val('');
+        $('#F08_measure_part').val('');
+        $('#F09_measure_part').val('');
+        $('#F10_measure_part').val('');
+
+        $('#F11_measure_part').val('');
+        $('#F12_measure_part').val('');
+        $('#F13_measure_part').val('');
+        $('#F14_measure_part').val('');
+        $('#F15_measure_part').val('');
+
+        // 상세
+        $('#F01_Detail').val('');
+        $('#F02_Detail').val('');
+        $('#F03_Detail').val('');
+        $('#F04_Detail').val('');
+        $('#F05_Detail').val('');
+
+        $('#F06_Detail').val('');
+        $('#F07_Detail').val('');
+        $('#F08_Detail').val('');
+        $('#F09_Detail').val('');
+        $('#F10_Detail').val('');
+
+        $('#F11_Detail').val('');
+        $('#F12_Detail').val('');
+        $('#F13_Detail').val('');
+        $('#F14_Detail').val('');
+        $('#F15_Detail').val('');
+
+        // 규격
+        $('#F01_standard').val('');
+        $('#F02_standard').val('');
+        $('#F03_standard').val('');
+        $('#F04_standard').val('');
+        $('#F05_standard').val('');
+
+        $('#F06_standard').val('');
+        $('#F07_standard').val('');
+        $('#F08_standard').val('');
+        $('#F09_standard').val('');
+        $('#F10_standard').val('');
+
+        $('#F11_standard').val('');
+        $('#F12_standard').val('');
+        $('#F13_standard').val('');
+        $('#F14_standard').val('');
+        $('#F15_standard').val('');
+
+        // 동심도
+        $('#F01_concentricity').val('');
+        $('#F02_concentricity').val('');
+        $('#F03_concentricity').val('');
+        $('#F04_concentricity').val('');
+        $('#F05_concentricity').val('');
+
+        $('#F06_concentricity').val('');
+        $('#F07_concentricity').val('');
+        $('#F08_concentricity').val('');
+        $('#F09_concentricity').val('');
+        $('#F10_concentricity').val('');
+
+        $('#F11_concentricity').val('');
+        $('#F12_concentricity').val('');
+        $('#F13_concentricity').val('');
+        $('#F14_concentricity').val('');
+        $('#F15_concentricity').val('');
+
+        // ø
+        $('#F01_pi').val('');
+        $('#F02_pi').val('');
+        $('#F03_pi').val('');
+        $('#F04_pi').val('');
+        $('#F05_pi').val('');
+
+        $('#F06_pi').val('');
+        $('#F07_pi').val('');
+        $('#F08_pi').val('');
+        $('#F09_pi').val('');
+        $('#F10_pi').val('');
+
+        $('#F11_pi').val('');
+        $('#F12_pi').val('');
+        $('#F13_pi').val('');
+        $('#F14_pi').val('');
+        $('#F15_pi').val('');
+
+        // 진동
+        $('#F01_vibration').val('');
+        $('#F02_vibration').val('');
+        $('#F03_vibration').val('');
+        $('#F04_vibration').val('');
+        $('#F05_vibration').val('');
+
+        $('#F06_vibration').val('');
+        $('#F07_vibration').val('');
+        $('#F08_vibration').val('');
+        $('#F09_vibration').val('');
+        $('#F10_vibration').val('');
+
+        $('#F11_vibration').val('');
+        $('#F12_vibration').val('');
+        $('#F13_vibration').val('');
+        $('#F14_vibration').val('');
+        $('#F15_vibration').val('');
+
+        // 측정부
+        $('#F01_measure_div').val('');
+        $('#F02_measure_div').val('');
+        $('#F03_measure_div').val('');
+        $('#F04_measure_div').val('');
+        $('#F05_measure_div').val('');
+
+        $('#F06_measure_div').val('');
+        $('#F07_measure_div').val('');
+        $('#F08_measure_div').val('');
+        $('#F09_measure_div').val('');
+        $('#F10_measure_div').val('');
+
+        $('#F11_measure_div').val('');
+        $('#F12_measure_div').val('');
+        $('#F13_measure_div').val('');
+        $('#F14_measure_div').val('');
+        $('#F15_measure_div').val('');
+
+        // 측정값
+        $('#F01_measure_value').val('');
+        $('#F02_measure_value').val('');
+        $('#F03_measure_value').val('');
+        $('#F04_measure_value').val('');
+        $('#F05_measure_value').val('');
+
+        $('#F06_measure_value').val('');
+        $('#F07_measure_value').val('');
+        $('#F08_measure_value').val('');
+        $('#F09_measure_value').val('');
+        $('#F10_measure_value').val('');
+
+        $('#F11_measure_value').val('');
+        $('#F12_measure_value').val('');
+        $('#F13_measure_value').val('');
+        $('#F14_measure_value').val('');
+        $('#F15_measure_value').val('');
+    }
+
+
+    // hjlim : ajax 따로 api_xxx.js 로 만들어서 사용하면 좋긴하나..
+    // ajax 내용 수정시, 변경 내용이 적용이 잘 안되어, 쿠키를 계속 비워야하는 번거러움 때문에 여기에 작성
+    function api_stator_post(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/Stator/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+
+    function api_stator_patch(id, allData, done_callback) {
+        $.ajax({
+            type: "PATCH",
+            url: "/Stator/" + id + "/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function (json) {
+                done_callback(json);
+            })
+            .fail(handle_error);
+    }
+
+
+    function get_url_extension(url) {
+        return url.split(/[#?]/)[0].split('.').pop().trim();
+    }
+
+
+    function fileCheck(file) {
+        // 사이즈체크
+        var maxSize = 1 * 1024 * 1024 //1MB
+        var fileSize = 0;
+
+        fileSize = file.files[0].size;
+        if (fileSize > maxSize) {
+            alert("파일 사이즈는 1MB 이내로 등록 가능합니다.");
+            return false;
+        }
+        return true;
+    }
+
+    function search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+
+        search();
+        return false;
+    }
+
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+
+</script>

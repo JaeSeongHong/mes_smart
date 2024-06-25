@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+{# 발주대비 입고등록 #}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.4.0/css/rowGroup.dataTables.min.css">
+
+
+</style>
+
+{% load static %}
+{{ it.media }}
+
+<body style="overflow: hidden;">
+
+<!-- 검색 -->
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">거래처</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.cu_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">입고현황</label>
+                                        <div class="content-input-group-input">
+                                         <select class="form-control form-control-sm" id="in_status">
+                                            <option value="">전체</option>
+                                            <option value="F">입고완료</option>
+                                            <option value="P">일부입고</option>
+                                            <option selected value="U">미입고</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label class="col-form-label">발주일자</label>
+                                        <div class="input-group input-daterange">
+                                        <input type="text"
+                                            class="form-control created_at_after datepicker form-control-sm"
+                                            id="make_from"
+                                            autocomplete="off"
+                                        />
+                                        <div class="input-group-addon px-3">~</div>
+                                        <input type="text"
+                                            class="form-control created_at_before datepicker form-control-sm"
+                                            id="make_to"
+                                            autocomplete="off"
+                                        />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="refresh"><i class="fa fa-refresh"></i></li>
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+                <div class="col-sm-6">
+                    <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="order_input_data_table" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in column %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="order_input_tbody">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+            <div class="col-sm-6">
+            <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="order_input_data_table_sub" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in subcolumn %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="order_input_tbody_sub"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#or_input_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="or_input_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="order_input_form">
+                            <div class="form-row">
+
+                            <div class="col-md-6 mb-3">
+                            <label><strong>*</strong>품번</label>
+                            <input type="text" class="form-control form-control-sm" name="itemcode" autocomplete="off" readonly />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                            <label><strong>*</strong>품명</label>
+                            <input type="text" class="form-control form-control-sm" name="itemname" autocomplete="off" readonly />
+                            </div>
+
+                            <div class="col-md-6 mb-3" id="id_it_name_form_div">
+                                <label><strong>*</strong>창고위치</label>
+                                <div class="input-group">
+                                    {{ it.it_location_add }}
+                                </div>
+                            </div>
+
+                                {% for item in subcolumn %}
+                                    {% if item.edit_flag %}
+
+
+                                        {% if item.tag == "input" %}
+                                    <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="text" class="{{ item.class_name|safe }}"
+                                           name="{{ item.label_en|safe }}"
+                                           autocomplete="off"
+                                            {% if item.attr != None %} {{ item.attr|safe }} {% endif %}
+                                            {% if item.event != None %} {{ item.event|safe }} {% endif %}/>
+                                     </div>
+                                        {% elif item.tag == "btn" %}
+                                            <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="button" class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" onclick="{{ item.event|safe }}" {{ item.attr }}/>
+                                     </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                        {% for item in subcolumn %}
+                            {% if item.tag == "button" %}
+                                <div class="{{ item.class_name|safe }}" onclick="{{ item.event|safe }}">{{ item.label }}</div>
+                            {% endif %}
+                        {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="{% static 'js/html2canvas.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/jspdf.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.4.0/js/dataTables.rowGroup.min.js"></script>
+<script src="{% static 'srtdash/datatable/dataTables.checkboxes.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+<script>
+    let maintable = null;
+    let subtable = null;
+    let re_column = []
+    let sub_column = []
+    let re_invisual_col = []
+    let sub_re_invisual_col = []
+    let re_name = []
+    let sub_re_name = []
+    let hidden_name = []
+    let sub_hidden_name = []
+    let orders_item_id = null;
+    let order_item_list_id = null;
+
+    {% for item in column %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            re_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+    re_column.push("id")
+
+    {% for item in subcolumn %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                sub_re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                sub_hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            sub_re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            sub_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+        sub_column.push("id");
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $(".datepicker").datepicker("setDate", "today");
+
+    $(function () {
+        let now = new Date();
+        let first_date = new Date(now.getFullYear(), now.getMonth(), 1);
+          $('[data-toggle="tooltip"]').tooltip()
+        $("#make_from").datepicker("setDate", first_date);
+        $("#make_to").datepicker("setDate", "today");
+
+        let quantity_idx = re_column.indexOf('item_supply_total');
+        let in_status_idx = re_column.indexOf('in_items_status');
+        let po_no_idx = re_column.indexOf('po_no');
+        let customer_name_idx = re_column.indexOf('customer_name');
+
+        main_table = $('#order_input_data_table').DataTable({
+            scrollX: true,
+            rowGroup: {
+                dataSrc: [po_no_idx]
+            },
+            "columnDefs": [
+
+                    {
+                        targets: [0],
+                        orderable: false,
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },{
+                        targets: [po_no_idx, customer_name_idx],
+                        visible: false
+                    },{
+                        targets: [quantity_idx],
+                        render: function(data, type, row) {
+                            data = parseInt(data);
+                            if (type === 'display' && typeof data === 'number') {
+                              return data.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                            }
+                        return data;
+                      }
+                },{
+                        targets: [in_status_idx],
+                        render: function(data, type, row) {
+                            switch (data){
+                                case "U":
+                                    data = "미입고";
+                                    break;
+                                case "P":
+                                    data = "일부입고";
+                                    break;
+                                case "F":
+                                    data = "입고완료";
+                                    break;
+                                default:
+                                    break;
+                            }
+                        return data;
+                      }
+                },
+                    {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                ],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+                        //console.log(data)
+                        orders_item_id=data[data.length-1]
+
+                        setRowColor(this, 'M');
+                        load_detail_table();
+                        $("#order_input_form [name='itemcode']").val(data[3]);
+                        $("#order_input_form [name='itemname']").val(data[4]);
+
+                    });
+                },
+        });
+        let in_quantity_idx = sub_column.indexOf('in_quantity')
+        sub_table = $('#order_input_data_table_sub').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                     {
+                        targets: [0],
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },{
+                        targets: [1],
+                        render: function(data, type, row, meta) {
+                            let obj = row[in_quantity_idx]
+                            if (obj<0){
+                                data = "입고취소";
+                            }else{
+                                data = "입고";
+                            }
+                            return '<span class="' + (parseFloat(obj) < 0 ? 'red-cell' : 'green-cell') + '">' + data + '</span>';
+                        }
+                    },{
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                ],
+            "createdRow": function(row, data, dataIndex) {
+
+                    $(row).find('.red-cell').css('color', 'red');
+                    $(row).find('.green-cell').css('color', 'green');
+                }
+        });
+
+
+        // 상위 체크박스의 이벤트 리스너를 등록합니다.
+      $('#parentCheckbox').change(function() {
+        let isChecked = $(this).prop('checked');
+
+        $('.childCheckbox').prop('checked', isChecked);
+      });
+
+      // 하위 체크박스 중 하나라도 체크 해제되면 상위 체크박스도 체크를 해제합니다.
+      $(document).on('change', '.childCheckbox', function() {
+            if ($('.childCheckbox:checked').length === $('.childCheckbox').length) {
+              $('#parentCheckbox').prop('checked', true);
+            } else {
+              $('#parentCheckbox').prop('checked', false);
+            }
+          });
+
+        refresh();
+
+    });
+
+
+    function refresh() {
+
+        search();
+    }
+
+
+    function search(){
+        let customer_search = $('#id_cu_name_sch').val();
+        if (customer_search === undefined || customer_search === null) customer_search = ''
+
+        let make_from = $("#make_from").val();
+        let make_to = $("#make_to").val();
+        let in_status = $("#in_status").val();
+
+        let query = "?page=1&";
+        if (customer_search === ''){} else query += "customer_id=" + customer_search + "&";
+
+        if (make_from === ''){} else query += "make_from=" + make_from + "&";
+        if (make_to === ''){} else query += "make_to=" + make_to + "&";
+
+        if (in_status === ''){} else query += "in_status=" + in_status + "&";
+
+        api_gp("/order_s/input_read" + query + "/", "GET", {}, (done) => {
+            load_list_table(done);
+        });
+    }
+
+
+    function load_list_table(done) {
+        let data = done.results;
+        console.log(data);
+
+        main_table.rows().remove().draw();
+        //console.log(re_column)
+        //main_table.rows.add(exformatData(data, re_column)).draw();
+        main_table.rows.add(formatData(data, re_column)).draw();
+
+        sub_table.rows().remove().draw();
+    }
+
+
+    function load_detail_table() {
+
+        let query = "?";
+        if (orders_item_id) query += "ordersitem_id=" + orders_item_id + "&";
+
+        api_gp("/order_s_in_items/" + query, "GET", {}, (done) => {
+
+            ordersItemDraw(done)
+        });
+    }
+
+    function ordersItemDraw(done) {
+        let data = done;
+        console.log(data);
+        //console.log("sub_column   :" + sub_column);
+        sub_table.rows().remove().draw();
+
+        sub_table.rows.add(formatDataArray(data, sub_column)).draw();
+
+    }
+
+    function load_in_table() {
+
+        let query = "?";
+        query += "orders_id=" + list_id + "&";
+        api_gp("/order_s_in_items/" + query, "GET", {}, (done) => {
+            //console.table(done)
+
+        });
+    }
+
+
+    function material_input_add(type) {
+        console.log("type   :  " + type);
+        if (orders_item_id == null) {
+            alert("입고등록 리스트를 먼저 선택해 주세요.");
+            return;
+        }
+
+        let in_date = $("#order_input_form [name=in_date]").val();
+        if (in_date == null || in_date == '') {
+            alert("입고일자를 선택해 주세요.");
+            return;
+        }
+
+        let in_quantity = $("#order_input_form [name=in_quantity]").val();
+        if (in_quantity == null || in_quantity == '') {
+            alert("입고할 수량를 선택해 주세요.");
+            return;
+        }
+        if (type === "C") {
+            in_quantity = -in_quantity
+        }
+
+        let in_faulty = $("#order_input_form [name=in_faulty]").val();
+        if (in_faulty == null || in_faulty == '') {
+            in_faulty =0;
+        }
+
+        let location = $("#id_it_location_add").val()
+        if (location == null || location ==''){
+            location = get_cookie('location');
+        }
+
+        let data = {};
+        data['csrfmiddlewaretoken'] = '{{ csrf_token }}';
+        data['orders_item_id'] = orders_item_id;
+        data['in_date'] = in_date;
+        data['in_quantity'] = in_quantity;
+        data['in_faulty'] = in_faulty;
+        data['location_id'] = location;
+
+
+        //console.log(data)
+        api_gp("/order_s_in_items/", "POST", data, (done) => {
+            if (type === "C") {
+                alert("입고취소 완료");
+            }else {
+                alert("입고 완료");
+            }
+
+
+        });
+    }
+
+
+
+    function form_blank() {
+        $('#order_input_form input').val('');
+
+        $('#order_input_form select').val(null).trigger('change');
+        $('#order_input_form select').attr("disabled",false);
+
+        $('#order_input_tbody').find('tr').siblings().css('background-color', '');
+        $('#order_input_tbody_sub').find('tr').siblings().css('background-color', '');
+
+
+        orders_item_id = null;
+    }
+
+    function exformatData(results) {
+
+          return results.map(result => [
+            "<input type='checkbox' class='childCheckbox' value='"+result.id+"' />",
+            null,
+            result.code,
+            result.name,
+            result.detail,
+            //result.model_name,
+            //  result.division_name,
+            result.shape,
+              result.quantity,
+              result.created_at,
+              result.in_quantity,
+              result.in_faulty,
+              result.location,
+              //result.etc,
+              result.id
+          ]);
+        }
+
+</script>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+<!-- UNBALANCE 등록 -->
+
+<body style="overflow: hidden;">
+
+{% comment %}<!-- spinner -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>{% endcomment %}
+
+
+<!-- 등록 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div class="row no-gutters">
+            <div class="content-title col-2 align-self-stretch d-flex"
+                 style="font-weight: bold;font-size:28px;height:70px;line-height:70px;"
+            >등록
+            </div>
+            <div class="col-10">
+                <div class="row no-gutters">
+
+                    <div class="col-2 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:28px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>제품명</label>
+                    </div>
+                    <input class="col-4 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:28px;height:70px;line-height:70px;background:white"
+                           id="item_name" placeholder="직접입력" autocomplete='off'
+                    />
+
+                    <div class="col-2 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:28px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>테스트 일자</label>
+                    </div>
+                    <input class="col-4 w-100 text-center form-control datepicker"
+                           style="font-weight: bold;font-size:28px;height:70px;line-height:70px;background:white"
+                           id="test_date" autocomplete='off'
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- UNBALANCE INPUT -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div class="row no-gutters">
+            <div class="col-12">
+                <div class="row no-gutters">
+                    <div class="col-3 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:25px;height:70px;line-height:70px;background:#e1ebf7">
+                        <label>UNBALANCE</label>
+                    </div>
+                    <div class="col-3 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:25px;height:70px;line-height:70px;background:#e1ebf7;
+                            border-right:10px solid #d9d9d9;">
+                        <label>ANGLE</label>
+                    </div>
+                    <div class="col-3 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:25px;height:70px;line-height:70px;background:#e1ebf7;
+                            border-left:10px solid #d9d9d9;">
+                        <label>UNBALANCE</label>
+                    </div>
+                    <div class="col-3 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:25px;height:70px;line-height:70px;background:#e1ebf7">
+                        <label>ANGLE</label>
+                    </div>
+                </div>
+
+                <div class="row no-gutters">
+                    <input class="col-3 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:30px;height:70px;line-height:70px;background:white"
+                           id="unbalance1" autocomplete='off' type="number"
+                    />
+                    <input class="col-3 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:30px;height:70px;line-height:70px;background:white;
+                            border-right:10px solid #d9d9d9;"
+                           id="angle1" autocomplete='off' type="number"
+                    />
+                    <input class="col-3 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:30px;height:70px;line-height:70px;background:white;
+                            border-left:10px solid #d9d9d9;"
+                           id="unbalance2" autocomplete='off' type="number"
+                    />
+                    <input class="col-3 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:30px;height:70px;line-height:70px;background:white"
+                           id="angle2" autocomplete='off' type="number"
+                    />
+                </div>
+
+
+                <div class="row no-gutters mt-3 mb-1 justify-content-end">
+                    <button
+                            class="col-2 btn btn-primary m-0 p-0"
+                            style="font-weight: bold;font-size:20px;height:60px;line-height:60px;"
+                            type="button"
+                            onclick="add();"
+                    >
+                        등록
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: scroll; height:506px;">
+            <table
+                    id="detail_table"
+                    class="table table-sm text-center"
+            >
+                <thead id="detail_thead">
+                <tr>
+                    <th width="5%">순번</th>
+                    <th width="22.5%">UNBALANCE</th>
+                    <th width="22.5%">ANGLE</th>
+                    <th width="22.5%" >UNBALANCE</th>
+                    <th width="22.5%">ANGLE</th>
+                </tr>
+                </thead>
+                <tbody id="detail_tbody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="card-body p-2">
+        <div class="row no-gutters mb-1 justify-content-end">
+            <button
+                    class="col-2 btn btn-primary m-0 p-0"
+                    style="font-weight: bold;font-size:20px;height:60px;line-height:60px;"
+                    type="button"
+                    onclick="reset();"
+            >
+                초기화
+            </button>
+
+            <button
+                    class="col-2 btn btn-primary ml-2 p-0"
+                    style="font-weight: bold;font-size:20px;height:60px;line-height:60px;"
+                    type="button"
+                    onclick="finish();"
+            >
+                완료
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    let Qunbalance_id = null;
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+
+    $(".datepicker").datepicker("setDate", "today");
+
+
+    $(function () {
+        refresh();
+
+    });
+
+
+    function refresh() {
+        // 입력하던 데이터가 있는지 체크
+        api_gp("/Unbalance/?last=true", "GET", {}, (done) => {
+            console.table(done);
+
+            if (done == null || done == ""){
+                Qunbalance_id = null;
+            }else{
+                read_item(done);
+            }
+        });
+    }
+
+
+    function read_item(data){
+        let done = data.results;
+        Qunbalance_id = done[0].id;
+        $('#item_name').val(done[0].item_name);
+        $('#item_name').attr('disabled', true);
+
+        $('#test_date').val(done[0].test_date);
+        $('#test_date').attr('disabled', true);
+
+        api_gp("/UnbalanceDetail/?num=" + Qunbalance_id, "GET", {}, (done) => {
+            load_detail_table(done);
+        });
+    }
+
+
+    function load_detail_table(data) {
+        {#console.table(data)#}
+        let rows = "";
+        let list_num = data.length;
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "'>";
+            row += "<td>" + (list_num--) + "</td>";  // 순번
+            row += "<td class='d-none' name='detail_id'>" + item.id + "</td>";  // id
+
+            row += "<td name='unbalance1'>" + item.unbalance1.toLocaleString() + "</td>";  // UNBALANCE
+            row += "<td name='angle1'>" + item.angle1.toLocaleString() + "</td>";  // UNBALANCE
+            row += "<td name='unbalance2'>" + item.unbalance2.toLocaleString() + "</td>";  // UNBALANCE
+            row += "<td name='angle2'>" + item.angle2.toLocaleString() + "</td>";  // UNBALANCE
+            row += "</tr>";
+            rows += row;
+        }
+
+        $('#detail_tbody').html(rows);
+
+    }
+
+
+    function add(){
+        if ($('#item_name').val() == "") {
+            alert("제품명을 입력해 주세요.");
+            return;
+        }
+
+        if ($('#test_date').val() == "") {
+            alert("테스트 일자를 입력해 주세요.");
+            return;
+        }
+
+        if ( ($('#unbalance1').val() == "") || ($('#unbalance2').val() == "")
+            || ($('#angle1').val() == "") || ($('#angle2').val() == "")) {
+            alert("등록할 'UNBALANCE, ANGLE' 값을 모두 입력해 주세요.");
+            return;
+        }
+
+        if (Qunbalance_id){  // 작업 하던 곳에, 계속해서 ADD
+            let data = get_detail_data();
+            api_gp("/UnbalanceDetail/", "POST", data, () => {
+
+                api_gp("/UnbalanceDetail/?num=" + Qunbalance_id, "GET", {}, (done) => {
+                    load_detail_table(done);
+
+                    $('#item_name').attr('disabled', true);
+                    $('#test_date').attr('disabled', true);
+
+                    $('#unbalance1').val('');
+                    $('#angle1').val('');
+                    $('#unbalance2').val('');
+                    $('#angle2').val('');
+                });
+
+            });
+
+        }else{  // 이전 작업이 없는 경우, 새로 작업 생성
+            let data = get_unbalance_data();
+            api_gp("/Unbalance/", "POST", data, (done) => {
+                console.table("test", done);
+                Qunbalance_id = done.id;
+
+                api_gp("/UnbalanceDetail/?num=" + Qunbalance_id, "GET", {}, (done) => {
+                    load_detail_table(done);
+
+                    $('#item_name').attr('disabled', true);
+                    $('#test_date').attr('disabled', true);
+
+                    $('#unbalance1').val('');
+                    $('#angle1').val('');
+                    $('#unbalance2').val('');
+                    $('#angle2').val('');
+                });
+            });
+        }
+    }
+
+
+    function get_unbalance_data() {
+        let item_name = $('#item_name').val();
+        let test_date = $('#test_date').val();
+
+        let unbalance1 = $('#unbalance1').val();
+        let angle1 = $('#angle1').val();
+        let unbalance2 = $('#unbalance2').val();
+        let angle2 = $('#angle2').val();
+
+        return {
+            code: test_date,
+            item_name: item_name,
+            test_date: test_date,
+
+            first_unbalance1 : unbalance1.replace(/,/g, ""),
+            first_angle1 : angle1.replace(/,/g, ""),
+            first_unbalance2 : unbalance2.replace(/,/g, ""),
+            first_angle2 : angle2.replace(/,/g, ""),
+
+            last_unbalance1 : unbalance1.replace(/,/g, ""),
+            last_angle1 : angle1.replace(/,/g, ""),
+            last_unbalance2 : unbalance2.replace(/,/g, ""),
+            last_angle2 : angle2.replace(/,/g, ""),
+
+            complete : false,
+        };
+    }
+
+    function get_detail_data() {
+        let unbalance1 = $('#unbalance1').val();
+        let angle1 = $('#angle1').val();
+        let unbalance2 = $('#unbalance2').val();
+        let angle2 = $('#angle2').val();
+
+        return {
+            num: Qunbalance_id,
+
+            unbalance1 : unbalance1.replace(/,/g, ""),
+            angle1 : angle1.replace(/,/g, ""),
+            unbalance2 : unbalance2.replace(/,/g, ""),
+            angle2 : angle2.replace(/,/g, ""),
+        };
+    }
+
+
+    function finish() {
+        if (Qunbalance_id == null){
+            return;
+        }
+
+        if (confirm("[완료] 하시겠습니까?") == false) {
+            return;
+        }
+
+        api_gp("/Unbalance/?id=" + Qunbalance_id, "GET", {}, (done) => {
+
+            let data ={
+                get_code : done.code,
+                get_item_name : done.item_name,
+                get_test_date : done.test_date,
+
+                get_first_unbalance1 : done.first_unbalance1,
+                get_first_angle1 : done.first_angle1,
+                get_first_unbalance2 : done.first_unbalance2,
+                get_first_angle2 : done.first_angle2,
+
+                get_last_unbalance1 : done.last_unbalance1,
+                get_last_angle1 : done.last_angle1,
+                get_last_unbalance2 : done.last_unbalance2,
+                get_last_angle2 : done.last_angle2,
+
+                complete : true
+            }
+
+            api_gp("/Unbalance/" + Qunbalance_id + "/", "PATCH", data, (done) => {
+                alert("[완료] 되었습니다.");
+                Qunbalance_id = null;
+
+                $('#item_name').val('');
+                $('#item_name').attr('disabled', false);
+                $(".datepicker").datepicker("setDate", "today");
+                $('#test_date').attr('disabled', false);
+
+                $('#unbalance1').val('');
+                $('#angle1').val('');
+                $('#unbalance2').val('');
+                $('#angle2').val('');
+
+                $('#detail_tbody').html("");
+            });
+
+        });
+    }
+
+
+    function reset(){
+        if (Qunbalance_id == null){
+            return;
+        }
+
+        if (confirm("[초기화] 하시겠습니까?") == false) {
+            return;
+        }
+
+        api_gp("/Unbalance/" + Qunbalance_id +"/", "DELETE", {}, (done) => {
+            console.table('delete', done);
+
+            Qunbalance_id = null;
+
+            $('#item_name').val('');
+            $('#item_name').attr('disabled', false);
+            $(".datepicker").datepicker("setDate", "today");
+            $('#test_date').attr('disabled', false);
+
+            $('#unbalance1').val('');
+            $('#angle1').val('');
+            $('#unbalance2').val('');
+            $('#angle2').val('');
+
+            $('#detail_tbody').html("");
+        });
+    }
+
+    function inputNumberFormat(obj) {
+        obj.value = comma(uncomma(obj.value));
+    }
+
+    function comma(str) {
+        str = String(str);
+        return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+    }
+
+    function uncomma(str) {
+        str = String(str);
+        return str.replace(/[^\d]+/g, '');
+    }
+
+</script>
+</body>

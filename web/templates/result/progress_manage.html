@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body>
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+
+<!-- {#{% block title %}#}
+{#    <title>공정진행현황 등록</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <form
+                class="content-search row no-gutters align-items-center content-input-group"
+                id="progress_manage_main-form"
+                onsubmit="return progress_manage_search_submit(event)"
+        >
+            <div class="content-title col-1 align-self-stretch">공정명 조회</div>
+            <div class="col-11" id="progress_manage">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>생산공정등록일자</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <div class="input-group input-daterange">
+                                <input
+                                        type="text"
+                                        class="form-control"
+                                        name="created-at-after"
+                                />
+                                <div class="input-group-addon px-3">~</div>
+                                <input
+                                        type="text"
+                                        class="form-control"
+                                        name="created-at-before"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>고객사</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    name="customer_name"
+                                    class="form-control customer-dropdown"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>생산제품명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    name="product_name"
+                                    class="form-control bom-dropdown-product"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0 d-none">
+                        <div
+                                class="content-input-group-header"
+                                style="background-color: darkgrey"
+                        >
+                            <label>모델명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    name="model_name"
+                                    class="form-control bom-dropdown-model"
+                            ></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0 d-none">
+                        <div
+                                class="content-input-group-header"
+                                style="background-color: darkgrey"
+                        >
+                            <label>버전</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    name="version"
+                                    class="form-control bom-dropdown-version"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>공장구분</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    name="factory_classification"
+                                    class="form-control factory-dropdown"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>생산공정명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input name="name" class="form-control"/>
+                        </div>
+                    </div>
+                    <!-- {#                        <div class="content-input-group col-lg-4 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2">#}
+{#                            <div class="content-input-group-header">#}
+{#                                <label>작업자명</label>#}
+{#                            </div>#}
+{#                            <div class="content-input-group-input">#}
+{#                                <input class="form-control" name="charge">#}
+{#                            </div>#}
+{#                        </div>#} -->
+                    <div class="col-1 px-0 ml-auto">
+                        <button class="btn button-search rounded-0 w-100 h-100">
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="height: 200px">
+            <table
+                    id="data-table-up"
+                    class="table table-sm text-center"
+                    style="min-width: 1300px"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>공장등록코드</th>
+                    <th>생산공정명</th>
+                    <th>고객사</th>
+                    <th>생산제품명</th>
+                    <th>모델명</th>
+                    <th>버전</th>
+                    <th>공장구분</th>
+                    <th>등록자</th>
+                    <th>등록일</th>
+                </tr>
+                </thead>
+                <tbody id="progress_manage_tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 내용 -->
+
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form class="content-content w-100" id="progress_manage_detail">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">공정진행 현황등록</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>세부공정명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control sp-type-dropdown"
+                                        id="sp-type-dropdown-id"
+                                >
+                                    <option>항목을 먼저 선택하세요</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>작업장명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input
+                                        class="form-control"
+                                        id="disabled-workshop"
+                                        disabled
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>생산지시수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="disabled-amount" disabled/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>공정담당자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="disabled-charge" disabled/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>작업일자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="disabled-by" disabled/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>생산진행수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" type="text" name="amount" onkeyup="_chkNumber(this, 3)"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>불량수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="faulty_amount" onkeyup="_chkNumber(this, 3)"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>작업진행현황</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control status-dropdown" name="status">
+                                    <option>항목을 먼저 선택하세요</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>완료예정일</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input
+                                        class="form-control datepicker"
+                                        autocomplete="off"
+                                        name="finished_at"
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>지연사유</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="reason"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters w-100 justify-content-end">
+                <div class="col-1 px-0 mr-2">
+                    <a
+                            id="progress_manage_add_btn"
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="progress_manage_add()"
+                    >등록</a
+                    >
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <a
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="progress_manage_edit()"
+                    >수정</a
+                    >
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <a
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="progress_manage_remove()"
+                    >삭제</a
+                    >
+                </div>
+                <!-- {#                    <div class="col-1 px-0">#}
+{#                        <a class="btn button-custom2 w-100" role="button">저장</a>#}
+{#                    </div>#} -->
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <!-- {#            <div class="col-12">#}
+{#                <p class="mb-2"><strong>생산공정명 : </strong>고객사 + 생산제품명 + 모델명 + 버전&emsp;<strong>공장구분 : </strong>본사&emsp;<strong>생산수량 : </strong>1000개</p>#}
+{##}
+{#            </div>#} -->
+        <div class="content-table col-12">
+            <table
+                    id="data-table-down"
+                    class="table table-sm text-center"
+                    style="min-width: 1300px"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>작업일자</th>
+                    <th>세부공정명</th>
+                    <th>작업장명</th>
+                    <th>생산지시수량</th>
+                    <th>작업자명</th>
+                    <th>등록자명</th>
+                    <th>생산진행수량</th>
+                    <th>불량수량</th>
+                    <th>작업진행현황</th>
+                    <th>완료예정일</th>
+                    <th>지연사유</th>
+                    <!-- {#                        <th>재고반영</th>#}
+{#                        <th>최초작성자</th>#} -->
+                    <th>최초작성일</th>
+                </tr>
+                </thead>
+                <tbody id="process_detail_tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script
+        src="{% static 'js/api_process.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_customer.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_codemaster.js' %}"
+        type="text/javascript"
+></script>
+<script>
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+    $(".datepicker").datepicker("setDate", "today");
+
+    $(".input-daterange input").each(function () {
+        $(this).datepicker({
+            format: "yyyy-mm-dd",
+            language: "ko",
+        });
+    });
+
+    var progress_process_id,
+        progress_subprocess_id,
+        progress_process_bom_master_id;
+
+    function progress_manage_search_submit(e) {
+        e.preventDefault();
+        let main_form = document.forms["progress_manage_main-form"];
+        let filter_arr = [];
+        filter_arr.push(main_form["created-at-after"].value);
+        filter_arr.push(main_form["created-at-before"].value);
+        filter_arr.push(main_form["customer_name"].value);
+        filter_arr.push(main_form["product_name"].value);
+        filter_arr.push(main_form["model_name"].value);
+        filter_arr.push(main_form["version"].value);
+        filter_arr.push(main_form["factory_classification"].value);
+        filter_arr.push(main_form["name"].value);
+        // filter_arr.push(main_form['charge'].value);
+        const urlParams = new URLSearchParams(window.location.search);
+        const myParam = urlParams.get("s"); // 실적관리일 경우 1 / 재고반영 버튼 구분 필요
+        filter_arr.push(myParam == 1 ? 1 : 0);
+
+        process_search(filter_arr, (data) => {
+            progress_manage_draw_table(data);
+        });
+
+        return false;
+    }
+
+    function progress_manage_draw_table(data) {
+        $("#progress_manage_table_row").text(data.length); // 로딩된 데이터 갯수 세기
+        let rows = "";
+        let list_num = 1;
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let created_date = item.created_at;
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + list_num++ + "</td>";
+            row += "<td name='code'>" + item.code + "</td>";
+            row += "<td name='name'>" + item.name + "</td>";
+            row +=
+                "<td name='customer_name' property='" +
+                (item.customer ? item.customer.id : "") +
+                "'>" +
+                (item.customer ? item.customer.name : "") +
+                "</td>";
+            row +=
+                "<td name='product_name'>" +
+                (item.bom_master ? item.bom_master.product_name : "") +
+                "</td>";
+            row +=
+                "<td name='model_name'>" +
+                (item.bom_master ? item.bom_master.model_name : "") +
+                "</td>";
+            row +=
+                "<td name='version'>" +
+                (item.bom_master ? item.bom_master.version : "") +
+                "</td>";
+            row +=
+                "<td name='factory_classification' property='" +
+                (item.factory_classification ? item.factory_classification.id : 0) +
+                "'>" +
+                (item.factory_classification
+                    ? item.factory_classification.name
+                    : "") +
+                "</td>";
+            row += "<td name='created_by'>" + item.created_by + "</td>";
+            row +=
+                "<td name='created_at'>" +
+                created_date.substring(0, 4) +
+                "-" +
+                created_date.substring(5, 7) +
+                "-" +
+                created_date.substring(8, 10) +
+                "</td>";
+            row += "</tr>";
+
+            rows += row;
+        }
+        spinner();
+        $("#progress_manage_tbody").html(rows);
+        $("#progress_manage_tbody > tr").on("click", function () {
+            $("#progress_manage_select_customer").val(
+                $(this).find("[name='customer_name']").text()
+            );
+            $("#progress_manage [name='code']").val(
+                $(this).find("[name='code']").text()
+            );
+            $("#progress_manage [name='customer_name']").val(
+                $(this).find("[name='customer_name']").attr("property")
+            );
+            $("#progress_manage [name='customer_name']").trigger("change");
+            $("#progress_manage [name='product_name']").val(
+                $(this).find("[name='product_name']").text()
+            );
+            $("#progress_manage [name='product_name']").trigger("change");
+            $("#progress_manage [name='model_name']").val(
+                $(this).find("[name='model_name']").text()
+            );
+            $("#progress_manage [name='model_name']").trigger("change");
+            $("#progress_manage [name='version']").val(
+                $(this).find("[name='version']").text()
+            );
+            $("#progress_manage [name='version']").trigger("change");
+            $("#progress_manage [name='factory_classification']").val(
+                $(this).find("[name='factory_classification']").attr("property")
+            );
+            $("#progress_manage [name='factory_classification']").trigger(
+                "change"
+            );
+            $("#progress_manage [name='name']").val(
+                $(this).find("[name='name']").text()
+            );
+            progress_process_id = $(this).attr("id");
+
+            // 공정진행현황등록 리셋
+            $("#sp-type-dropdown-id").val(null).trigger("change");
+            $("#progress_manage_detail [name='amount']").val("");
+            $("#progress_manage_detail [name='faulty_amount']").val("");
+            $("#progress_manage_detail [name='status']")
+                .val(null)
+                .trigger("change");
+            $("#progress_manage_detail [name='finished_at']").val("");
+            $("#progress_manage_detail [name='reason']").val("");
+            $("#disabled-workshop").val("");
+            $("#disabled-amount").val("");
+            $("#disabled-charge").val("");
+            $("#disabled-by").val("");
+
+            table_highlight("#progress_manage_tbody", progress_process_id);
+
+            // TODO: 차라리 안바뀌는 쪽이 나음.
+            // $('#progress_manage_detail input').val('');
+            // $('#progress_manage_detail select').val();
+            $("#progress_manage_detail select").trigger("change");
+
+            load_type_dropdown_for_subtable(progress_process_id);
+            progress_manage_load_subtable();
+        });
+
+        $('#data-table-up + .pagination-container').remove();
+        $(function () {
+            //Table pagination
+            $('#progress_manage_tbody').paginathing({
+                insertAfter: '#data-table-up'
+            });
+        });
+    }
+
+    let subprocess_finished = [];
+    let subprocess_list;
+
+    function progress_manage_detail_draw_table(data) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const myParam = urlParams.get("s"); // 실적관리일 경우 1 / 재고반영 버튼 구분 필요
+
+        let detail_rows = "";
+        let detail_list_num = 1;
+        let detail_count = 0;
+
+        subprocess_finished = [];
+        for (let si in subprocess_list) subprocess_finished.push(false);
+
+        for (let i = 0; i < data.length; i++) {
+            let detail_item = data[i];
+            let detail_created_date = detail_item.created_at;
+
+            // append it
+            detail_count++;
+            let detail_row =
+                "<tr id='" + detail_item.id + "' style='cursor:pointer;'>";
+            detail_row += "<td>" + detail_list_num++ + "</td>"; //순번
+            detail_row += "<td name='by'>" + detail_item.subprocess.by + "</td>"; //작업장
+            detail_row +=
+                "<td name='type' property='" +
+                detail_item.subprocess.type.id +
+                "'>" +
+                detail_item.subprocess.type.name +
+                "</td>"; //세부공정명
+            // {#detail_row += "<td class='d-none' name='type_id'>" + detail_item.subprocess.type.id + "</td>";#}
+            detail_row +=
+                "<td name='workshop' property='" +
+                detail_item.subprocess.workshop.id +
+                "'>" +
+                detail_item.subprocess.workshop.name +
+                "</td>"; //작업장
+            // {#detail_row += "<td class='d-none' name='workshop_id'>" + detail_item.subprocess.workshop.id + "</td>";#}
+            detail_row +=
+                "<td name='subprocess_amount'>" +
+                (detail_item.subprocess.amount ? detail_item.subprocess.amount.toLocaleString() : 0) +
+                "</td>"; // 일정
+            detail_row +=
+                "<td name='created_by' property='" +
+                detail_item.created_by +
+                "'>" +
+                detail_item.created_by +
+                "</td>";
+            // {#detail_row += "<td class='d-none' name='created_by_id'>" + detail_item.created_by + "</td>";#}
+            detail_row +=
+                "<td name='charge'>" +
+                detail_item.subprocess.charge.username +
+                "</td>"; // 생산수량
+            detail_row += "<td name='amount'>" + (detail_item.amount ? detail_item.amount.toLocaleString() : 0) + "</td>"; // 생산수량
+            detail_row +=
+                "<td name='faulty_amount'>" + (detail_item.faulty_amount ? detail_item.faulty_amount.toLocaleString() : 0) + "</td>"; // 단위
+            detail_row +=
+                "<td name='status' property='" +
+                detail_item.status.id +
+                "'>" +
+                detail_item.status.name +
+                "</td>"; // 공정 담당자
+            // {#detail_row += "<td class='d-none' name='status_id'>" + detail_item.status.id + "</td>";#}
+            detail_row +=
+                "<td name='finished_at'>" + detail_item.finished_at + "</td>"; // 일정
+            if (myParam == 1) {
+                if (detail_item.status.name === "완료") {
+                    detail_row +=
+                        "<td class='btn button-custom2 w-100' id='inventory_reflection_btn'  role='button' onclick='inventory_reflection()'>실적 재고 반영</td>"; // 재고반영
+                } else {
+                    detail_row += "<td></td>";
+                }
+            }
+            detail_row += "<td name='reason'>" + detail_item.reason + "</td>";
+            detail_row +=
+                "<td name='created_at'>" +
+                detail_created_date.substring(0, 4) +
+                "-" +
+                detail_created_date.substring(5, 7) +
+                "-" +
+                detail_created_date.substring(8, 10) +
+                "</td>"; // 공정 등록일
+            detail_row += "</tr>";
+
+            if (detail_item.status.name === "완료") {
+                for (let si in subprocess_list) {
+                    if (subprocess_list[si].id === detail_item.subprocess.id) {
+                        subprocess_finished[si] = true; // 하나라도 완료되면 등록 불가능하게.
+                    }
+                }
+            }
+
+            detail_rows += detail_row;
+        }
+
+        $("#detail_progress_manage_table_row").text(detail_count); // 로딩된 데이터 갯수 세기
+        $("#process_detail_tbody").html(detail_rows);
+        $("#process_detail_tbody > tr").on("click", function () {
+            $("#sp-type-dropdown-id").val(
+                $(this).find("[name='type']").attr("property")
+            ); // 세부공정명
+            $("#sp-type-dropdown-id").trigger("change");
+
+            $("#progress_manage_detail [name='amount']").val(
+                $(this).find("[name='amount']").text()
+            ); //
+            $("#progress_manage_detail [name='faulty_amount']").val(
+                $(this).find("[name='faulty_amount']").text()
+            ); //
+
+            $("#progress_manage_detail [name='status']").val(
+                $(this).find("[name='status']").attr("property")
+            ); //
+            $("#progress_manage_detail [name='status']").trigger("change");
+
+            $("#progress_manage_detail [name='finished_at']").val(
+                $(this).find("[name='finished_at']").text()
+            ); //
+            $("#progress_manage_detail [name='reason']").val(
+                $(this).find("[name='reason']").text()
+            ); //
+
+            progress_subprocess_id = $(this).attr("id");
+            table_highlight("#process_detail_tbody", progress_subprocess_id);
+        });
+
+        $('#data-table-down + .pagination-container').remove();
+        $(function () {
+            //Table pagination
+            $('#process_detail_tbody').paginathing({
+                insertAfter: '#data-table-down'
+            });
+        });
+    }
+
+    $("#progress_manage_detail [name='status']").change(function () {
+        // 작업진행현황’이 ‘완료’일 때는 ‘완료예정일’이 자동으로 ‘오늘 날짜’가 기입될 수 있게
+        if ($(this).select2("data")[0].text === "완료") {
+            $("#progress_manage_detail [name='finished_at']").val(
+                (date = getFormatDate(new Date()))
+            );
+        }
+    });
+
+    $(function () {
+        // 재고반영 tr
+        const urlParams = new URLSearchParams(window.location.search);
+        const myParam = urlParams.get("s"); // 실적관리일 경우 1 / 재고반영 버튼 구분 필요
+        if (myParam == 1) {
+            // 테이블
+            let bottom_table = $("#data-table-down tr")[0];
+
+            let element = document.createElement("th");
+            let txt = document.createTextNode("실적 재고반영");
+            element.appendChild(txt);
+
+            bottom_table.insertBefore(element, bottom_table.children[11]);
+
+            $(
+                "#progress_manage_detail > div.row.no-gutters.w-100.mb-2 > div.col-1.content-title"
+            ).text("작업실적관리");
+        }
+
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() => {
+            init_excel_export($("#data-table-up"), "생산공정");
+            init_excel_export($("#data-table-down"), "공정진행 현황등록");
+        });
+    });
+
+    function refresh() {
+        // 데이터 보여주기
+        progress_manage_init();
+        progress_manage_load_table();
+    }
+
+    function progress_manage_load_table() {
+        let filter_arr = null;
+        process_list(filter_arr, (data) => {
+            progress_manage_draw_table(data);
+        });
+    }
+
+    function load_type_dropdown_for_subtable(progress_process_id) {
+        api_gp(
+            "/process/sub/?process=" + progress_process_id,
+            "GET",
+            {},
+            (data) => {
+                subprocess_list = data;
+                make_dropdown(data, "#progress_manage_detail .sp-type-dropdown");
+            }
+        );
+    }
+
+    function progress_manage_load_subtable() {
+        api_gp(
+            "/process/sub/progress/?subprocess__process=" + progress_process_id,
+            "GET",
+            {},
+            (data) => {
+                progress_manage_detail_draw_table(data);
+                table_highlight("#process_detail_tbody", progress_subprocess_id);
+            }
+        );
+    }
+
+    function progres_manage_get_table_data(progress_process_id) {
+        api_gp(
+            "/process/sub/?process=" + progress_process_id,
+            "GET",
+            {},
+            (data) => {
+            }
+        );
+    }
+
+    function make_dropdown(data, selectors) {
+        let list = "<option value=''>선택</option>";
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            if (selectors.includes(".user-dropdown")) {
+                list +=
+                    "<option value='" + item.id + "'>" + item.username + "</option>";
+            } else if (selectors.includes(".bom-dropdown-product")) {
+                list +=
+                    "<option value='" +
+                    item.product_name +
+                    "'>" +
+                    item.product_name +
+                    "</option>";
+            } else if (selectors.includes(".bom-dropdown-model")) {
+                list +=
+                    "<option value='" +
+                    item.model_name +
+                    "'>" +
+                    item.model_name +
+                    "</option>";
+            } else if (selectors.includes(".bom-dropdown-version")) {
+                list +=
+                    "<option value='" +
+                    item.version +
+                    "'>" +
+                    item.version +
+                    "</option>";
+            } else if (selectors.includes(".sp-type-dropdown")) {
+                let adata =
+                    item.workshop.name +
+                    "," +
+                    item.amount +
+                    "," +
+                    item.charge.username +
+                    "," +
+                    item.by;
+                list +=
+                    "<option value='" +
+                    item.type.id +
+                    "' data-subprocess='" +
+                    item.id +
+                    "' data-item='" +
+                    adata +
+                    "'>" +
+                    item.type.name +
+                    "</option>";
+            } else {
+                list +=
+                    "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+        }
+        $(selectors).html(list);
+        $(selectors).select2({width: "100%"});
+    }
+
+    $("#sp-type-dropdown-id").on("select2:select", function (e) {
+        let item = $("#sp-type-dropdown-id")
+            .select2("data")[0]
+            .element.getAttribute("data-item");
+        let items = item ? item.split(",") : ",,,";
+
+        $("#disabled-workshop").val(items[0]);
+        $("#disabled-amount").val(items[1]);
+        $("#disabled-charge").val(items[2]);
+        $("#disabled-by").val(items[3]);
+    });
+
+    function progress_manage_init() {
+        api_gp("/customers/", "GET", {}, (data) => {
+            make_dropdown(data, ".customer-dropdown");
+        });
+
+        api_gp("/bom/master/", "GET", {}, (data) => {
+            make_dropdown(
+                data,
+                "#progress_manage_main-form .bom-dropdown-product"
+            );
+            make_dropdown(data, "#progress_manage_main-form .bom-dropdown-model");
+            make_dropdown(
+                data,
+                "#progress_manage_main-form .bom-dropdown-version"
+            );
+        });
+
+        api_gp("/codes/?group=109&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".type-dropdown");
+        });
+
+        // {#api_gp('/codes/?group=110', 'GET', {}, (data) => {#}
+        // {#    make_dropdown(data, '.workshop-dropdown');#}
+        // {# });#}
+
+        // {#api_gp('/codes/?group=105', 'GET', {}, (data) => {#}
+        // {#    make_dropdown(data, '.unit-dropdown');#}
+        // {# });#}
+
+        api_gp("/codes/?group=104&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, "#progress_manage_main-form .factory-dropdown");
+        });
+
+        api_gp("/codes/?group=124&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, "#progress_manage_detail .status-dropdown");
+        });
+
+        // {#api_gp('/users/', 'GET', {}, (data) => {#}
+        // {#    make_dropdown(data, '.user-dropdown');#}
+        // {# });#}
+    }
+
+    function progress_process_get_data() {
+        // Process Data
+        return new Promise(function (resolve, reject) {
+            api_gp("/process/" + progress_process_id + "/", "GET", {}, (data) => {
+                progress_process_bom_master_id = data.bom_master.id;
+                resolve(data);
+            });
+        });
+    }
+
+    function progress_sub_process_get_data() {
+        // SubProcessProgress Data
+        return new Promise(function (resolve, reject) {
+            api_gp(
+                "/process/sub/progress/?id=" + progress_subprocess_id,
+                "GET",
+                {},
+                (data) => {
+                    resolve(data);
+                }
+            );
+        });
+    }
+
+    function bom_get_data() {
+        // Bom Data
+        return new Promise(function (resolve, reject) {
+            api_gp(
+                "/bom/?master__id=" + progress_process_bom_master_id,
+                "GET",
+                {},
+                (data) => {
+                    resolve(data);
+                }
+            );
+        });
+    }
+
+    function item_out_get_data() {
+        // Item_Out Data
+        return new Promise(function (resolve, reject) {
+            api_gp("/items/out/", "GET", {}, (data) => {
+                resolve(data);
+            });
+        });
+    }
+
+    // 버튼을 눌렀을때 데이터 불러오기
+    async function inventory_reflection() {
+        await progress_process_get_data();
+        let progress_sub_process_datas = await progress_sub_process_get_data();
+        let bom_data = await bom_get_data();
+
+        let new_out_amount;
+        let target_subprocess;
+
+        for (let i = 0; i < progress_sub_process_datas.length; i++) {
+            let sub_process_data = progress_sub_process_datas[i];
+            if (
+                sub_process_data.id === Number(progress_subprocess_id) &&
+                sub_process_data.subprocess.process == progress_process_id
+            ) {
+                target_subprocess = sub_process_data;
+                new_out_amount =
+                    sub_process_data.amount + sub_process_data.faulty_amount;
+            }
+        }
+
+        if (target_subprocess === undefined) {
+            alert("해당 데이터를 찾을 수 없습니다.");
+            return;
+        }
+
+        for (let i = 0; i < bom_data.length; i++) {
+            // 생산공정(창고) 데이터가 존재할 경우, 해당 생산공정(창고)만 처리되도록.
+            if (
+                bom_data[i].storage != null &&
+                target_subprocess.subprocess.type.id != bom_data[i].storage.id
+            ) {
+                continue;
+            }
+
+            let item_id = bom_data[i].item.id;
+            let item_purpose = bom_data[i].master.product_name;
+            let bom_id = bom_data[i].master.id;
+            let enterprise_id = bom_data[i].item.enterprise;
+            let warehouse_id = target_subprocess.subprocess.type.code;
+            let warehouse_to_code = target_subprocess.subprocess.type.code;
+
+            let date = new Date();
+            date = getFormatDate(date);
+
+            let data = {
+                warehouse: warehouse_id,
+                warehouse_to_code: warehouse_to_code,
+                out_at: date,
+                purpose: item_purpose,
+                item: item_id,
+                bom_pk: bom_id,
+                out_amount: new_out_amount * bom_data[i].required_amount,
+                enterprise: enterprise_id,
+                wh_is_auto: true,
+            };
+
+            await new Promise(function (resolve, reject) {
+                api_gp("/wh/out/", "POST", data, (data) => {
+                    resolve(data);
+                });
+            });
+        }
+
+        alert("반영되었습니다.");
+
+        // parent.closeLoadingWithMask()
+    }
+
+    function getFormatDate(date) {
+        var year = date.getFullYear(); //yyyy
+        var month = 1 + date.getMonth(); //M
+        month = month >= 10 ? month : "0" + month; //month 두자리로 저장
+        var day = date.getDate(); //d
+        day = day >= 10 ? day : "0" + day; //day 두자리로 저장
+        return year + "-" + month + "-" + day; //'-' 추가하여 yyyy-mm-dd 형태 생성 가능
+    }
+
+    function progress_manage_get_form_data() {
+        let sp = $("#sp-type-dropdown-id")
+            .select2("data")[0]
+            .element.getAttribute("data-subprocess");
+        return {
+            subprocess: parseInt(sp),
+            amount: parseInt($("#progress_manage_detail [name='amount']").val().replace(/,/g, '')),
+            faulty_amount: parseInt(
+                $("#progress_manage_detail [name='faulty_amount']").val().replace(/,/g, '')),
+            status: $("#progress_manage_detail [name='status']").val(),
+            finished_at: $("#progress_manage_detail [name='finished_at']").val(),
+            reason: $("#progress_manage_detail [name='reason']").val(),
+        };
+    }
+
+    function progress_manage_add() {
+        let data = progress_manage_get_form_data();
+
+        for (let si in subprocess_list) {
+            if (
+                subprocess_list[si].id === data.subprocess &&
+                subprocess_finished[si] === true
+            ) {
+                alert("이미 완료처리 되었습니다.");
+                return;
+            }
+        }
+
+        api_gp("/process/sub/progress/", "POST", data, (data) => {
+            alert("성공적으로 등록하였습니다.");
+            progress_manage_load_subtable();
+        });
+    }
+
+    function progress_manage_edit() {
+        let data = progress_manage_get_form_data();
+        api_gp(
+            "/process/sub/progress/" + progress_subprocess_id + "/",
+            "PATCH",
+            data,
+            (data) => {
+                alert("성공적으로 수정하였습니다.");
+                progress_manage_load_subtable();
+            }
+        );
+    }
+
+    function progress_manage_remove() {
+        let data = progress_manage_get_form_data();
+        api_gp(
+            "/process/sub/progress/" + progress_subprocess_id + "/",
+            "DELETE",
+            data,
+            (data) => {
+                alert("성공적으로 삭제하였습니다.");
+                progress_manage_load_subtable();
+            }
+        );
+    }
+
+    function table_highlight(table, id) {
+        // {#console.log(id);#}
+        // {#console.log($(table).find('tr#' + id));#}
+        // table click highlight
+        $(table).find("tr").removeClass("clicked");
+        $(table)
+            .find("tr#" + id)
+            .addClass("clicked");
+    }
+
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

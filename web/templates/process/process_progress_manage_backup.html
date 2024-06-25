@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+
+{#<title>공정진행현황등록</title>#}
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 생산공정 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 생산공정 검색 -->
+        <form
+                class="content-search row no-gutters align-items-center content-input-group"
+                id="BOMmaster_form"
+                onsubmit="return search_submit(event)"
+        >
+            <div class="content-title col-1 align-self-stretch">
+                생산공정검색
+            </div>
+            <div class="col-11" id="BOMmaster">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>생산제품명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control product_name"
+                                    id="search_product"
+                            ></select>
+                        </div>
+                    </div>
+
+                    <div class="col-1 px-0">
+                        <button class="btn button-search w-100">검색</button>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 생산공정 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <div class="col-12 px-0">
+                <!-- 본문 -->
+                <div class="content-table col-12 px-0 mb-2" style="overflow-x:auto; overflow-y:hidden; height: 251px;">
+                    <table id="process_table" class="table table-sm text-center">
+                        <thead>
+                        <tr>
+                            <th>순번</th>
+                            <th>식별코드</th>
+                            <th>생산제품명</th>
+                            <th>품명상세</th>
+
+                            <th>생산수량</th>
+                            <th>생산일정</th>
+{#                            <th id="actual_top">실 생산일정</th>#}
+                            <th>생산공정등록일자</th>
+                        </tr>
+                        </thead>
+                        <tbody id="process_tbody">
+                        </tbody>
+                    </table>
+
+                    <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                         style="margin-top: -20px;">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 원가비교 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form class="content-content w-100" id="cost_form">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">원가비교</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header" title="평균불량률">
+                                <label>평균불량률</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input id="avg_frate" class="form-control" autocomplete="false" readonly/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header" title="현재불량률 = 현재불량수 / 생산수량">
+                                <label>현재불량률</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input id="now_frate" class="form-control" autocomplete="false" readonly/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header" title="현재 불량수 = 한 공정의 총 불량수">
+                                <label>현재불량수</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input id="now_fnum" class="form-control" autocomplete="false" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header" title="평균불량원가 = (원재료원가 * 평균불량률) + 원재료원가">
+                                <label>평균불량원가</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input id="avg_fcost" class="form-control" autocomplete="false" readonly/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header" title="현재원가 = (원자재원가 * 현재불량률) + 원재료원가">
+                                <label>현재원가</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input id="now_cost" class="form-control" autocomplete="false" readonly/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header" title="원재료원가">
+                                <label>원재료원가</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input id="org_cost" class="form-control" autocomplete="false" readonly/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header" title="(개선전수준-개선후수준) / 개선전수준) * 100">
+                                <label>개선율</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input id="improve_rate" class="form-control" autocomplete="false" readonly/>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 세부공정 진행현황 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form class="content-content w-100" id="sub_process_form">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">공정진행현황등록</div>
+                <div class="col-11" id="sub_process_manage">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>완료수량 <strong>*</strong> </label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input name="complete_amount" class="form-control" onkeyup="_chkNumber(this, 3)"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>불량수량 <strong>*</strong> </label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input name="faulty_amount" class="form-control" onkeyup="_chkNumber(this, 3)"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>진행현황 <strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control" name="status">
+                                    <option value="대기">대기</option>
+                                    <option value="진행">진행</option>
+                                    <option value="완료">완료</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>완료예정일</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input
+                                        class="form-control datepicker"
+                                        autocomplete="off"
+                                        id="finished_at"
+                                        name="finished_at"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-12">
+                            <div class="content-input-group-header">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input name="reason" class="form-control"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters w-100 justify-content-end">
+                <div class="col-1 px-0 mr-2">
+                    <a
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="sub_process_add()"
+                    >등록</a
+                    >
+                </div>
+
+                <div class="col-1 px-0 mr-2">
+                    <a
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="sub_process_remove()"
+                    >삭제</a
+                    >
+                </div>
+                <div id="connect" class="col-1 px-0 mr-2">
+                    <a
+                            class="btn button-custom2 w-100"
+                            role="button"
+                            onclick="send_subprocess_info()"
+                    >통신시작</a
+                    >
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- 세부공정 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <div class="col-12 px-0">
+            <!-- 본문 -->
+            <div class="content-table col-12 px-0 mb-2" style="overflow-x:auto; overflow-y: hidden; height: 251px;">
+                <table id="sub_process_table" class="table table-sm text-center">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>세부공정명</th>
+                        <th>작업장</th>
+                        <th>공정담당자</th>
+                        <th>공정등록자</th>
+                        <th>공정등록일</th>
+
+                        <th>작업일정</th>
+{#                        <th id="actual_bottom">실 작업일정</th>#}
+                        <th>계획수량</th>
+                        <th>완료수량</th>
+                        <th>잔여수량</th>
+                        <th>불량수량</th>
+
+                        <th>진행현황</th>
+                        <th>완료일</th>
+                        <th>비고</th>
+                    </tr>
+                    </thead>
+                    <tbody id="detail_tbody">
+                    </tbody>
+                </table>
+
+                <div class="row no-gutters d-flex justify-content-center" id="item_nation2"
+                     style="margin-top: -20px;">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_process.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_customer.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script>
+    let enterprise_manage = get_userinfo().enterprise_manage;
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+    let nation1 = new Pnations(nation_data1, process_search);  // 인스턴스 명
+
+    let nation_data2 = {
+        cname : 'nation2',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation2',
+        range: 5,
+        page_size: 5,
+    };
+    let nation2 = new Pnations(nation_data2, detail_search);  // 인스턴스 명
+
+    let process_id = null;
+    let detail_id = null;
+    let sub_process_complete = null;
+
+    // 원가비교에 사용되는 데이터
+    let pr_amount = 0  // 생산수량
+    let cost_this = null;
+    let cost_avg_frate = null;  // 평균불량률
+    // 현재불량률
+    let cost_now_fnum = '';  // 현재불량수
+    // 현재불량수
+    let cost_avg_fcost = '';  // 평균불량원가
+    // 현재원가
+    let cost_org_cost = '';  // 원재료원가
+
+    if (enterprise_manage !== "(주)건강생활연구소") {
+        $('#actual_top').addClass('d-none');
+        $('#actual_bottom').addClass('d-none');
+    }
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+    $(".datepicker").datepicker("setDate", "today");
+
+    $(".input-daterange input").each(function () {
+        $(this).datepicker({
+            format: "yyyy-mm-dd",
+            language: "ko",
+        });
+    });
+
+    $(function () {
+        refresh();
+
+        if (get_userinfo().enterprise_manage !== '(주)오큐텍'){
+            $('#connect').addClass('d-none');
+        }
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#process_manage_data-table"), "생산공정")
+        );
+    });
+
+
+    function refresh() {
+        init_data();
+        process_search();
+    }
+    
+    function process_search(){
+        let search_product = $('#search_product :selected').text();
+
+        let query = ";"
+        let enterprise_manage = get_userinfo().enterprise_manage;
+        if (enterprise_manage == '(주)온교육') {
+            query = "?page=" + nation1.page;
+        }else{
+            query = "?page=" + nation1.page + "&complete=0";;
+        }
+
+
+        if (search_product == '' || search_product == null || search_product == '선택 및 검색'){
+        } else { query += "&bom_master__product_name=" + search_product; }
+
+        {#console.log(query);#}
+
+        api_gp("/process/" + query, 'GET', {}, (done) => {
+            process_table_draw(done);
+        });
+    }
+
+
+    function init_data() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택 및 검색</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === '.bom-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.bom_name + "</option>";
+                } else if (selectors === ".product_name") {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.product_name + "</option>";
+                } else {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // BOM명, 생산제품명
+        api_gp("/bom/master_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".product_name");
+        });
+
+        $("#finished_at").datepicker("setDate", "");
+    }
+
+
+    function process_table_draw(done) {
+        {#console.table(done);#}
+
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+        let rows = "";
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";
+            row += "<td class='d-none' name='bom_id'>" + item.id + "</td>";
+            row += "<td name='item_code'>" + item.code + "</td>";  // 식별코드
+            row += "<td class='d-none' name='bom_number'>" + item.bom_master.bom_number + "</td>";  // BOM 코드번호
+            row += "<td name='bom_name'>" + item.bom_master.product_name + "</td>";  // 생산제품명
+            row += "<td name='detail'>" + (item.bom_master.detail ? item.bom_master.detail : "") + "</td>";  // 품명상세
+            row += "<td name='product_amount'>" + item.amount + "</td>"; // 생산수량
+
+            row += "<td class='d-none' name='process_fr'>" + (item.fr_date ? item.fr_date : "") + "</td>";
+            row += "<td class='d-none' name='process_to'>" + (item.to_date ? item.to_date : "") + "</td>";
+            row += "<td name='process_date'>" +
+                (item.fr_date ? item.fr_date : "") + " ~ " +
+                (item.to_date ? item.to_date : "")+ "</td>"; // 생산일정
+
+            {% comment %}if (enterprise_name === "(주)건강생활연구소") {
+                row += "<td name='actual_process_date'>" +
+                    (item.actual_fr_date ? item.actual_fr_date : "") + " ~ " +
+                    (item.actual_to_date ? item.actual_to_date : "") + "</td>"; // 실작업일정
+            }{% endcomment %}
+
+            row += "<td name='process_in_day'>" + item.created_at + "</td>"; // 생산공정등록일자
+            row += "<td class='d-none' name='avg_frate'>" + item.avg_fault_rate + "</td>"; // 평균불량률
+            row += "<td class='d-none' name='now_fnum'>" + item.now_fnum + "</td>"; // 현재불량률
+            row += "</tr>";
+            rows += row;
+        }
+
+        spinner();
+
+        nation1.nation_display(done);
+        $('#process_tbody').html(rows);
+
+        // click check
+        if (process_id != null){
+            $("#process_tbody #" + process_id).addClass('clicked');
+        }
+
+        cost_this = null;
+        $('#process_tbody > tr').on('click', function () {
+            reset_data();
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            cost_this = this;
+            process_id = $(this).attr("id");
+            detail_table_load();
+            cost_avg_frate = $(this).find("[name='avg_frate']").text();  // 평균불량률
+            $("#avg_frate").val(cost_avg_frate);
+
+            pr_amount = $(this).find("[name='product_amount']").text(); // 생산수량
+            cost_now_fnum = $(this).find("[name='now_fnum']").text(); // 현재불량수
+            $("#now_fnum").val(cost_now_fnum);
+
+            let bom_number = $(this).find("[name='bom_number']").text();
+            cal_costs(bom_number);
+        });
+    }
+
+
+    function cal_costs(bom_number){
+        let query = "?page=" + '1';
+        if (bom_number == null){
+        } else { query += "&bom_number=" + bom_number }
+
+        api_gp("/cost/product/search/" + query, "GET", {}, (done) => {
+            console.table(done);
+            if (done.results){
+                if(done.results[0].product_cost){
+
+                    cost_org_cost = done.results[0].product_cost;
+                    $("#org_cost").val(cost_org_cost); // 원재료 원가
+                    cost_avg_frate = cost_avg_frate * 1; // 평균 불량 원가 = (원재료원가*평균 불량률) + 원재료원가
+                    cost_avg_fcost = (cost_org_cost * cost_avg_frate / 100) + cost_org_cost;
+
+                    cost_avg_fcost += '';
+                    if (cost_avg_fcost.indexOf('.')){
+                        cost_avg_fcost = cost_avg_fcost * 1;
+                        cost_avg_fcost = cost_avg_fcost.toFixed(2);
+                    }
+                    cost_avg_fcost = cost_avg_fcost * 1;
+
+                    $("#avg_fcost").val(cost_avg_fcost); // 평균 불량 원가
+                    cal_now();  // 현재 불량률, 현재 원가
+                }
+            }
+        });
+    }
+
+
+    function cal_now(){
+        if ((cost_now_fnum == 0) || (cost_now_fnum == null) || (cost_now_fnum == undefined) ||
+        (pr_amount == 0) || (pr_amount == null) || (pr_amount == undefined)){
+            $("#now_frate").val('');
+            $("#now_cost").val(cost_org_cost);
+            return;
+        }
+        let now_frate = 0;
+        now_frate = cost_now_fnum / pr_amount * 100;
+
+        now_frate += '';
+
+        if (now_frate.indexOf('.')) {
+            now_frate = now_frate * 1;
+            now_frate = now_frate.toFixed(2);
+        }
+        now_frate = now_frate * 1;
+
+        $("#now_frate").val(now_frate);
+
+        let now_cost = 0;
+        now_cost = (cost_org_cost * now_frate / 100) + cost_org_cost;
+
+        now_cost += '';
+        if (now_cost.indexOf('.')) {
+            now_cost = now_cost * 1;
+            now_cost = now_cost.toFixed(2);
+        }
+        now_cost = now_cost * 1;
+
+        $("#now_cost").val(now_cost);
+
+        let improve_rate = 0;
+
+        // (개선전수준-개선후수준) / 개선전수준) * 100
+        if (cost_avg_fcost == 0){
+            improve_rate = 0;
+        }else{
+            improve_rate = ((cost_avg_fcost - now_cost) / cost_avg_fcost ) * 100;
+        }
+
+        improve_rate += ''; // todo 함수화 하면 좋을 듯
+        if (improve_rate.indexOf('.')) {
+            improve_rate = improve_rate * 1;
+            improve_rate = improve_rate.toFixed(2);
+        }
+
+        $("#improve_rate").val(improve_rate);
+
+    }
+    
+    function detail_table_load() {
+        nation2.page = 1;
+        detail_id = null;
+        detail_search();
+    }
+    
+    
+    function detail_search() {
+        let query = "?page=" + nation2.page + "&process=" + process_id;
+
+        api_gp("/process/sub/" + query, "GET", {}, (done) => {
+            detail_table_draw(done);
+        });
+    }
+
+
+    function detail_table_draw(done) {
+        {#console.table(done);#}
+        let data = done.results;
+        let num = (((nation2.page*1) - 1) * nation_data2["page_size"]) + 1 ;
+        let rows = "";
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";  // 순번
+            row += "<td class='d-none' name='bom_id'>" + item.id + "</td>";  // id
+            row += "<td name='type'>" + item.type.name + "</td>";  // 세부공정명
+            row += "<td name='workshop'>" + (item.workshop ? item.workshop.name : "") + "</td>";  // 작업장
+            row += "<td name='charge'>" + (item.charge ? item.charge.username : "") + "</td>";  // 공정담당자
+            row += "<td name='updated_by'>" + item.created_by + "</td>"; // 공정등록자
+            row += "<td name='created_at'>" + item.created_at + "</td>"; // 공정등록일
+
+            row += "<td class='d-none' name='process_fr'>" + (item.fr_date ? item.fr_date : "") + "</td>";
+            row += "<td class='d-none' name='process_to'>" + (item.to_date ? item.to_date : "") + "</td>";
+            row += "<td name='process_date'>" +
+                (item.fr_date ? item.fr_date : "") + " ~ " +
+                (item.to_date ? item.to_date : "")+ "</td>"; // 작업일정
+
+            {% comment %}if (enterprise_name === "(주)건강생활연구소") {
+                row += "<td name='actual_process_date'>" +
+                    (item.actual_fr_date ? item.actual_fr_date : "") + " ~ " +
+                    (item.actual_to_date ? item.actual_to_date : "") + "</td>"; // 실작업일정
+            }{% endcomment %}
+
+            row += "<td name='amount'>" + item.amount + "</td>"; // 계획수량
+
+            row += "<td name='complete_amount' property='" + item.complete_amount +  "'>" +
+                (item.complete_amount == 0 ? "" :  item.complete_amount)  + "</td>"; // 완료수량
+
+            row += "<td name='remain_amount' property='" + item.remain_amount +  "'>" +
+                (item.remain_amount == 0 ? "" : item.remain_amount) + "</td>"; // 잔여수량
+
+            row += "<td name='faulty_amount' property='" + item.faulty_amount +  "'>" +
+                (item.faulty_amount == 0 ? "" : item.faulty_amount) + "</td>"; // 불량수량
+
+            row += "<td name='status' property='" + (item.status ? item.status.id : "") +  "'>" +
+                item.status + "</td>"; // 진행현황
+
+            row += "<td name='finished_at'>" +
+                (item.finished_at ? item.finished_at : "") + "</td>"; // 완료일
+
+            row += "<td name='reason'>" + item.reason + "</td>"; // 지연사유
+            row += "</tr>";
+            rows += row;
+
+        }
+
+        spinner();
+        nation2.nation_display(done);
+        $('#detail_tbody').html(rows);
+
+        // click check
+        if (detail_id != null){
+            $("#detail_tbody #" + detail_id).addClass('clicked');
+        }
+
+        $('#detail_tbody > tr').on('click', function () {
+
+            // 완료수량
+            $("#sub_process_manage [name='complete_amount']").val(
+                $(this).find("[name='complete_amount']").attr("property")
+            );
+
+            // 불량수량
+            $("#sub_process_manage [name='faulty_amount']").val(
+                $(this).find("[name='faulty_amount']").attr("property")
+            );
+
+            // 진행현황
+            $("#sub_process_manage [name='status']").val(
+                $(this).find("[name='status']").text()
+            );
+            sub_process_complete = $(this).find("[name='status']").text();
+
+            $("#sub_process_manage [name='status']").trigger("change");
+
+            // 완료예정일
+            $("#sub_process_manage [name='finished_at']").val(
+                $(this).find("[name='finished_at']").text()
+            );
+
+            // 지연사유
+            $("#sub_process_manage [name='reason']").val(
+                $(this).find("[name='reason']").text()
+            );
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            detail_id = $(this).attr("id");
+        });
+    }
+
+
+    function search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+        process_id = null;
+
+        reset_cost();
+        reset_data();
+        $("#detail_tbody").empty();
+        $("#item_nation2").empty();
+
+        process_search();
+        return false;
+    }
+
+
+    function get_sub_process_data() {
+        return {
+            complete_amount: parseFloat($("#sub_process_manage [name='complete_amount']").val().replace(/,/g, "")),
+            faulty_amount: parseFloat($("#sub_process_manage [name='faulty_amount']").val().replace(/,/g, "")),
+            status: $("#sub_process_manage [name='status']").val(),
+            finished_at: $("#sub_process_manage [name='finished_at']").val(),
+            reason: $("#sub_process_manage [name='reason']").val(),
+        };
+    }
+
+
+    function sub_process_add(){
+
+        if (sub_process_complete == "완료"){
+            alert("이미 완료처리 되었습니다.");
+            return;
+        }
+
+        if (detail_id == null){
+            alert("세부 공정을 먼저 선택해 주세요.");
+            return;
+        }
+
+        if (($("#sub_process_manage [name='complete_amount']").val() == "")
+            || ($("#sub_process_manage [name='complete_amount']").val() == null)) {
+            alert("완료수량을 입력해 주세요.");
+            return;
+        }
+
+        if (($("#sub_process_manage [name='faulty_amount']").val() == "")
+            || ($("#sub_process_manage [name='faulty_amount']").val() == null)) {
+            alert("불량수량을 입력해 주세요.");
+            return;
+        }
+
+        if (($("#sub_process_manage [name='status']").val() == "")
+            || ($("#sub_process_manage [name='status']").val() == null)) {
+            alert("진행현황을 선택해 주세요.");
+            return;
+        }
+
+        let data = get_sub_process_data();
+
+
+        if (data['status'] == '완료'){
+            if (confirm("진행현황 [완료] 처리 후 등록, 수정이 불가합니다. 계속하시겠습니까?") == false){
+                return;
+            }
+        }
+
+        api_gp("/process/sub/" + detail_id + "/", "PATCH", data, (done) => {
+            console.table(done);
+            if (done.now_fnum){
+                $("#now_fnum").val(done.now_fnum);  // 현재 불량수
+                cost_now_fnum = done.now_fnum;
+                $(cost_this).find("[name='now_fnum']").text(cost_now_fnum);  // 평균불량률
+                cal_now();
+            }
+
+            alert("수정하였습니다.");
+            detail_search();
+        });
+    }
+
+    function get_sub_process_remove_data() {
+        return {
+            complete_amount: 0,
+            faulty_amount: 0,
+            remain_amount: 0,
+            status: '대기',
+            finished_at: "",
+            reason: "",
+        };
+    }
+
+
+    function sub_process_remove(){
+        if (sub_process_complete == "완료"){
+            alert("이미 완료처리 되었습니다.");
+            return;
+        }
+
+        if (detail_id == null){
+            alert("세부 공정을 먼저 선택해 주세요.");
+            return;
+        }
+
+        let data = get_sub_process_remove_data();
+
+        api_gp("/process/sub/" + detail_id + "/", "PATCH", data, (done) => {
+            alert("삭제하였습니다.");
+            detail_search();
+        });
+    }
+
+    function send_subprocess_info(){
+        if (!detail_id){
+            alert('세부 공정을 선택해 주십시오.')
+            return;
+        }
+
+        $.ajax({
+            type:'GET',
+            url:'/sendsubprocessinfo/?subprocess_id=' + detail_id,
+            headers: {
+            "Authorization": get_token()
+            },
+        })
+    }
+
+    function reset_data(){
+
+        // 완료수량
+        $("#sub_process_manage [name='complete_amount']").val("");
+
+        // 불량수량
+        $("#sub_process_manage [name='faulty_amount']").val("");
+
+        // 진행현황
+        $("#sub_process_manage [name='status']").val("");
+        $("#sub_process_manage [name='status']").trigger("change");
+
+        // 완료예정일
+        $("#sub_process_manage [name='finished_at']").val("");
+
+        // 지연사유
+        $("#sub_process_manage [name='reason']").val("");
+    }
+
+    function reset_cost(){
+        $("#avg_frate").val('');  // 평균 불량률
+        $("#org_cost").val('');  // 원재료 원가
+        $("#now_fnum").val('');  // 현재 불량수
+        $("#avg_fcost").val('');  // 평균 불량 원가
+        $("#improve_rate").val('');  // 개선율
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>
+
+</body>
+</html>

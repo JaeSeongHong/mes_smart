@@ -1,0 +1,147 @@
+{% load static %}
+<div class="header-area">
+    <div class="row align-items-center">
+        <div class="col-md-6 col-sm-8 clearfix">
+            <div class="nav-btn pull-left">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-4 clearfix">
+            <ul class="notification-area pull-right">
+                <li><i class="fa fa-sign-out" id="logout" style="font-size: 48px;" ></i></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    {#let enterprise_name = get_userinfo().enterprise_name;#}
+    let enterprise_manage = get_userinfo().enterprise_manage;
+
+    $(".dropdown-item").on('contextmenu', function(ev) {
+        ev.preventDefault();
+        var button_url = this.getAttribute("href");
+        window.open(button_url);
+    })
+
+    // logout action
+    $("#logout").click(function() {
+        flush_token();
+        window.location.href = "/accounts/login/" // TODO:
+    });
+
+    // help 도움말
+    $("#help").click(function() {
+        if (enterprise_manage == '할랄푸드코리아') {
+            var url = "/KPI/kpi_pop";
+            var name = "KPI";
+            var option = "width=1000, height=417, location=no";
+            window.open(url, name, option);
+        }else if (enterprise_manage == '(주)건강생활연구소'){
+            var url = "/basic_information/health";
+            var name = "health";
+            var option = "width=1920, height=1080, location=no";
+            {#var option = "width=600, height=600, location=no";#}
+            {#window.open(url, name, option);#}
+        }
+    });
+
+    if (enterprise_manage !== '(주)건강생활연구소'){
+        $("#graph").addClass('d-none');
+        $("#alert").addClass('d-none');
+        $("#kpi").addClass('d-none');
+    }
+
+    $("#graph").click(function () {
+        if (enterprise_manage == '(주)건강생활연구소'){
+            var url = "/basic_information/graph";
+            var name = "graph";
+            var option = "width=1920, height=1080, location=no";
+            {#var option = "width=600, height=600, location=no";#}
+            window.open(url, name, option);
+        }
+    })
+
+    $("#alert").click(function () {
+        if (enterprise_manage == '(주)건강생활연구소'){
+            var url = "/basic_information/alert";
+            var name = "alert";
+            var option = "width=1920, height=700, location=no";
+            {#var option = "width=600, height=600, location=no";#}
+            window.open(url, name, option);
+        }
+    })
+
+    $("#kpi").click(function () {
+        if (enterprise_manage == '(주)건강생활연구소'){
+            var url = "/basic_information/rest_kpi";
+            var name = "rest_kpi";
+            var option = "width=1920, height=800, location=no";
+            {#var option = "width=600, height=600, location=no";#}
+            window.open(url, name, option);
+        }
+    })
+
+    if (enterprise_manage == '한빛테크랩'){
+        $('button.sm-6').attr("onclick", "url_click('/basic_information/BOM_hanvit/', 'sm-6');")
+        $('button .sm-7').attr("onclick", "url_click('/BOM/manage_hanvit/', 'sm-7');")
+        $('button .sm-8').attr("onclick", "url_click('/BOM/lookup_hanvit/', 'sm-8');")
+    }
+
+    // for screen-print
+    $("#screen-print").click(function() {
+        $('.tab-content .show iframe').contents().find("body").printThis();
+    });
+
+    $("#content-print").click(function() {
+        var title_text = $("title").text();
+
+        $('.tab-content .show iframe').contents().find("table").printThis({
+            header: '<h3 class="mb-2" id=title">' + title_text + '</h3>'
+        });
+    });
+
+    $(() => {
+
+        let permissions = get_userinfo().permissions;
+
+        for (let i = 0; i < AUTH_CNT_MAX; i++) {
+            let enabled = (permissions[i]) == '1';
+            if (enabled == true) $('.sm-' + i).css('display', 'block');
+        }
+
+        if (get_userinfo().is_superuser === 'true') {
+            $('.sm-su').css('display', 'block');
+            $(".sm-en").css("display", "block");
+        }
+
+        if (get_userinfo().is_master === "true") {
+          $(".sm-en").css("display", "block");
+        }
+
+        for (let i = 1; i <= TAB_CNT_MAX; i++) {
+            let checkDisplay = 1;
+            let check_this = '#menu-' + i;
+            $(check_this).find('a').each(function() {
+                if (!($(this).css('display') == 'none')) {
+                    checkDisplay = 0;
+                }
+            })
+            if (checkDisplay) {
+                $(check_this).css('display', 'none');
+            }
+        }
+
+        let userinfo = get_userinfo();
+        $("#usercode").text(userinfo.code);
+        $("#username").text(userinfo.name);
+        $("#enterprise_name").text(userinfo.enterprise_name);
+        $("#e-name").text(userinfo.enterprise_name);
+    });
+
+</script>

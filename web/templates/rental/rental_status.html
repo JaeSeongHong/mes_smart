@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html>
+<header>
+    {% include "header.html" %}
+</header>
+<body>
+
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {#{% block title %}#}
+{#    <title>대여현황 조회</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px" />
+  </div>
+
+    <div class="row no-gutters justify-content-center d-lg-none d-md-flex d-sm-flex">
+        <h2 class="font-weight-bold my-2">대여현황 조회</h2>
+    </div>
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center content-input-group">
+                <div class="content-title col-lg-1 align-self-stretch d-lg-flex d-md-none d-sm-none">
+                    대여현황 조회
+                </div>
+                <form class="col-lg-11 col-md-12" id="rental_status_main-form" onsubmit="return rental_status_search_submit(event)">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2">
+                            <div class="content-input-group-header">
+                                <label>대여일</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="input-group input-daterange">
+                                    <input type="text" class="form-control" name="from_date" autocomplete="off">
+                                    <div class="input-group-addon px-3">~</div>
+                                    <input type="text" class="form-control" name="to_date"  autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2">
+                            <div class="content-input-group-header">
+                                <label>대여품목 코드</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control code-dropdown" name="code">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2">
+                            <div class="content-input-group-header">
+                                <label>대여품목명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control name-dropdown" name="name">
+                                </select>
+                            </div>
+                        </div>
+<!-- {#                        <div class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2" style="display:none;"> <!-- 주석처리 -->#}
+{#                            <div class="content-input-group-header" style="background-color: darkgrey;">#}
+{#                                <label>모델명</label>#}
+{#                            </div>#}
+{#                            <div class="content-input-group-input">#}
+{#                                <select class="form-control model-dropdown" name="model">#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#} -->
+
+                    </div>
+                    <div class="row no-gutters">
+<!-- {#                        <div class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2" style="display:none;">#}
+{#                            <div class="content-input-group-header" style="background-color: darkgrey;">#}
+{#                                <label>버전</label>#}
+{#                            </div>#}
+{#                            <div class="content-input-group-input">#}
+{#                                <select class="form-control rev-dropdown" name="version">#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#} -->
+                        <div class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2">
+                            <div class="content-input-group-header">
+                                <label>시리얼 No</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="serial">
+<!-- {#                                <select class="form-control serial-dropdown">#}
+{#                                </select>#} -->
+                            </div>
+                        </div>
+                        <div class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2">
+                            <div class="content-input-group-header">
+                                <label>대여업체</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control customer-dropdown" name="customer">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-lg-2 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2">
+                            <div class="content-input-group-header">
+                                <label>대여자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="customer_name">
+<!-- {#                                <select class="form-control">#}
+{#                                    <option>1</option>#}
+{#                                    <option>2</option>#}
+{#                                    <option>3</option>#}
+{#                                </select>#} -->
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-12 px-0 ml-auto">
+                            <button class="btn button-search rounded-0 w-100 h-100">검색</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-table col-12">
+                <table id="rental_status_data-table" class="table table-sm text-center" style="min-width: 1300px;">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>대여품목코드</th>
+                        <th>대여품목명</th>
+                        <th>모델명</th>
+<!-- {#                        <th>버전</th>#} -->
+                        <th>시리얼 넘버</th>
+                        <th>대여품 구분</th>
+                        <th>공장 구분</th>
+                        <th>반납 예정일</th>
+                        <th>대여품 상태</th>
+                        <th>대여업체</th>
+                        <th>대여자명</th>
+                        <th>대여자 연락처</th>
+                        <th>반납일</th>
+                        <th>회수상품 이상유무</th>
+                        <th>반납자 이름</th>
+                        <th>반납자 연락처</th>
+                        <th>특이사항</th>
+                        <th>대여 등록자</th>
+                        <th>대여 등록일</th>
+                        <th>회수 등록자</th>
+                        <th>회수 등록일</th>
+                    </tr>
+                    </thead>
+                    <tbody id="rental_status_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <label class="mb-0">(<strong id="rental_status_table_row">0</strong>) 건 로딩</label>
+        </div>
+    </div>
+    <script src="{% static 'js/api_rental.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+    <script>
+    $('.input-daterange input').each(function() {
+        $(this).datepicker({
+            format: 'yyyy-mm-dd',
+            language: 'ko',
+        });
+    });
+    var now_code = getParameters('code');
+    if (now_code === '선택') now_code = '';
+    var now_name = getParameters('name');
+    if (now_name === '선택') now_name = '';
+    var now_serial = getParameters('serial');
+    if (now_serial === '선택') now_serial = '';
+    var now_customer = getParameters('customer');
+    if (now_customer === '선택') now_customer = '';
+    var now_customer_name = getParameters('customer_name');
+    if (now_customer_name === '선택') now_customer_name = '';
+
+    $(() => {
+        // TODO: 대여품목명, 등..
+        rental_status_init();
+
+        // Table export
+        $(parent.document).find("#excel-export").click(() => init_excel_export($('#rental_status_data-table'), '대여현황조회'));
+    });
+
+    // {#function rental_status_makeOptions(data, filter, compare_value, value, detail, dest) {#}
+    // {#    let list = "<option value=''>선택</option>";#}
+    // {#    for (let i = 0; i < data.length; i++) {#}
+    // {#        let item = data[i];#}
+    // {#        if (filter == item[compare_value])#}
+    // {#            list += "<option value='" + item[value] + "' selected>" + item[detail] + "</option>";#}
+    // {#        else#}
+    // {#            list += "<option value='" + item[value] + "' >" + item[detail] + "</option>";#}
+    // {#    }#}
+    // {#    $(dest).html(list).select2({#}
+    // {#        width: '100%',#}
+    // {#    });#}
+    // {# }#}
+
+    function rental_status_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            if (selectors.includes('.code-dropdown')) {
+                for (let i = 0; i < data.length; i++) {
+                    let item = data[i];
+                    list += "<option value='" + item.id + "'>" + item.code + "</option>";
+                }
+            } else {
+                for (let i = 0; i < data.length; i++) {
+                    let item = data[i];
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+
+            $(selectors).html(list);
+            $(selectors).select2({
+                width: '100%',
+            });
+        }
+
+        api_gp('/rental/master/', 'GET', {}, (data) => {
+            // {#rental_status_makeOptions(data, now_code, 'id', 'id', 'code', $('.code-dropdown'));#}
+            make_dropdown(data, '#rental_status_main-form .code-dropdown')
+        });
+
+        api_gp('/items_select/', 'GET', {}, (data) => {
+            // {#rental_status_makeOptions(data, now_name, 'id', 'id', 'name', $('.name-dropdown'));#}
+            make_dropdown(data, '#rental_status_main-form .name-dropdown');
+        });
+
+        // {#api_gp('/codes/?group=116', 'GET', {}, (data) => {#}
+        // {#    make_dropdown(data, '#rental_status_main-form .model-dropdown');#}
+        // {# });#}
+
+        // {#api_gp('/codes/?group=117', 'GET', {}, (data) => {#}
+        // {#    make_dropdown(data, '#rental_status_main-form .rev-dropdown');#}
+        // {# });#}
+
+        // {#api_gp('/codes/?group=122', 'GET', {}, (data) => {#}
+        // {#    make_dropdown(data, '#rental_status_main-form .type-dropdown');#}
+        // {# });#}
+
+        api_gp('/customers_select/', 'GET', {}, (data) => {
+            make_dropdown(data, '#rental_status_main-form .customer-dropdown');
+        });
+    }
+
+    $(function () { refresh(); });
+
+    function refresh() {
+        rental_status_load_table(now_code, now_name, now_serial, now_customer, now_customer_name);
+        rental_status_init();
+    }
+
+    function rental_status_load_table(code, name, serial, customer, customer_name) {
+        api_gp('/rental/?code=' + code + '&name=' + name + '&serial=' + serial
+            + '&customer=' + customer + '&customer_name' + customer_name, 'GET', {}, (data) => {
+            rental_status_draw_table(data);
+        })
+    }
+
+    function nullapply(value) {
+        return (value ? value : "");
+    }
+
+        function rental_status_search_submit(e) {
+        e.preventDefault();
+        var myform = document.forms['rental_status_main-form'];
+        var my_arr = [];
+        my_arr.push(myform['from_date'].value);
+        my_arr.push(myform['to_date'].value);
+        my_arr.push(myform['code'].value);
+        my_arr.push(myform['name'].value);
+        // {#my_arr.push(myform['model'].value);#}
+        // {#my_arr.push(myform['version'].value);#}
+        my_arr.push(myform['serial'].value);
+        my_arr.push(myform['customer'].value);
+        my_arr.push(myform['customer_name'].value);
+
+        rental_status_search(my_arr, (data) => {
+            rental_status_draw_table(data);
+        });
+
+        return false;
+    }
+
+    function rental_status_draw_table(data) {
+        // {#console.table(data);#}
+
+        $('#rental_status_table_row').text(data.length); // 로딩된 데이터 갯수 세기
+
+        let rows = "";
+        let list_num = 1;
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (list_num++) + "</td>";
+            row += "<td name='rental_code' property='" + item.master.id + "'>" + item.master.code + "</td>";      // 대여품목코드
+            // {#row += "<td class='d-none' name='rental_code_id'>" + item.master.id + "</td>";#}
+            row += "<td name='rental_name'>" + item.master.item.name + "</td>";      // 대여품목명
+            // row += "<td class='d-none' name='item_id'>" + item.master.item.id + "</td>";
+            row += "<td name='model'>" + (item.master.item.model ? item.master.item.model.name : "") + "</td>";            // 모델명
+            // {#row += "<td name='rev'>" + nullapply(item.version) + "</td>";              // 버전#}
+            row += "<td name='serial'>" + item.master.serial + "</td>";           // 시리얼 넘버
+            row += "<td name='type'>" + item.master.rental_class.name + "</td>";             // 대여품 구분
+            row += "<td name='factory'>" + item.master.factory_class.name + "</td>";          // 공장 구분
+
+            row += "<td name='rent_return_date'>" + item.exp_date + "</td>";     // 반납 예정일
+            row += "<td name='rent_condition'>" + item.condition + "</td>";       // 대여품 상태
+            row += "<td name='rent_customer' property='" + (item.customer ? item.customer.id : "") + "'>" + (item.customer ? item.customer.name : "") + "</td>";        // 대여업체
+            // {#row += "<td class='d-none' name='rent_customer_id'>" + item.customer.id + "</td>";#}
+            row += "<td name='rent_customer_name'>" + item.customer_name + "</td>";   // 대여자명
+            row += "<td name='rent_customer_phone'>" + item.customer_phone + "</td>";  // 대여자 연락처
+
+            row += "<td name='return_date'>" + nullapply(item.return_date) + "</td>";          // 반납일
+            row += "<td name='return_condition'>" + nullapply(item.return_condition) + "</td>";     // 회수상품 이상유무
+            row += "<td name='return_customer_name'>" + nullapply(item.return_name) + "</td>"; // 반납자 연락처
+            row += "<td name='return_customer_phone'>" + nullapply(item.return_phone) + "</td>";// 반납자 연락처
+            row += "<td name='rent_etc'>" + item.etc + "</td>";             // 특이사항
+
+            row += "<td name='created_by'>" + item.created_by + "</td>";         // 대여 등록자
+            row += "<td name='created_at'>" + item.created_at + "</td>";         // 대여 등록일
+            row += "<td name='updated_by'>" + item.updated_by + "</td>";         // 회수 등록일
+            row += "<td name='updated_at'>" + item.updated_at + "</td>";         // 회수 등록일
+            row += "</tr>";
+
+            rows += row;
+        }
+        spinner();
+        $('#rental_status_tbody').html(rows);
+        $('#rental_status_tbody > tr').on('click', function () {
+            // {#$(".rental_code-dropdown").val($(this).find("[name='rental_code']").text()).trigger('change');#}
+            // {#$(".rental_name-dropdown").val($(this).find("[name='rental_name']").text()).trigger('change');#}
+            // {#$(".model_dropdown").val($(this).find("[name='model']").text()).trigger('change');#}
+            // {#$(".rev-dropdown").val($(this).find("[name='rev']").text()).trigger('change');#}
+            // {#$(".type-dropdown").val($(this).find("[name='type']").text()).trigger('change');#}
+            // {#$(".factory-dropdown").val($(this).find("[name='factory']").text()).trigger('change');#}
+            // {##}
+            // {#$("#detail_rent [name='rent_return_date']").val($(this).find("[name='rental_code']").text()).trigger('change');#}
+            // {#$("#detail_rent [name='rent_condition']").val($(this).find("[name='rent_condition']").text()).trigger('change');#}
+            // {#$("#detail_rent [name='rent_customer'], #detail_return [name='return_customer']").val($(this).find("[name='rent_customer']").text()).trigger('change');#}
+            // {#$("#detail_rent [name='rent_customer_name']").val($(this).find("[name='rent_customer_name']").text()).trigger('change');#}
+            // {#$("#detail_rent [name='rent_customer_phone']").val($(this).find("[name='rent_customer_phone']").text()).trigger('change');#}
+            // {#$("#detail_rent [name='rent_etc'], #detail_return [name='rent_etc']").val($(this).find("[name='rent_etc']").text()).trigger('change');#}
+            // {##}
+            // {#$("#detail_return [name='return_return_date']").val($(this).find("[name='return_date']").text()).trigger('change');#}
+            // {#$("#detail_return [name='return_condition']").val($(this).find("[name='return_condition']").text()).trigger('change');#}
+            // {#$("#detail_return [name='return_customer_name']").val($(this).find("[name='return_customer_name']").text()).trigger('change');#}
+            // {#$("#detail_return [name='return_customer_phone']").val($(this).find("[name='return_date']").text()).trigger('change');#}
+            // {#$("#detail_return [name='return_date']").val($(this).find("[name='return_date']").text()).trigger('change');#}
+            code_group_id = $(this).attr('id');
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+        });
+
+        //Table pagination
+        $('.pagination-container').remove();
+        $('.table tbody').paginathing();
+    }
+
+
+    function spinner(){
+        $("#spinner").remove();
+    }
+
+    </script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

@@ -1,0 +1,561 @@
+{% include 'header.html' %}
+{% load static %}
+
+<!-- 다중 조회 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="height: 150px">
+            <table
+                    id="multi_table"
+                    class="table table-sm text-center"
+                    style="min-width: 1300px"
+            >
+                <thead id="multi_thead">
+                <tr>
+                    <th></th>
+                    <th>장비1</th>
+                    <th>장비2</th>
+                    <th>장비3</th>
+                    <th>장비4</th>
+                    <th>장비5</th>
+                    <th>장비6</th>
+                    <th>장비7</th>
+                </tr>
+                </thead>
+                <tbody id="multi_tbody">
+                <tr>
+                    <td>온도</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>습도</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="vh-100">
+    <!-- 검색 -->
+    <form class="card m-2" id="monitoring_search-form">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div
+                        class="content-title col-lg-1 align-self-stretch d-lg-flex d-md-none d-sm-none"
+                >
+                    조회
+                </div>
+                <div class="col-lg-11 col-md-12">
+                    <div class="row no-gutters">
+                        <div
+                                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <div class="content-input-group-header">
+                                <label>장비명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control device_select"
+                                        id="device_id"
+                                ></select>
+                            </div>
+                        </div>
+                        <div
+                                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <div class="content-input-group-header">
+                                <label>MAC ADDS<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control mac_select"
+                                        id="mac_id"
+                                ></select>
+                            </div>
+                        </div>
+                        <div
+                                class="content-input-group col-lg-4 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <div class="content-input-group-header">
+                                <label>기간</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="input-group input-daterange">
+                                    <input
+                                            type="text"
+                                            class="form-control h-100 datepicker"
+                                            autocomplete="off"
+                                            id="fr_date"
+                                    />
+                                    <div class="input-group-addon h-100 px-3">~</div>
+                                    <input
+                                            type="text"
+                                            class="form-control h-100 datepicker"
+                                            autocomplete="off"
+                                            id="to_date"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                                class="content-input-group col-lg-1 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <input class="h-50 w-50 align-center" style="margin-top:7px;" type="checkbox" id="realtime" checked>
+                        </div>
+
+                        <div class="col-lg-1 col-md-12 mt-auto px-0">
+                            <button
+                                    class="btn button-search rounded-0 w-100 h-100"
+                                    onclick="monitoring_init_table();return false;"
+                            >
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- 차트 제목 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-content w-100">
+                <label class="mb-0">장비명 : &nbsp;</label><strong id="device_label"></strong>
+                <label class="mb-0">&nbsp;&nbsp;&nbsp;&nbsp; MAC ADDS : &nbsp;</label><strong id="mac_label"></strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- 차트 들어갈 자리 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-content w-100" style="height: 300px">
+                <canvas id="myChart" width="100" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-table col-12" style="height: 150px">
+                <table
+                        id="monitoring_table"
+                        class="table table-sm text-center"
+                        style="min-width: 1300px"
+                >
+                    <thead id="monitoring_thead">
+                    <tr>
+                        <th>구분</th>
+                        <th>1시</th>
+                        <th>2시</th>
+                        <th>3시</th>
+                        <th>4시</th>
+                        <th>5시</th>
+                        <th>6시</th>
+                        <th>7시</th>
+                        <th>8시</th>
+                        <th>9시</th>
+                        <th>10시</th>
+                        <th>11시</th>
+                        <th>12시</th>
+                        <th>13시</th>
+                        <th>14시</th>
+                        <th>15시</th>
+                        <th>16시</th>
+                        <th>17시</th>
+                        <th>18시</th>
+                        <th>19시</th>
+                        <th>20시</th>
+                        <th>21시</th>
+                        <th>22시</th>
+                        <th>23시</th>
+                        <th>24시</th>
+                    </tr>
+                    </thead>
+                    <tbody id="monitoring_tbody">
+                    <tr>
+                        <td>온도</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>습도</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script>
+
+    let interval_start = false;
+    let interval = null;
+
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $(".datepicker").datepicker("setDate", "today");
+
+
+    $(function () {
+        refresh();
+
+        // Table export
+    });
+
+
+    function refresh() {
+        init_drop_down();
+        load_multi_table();
+        {#init_manage_table();#}
+    }
+
+
+    function init_drop_down() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+
+                if (selectors === '.device_select') {
+                    list += "<option value='" + item.id + "'>" + item.device + "</option>";
+                }else if (selectors === '.mac_select') {
+                    list += "<option value='" + item.id + "'>" + item.mac + "</option>";
+                }else{
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        api_gp("/sensors_h2/", "GET", {}, (data) => {
+            console.table(data);
+            make_dropdown(data, ".device_select");
+            make_dropdown(data, ".mac_select");
+
+            $('#device_id').on('select2:select', function (e) { // 장비명 선택시
+                let select2_data = e.params.data;
+                if (select2_data.id === '') {
+                    $("#mac_id").val(null).trigger("change");
+                    $("#device_label").text("");
+                    $("#mac_label").text("");
+                } else {
+                    let id = $(this).val();
+                    $("#mac_id").val(id).trigger("change");
+
+                    $("#device_label").text($(".device_select").select2("data")[0].text);
+                    $("#mac_label").text($(".mac_select").select2("data")[0].text);
+                }
+            });
+
+            $('#mac_id').on('select2:select', function (e) { // MAC 선택시
+                let select2_data = e.params.data;
+                if (select2_data.id === '') {
+                    $("#device_id").val("").trigger("change");
+                    $("#device_label").text("");
+                    $("#mac_label").text("");
+                } else {
+                    let id = $(this).val();
+                    $("#device_id").val(id).trigger('change');
+
+                    $("#device_label").text($(".device_select").select2("data")[0].text);
+                    $("#mac_label").text($(".mac_select").select2("data")[0].text);
+                }
+            });
+        });
+    }
+
+
+    function get_today(){
+        let today = new Date();
+        let year = today.getFullYear(); // 년도
+        let month = today.getMonth() + 1;  // 월
+        let date = today.getDate();  // 날짜
+        let _today = year + "-" + (("00" + month.toString()).slice(-2)) + "-" + (("00" + date.toString()).slice(-2));
+
+        return _today;
+    }
+
+    function monitoring_init_table(){
+        if ($('#device_id').val() == "") {
+            alert("장비명을 작성해 주세요.");
+            return;
+        }
+
+        monitoring_load_table();
+
+        interval_start = false;
+        if (interval != null){
+            clearInterval(interval);
+            interval = null;
+        }
+
+        let realtime = $('#realtime').prop("checked");
+        if (realtime == true){
+
+            interval_start = true;
+            interval = setInterval(function () {
+                if (interval_start) {
+                    console.log("START");
+                    monitoring_load_realtime();
+                    load_multi_table();
+                } else {
+                    console.log("END");
+                    console.log("interval : " + interval);
+                    clearInterval(interval);
+                    interval = null;
+                }
+            }, 60000)
+        }
+    }
+
+    function monitoring_load_realtime(){
+        let mac_label = $("#mac_label").text();
+        let today = get_today();
+        $("#fr_date").val(today);
+        $("#to_date").val(today);
+
+        let query = "?";
+        if (mac_label != null) query += "mac=" + mac_label + "&";
+        query += "fr_date=" + today + "&";
+        query += "to_date=" + today + "&";
+
+        api_gp("/sensors_h2/values/" + query, "GET", {}, (done) => {
+            {#console.table(done);#}
+            mock(done)
+        });
+    }
+
+    function monitoring_load_table(){
+        let mac_label = $("#mac_label").text();
+        let fr_date = $("#fr_date").val();
+        let to_date = $("#to_date").val();
+
+        let query = "?";
+        if (mac_label != null) query += "mac=" + mac_label + "&";
+        if (fr_date !== null || fr_date !== '') query += "fr_date=" + fr_date + "&";
+        if (to_date !== null || to_date !== '') query += "to_date=" + to_date + "&";
+
+        api_gp("/sensors_h2/values/" + query, "GET", {}, (done) => {
+            {#console.table(done);#}
+            mock(done)
+        });
+    }
+
+
+    function render_table_static(data) {
+        let is_multiday = data.length > 48;
+
+        let cols = "<th>구분</th>";
+        let temp_rows = "<td>온도</td>";
+        let heu_rows = "<td>습도</td>";
+        for (let i = 0; i < data.length; i++) {
+            let date = new Date(data[i].fetch_datetime);
+            if (is_multiday) {
+                cols += "<th>" + date.getDate() + "일 " + date.getHours() + "시" + date.getMinutes() + "분</th>";
+            } else {
+                cols += "<th>" + date.getHours() + "시" + date.getMinutes() + "분</th>";
+            }
+            if(data[i].enterprise === '우주농수산유통'){
+                temp_rows += "<td>" + (data[i].temp - 15) + "</td>";
+            }
+            else {
+                temp_rows += "<td>" + data[i].temp + "</td>";
+            }
+            heu_rows += "<td>" + data[i].hue + "</td>";
+        }
+
+        $("#monitoring_thead").html("<tr>" + cols + "</tr>");
+        $("#monitoring_tbody").html(
+            "<tr>" + temp_rows + "</tr><tr>" + heu_rows + "</tr>"
+        );
+
+        return data;
+    }
+
+        function load_multi_table(){
+        let cols = "<th style='width: 0%'></th>";
+        let temp_rows = "<td>온도</td>";
+        let hue_rows = "<td>습도</td>";
+
+        api_gp("/sensors_h2/", "GET", {}, (data)=>{
+            for(let i = 0; i < data.length; i++) {
+                api_gp("/sensors_h2/values/?mac=" + data[i].mac, "GET", {}, (item)=>{
+                    cols += "<th style='table-layout: fixed; width: 12.5%;'>" + data[i].device + "</th>";
+                    if(item.length == 0) {
+                        temp_rows += "<td>No Data</td>";
+                        hue_rows += "<td>No Data</td>";
+                    } else {
+                        console.log(item);
+                        console.log("mac :" + item[item.length - 1].mac);
+
+                        temp_rows += "<td>" + item[item.length - 1].temp + "</td>";
+                        hue_rows += "<td>" + item[item.length - 1].hue + "</td>";
+
+                        $("#multi_thead").html("<tr>" + cols + "</tr>");
+                        $("#multi_tbody").html(
+                            "<tr>" + temp_rows + "</tr><tr>" + hue_rows + "</tr>"
+                        );
+
+                    }
+                })
+            }
+        })
+    }
+
+
+    function mock(data) {
+
+        let chart_raw_data = data;
+        render_table_static(data);
+
+        // render chart
+        let chart_data = {
+            labels: [],
+            datasets: [
+                {
+                    label: "온도",
+                    backgroundColor: "red",
+                    borderColor: "red",
+                    data: [],
+                    fill: false,
+                },
+                {
+                    label: "습도",
+                    backgroundColor: "blue",
+                    borderColor: "blue",
+                    data: [],
+                    fill: false,
+                },
+            ],
+        };
+
+        chart_raw_data.forEach((x) => {
+            if (x !== -1) {
+                let d = new Date(x.fetch_datetime);
+                let str_d =
+                    (d.getFullYear() % 100).toString() +
+                    "/" +
+                    (d.getMonth() + 1) +
+                    "/" +
+                    d.getDate() +
+                    " " +
+                    d.getHours() +
+                    "시";
+                chart_data.labels.push(str_d);
+                if(x.enterprise === '우주농수산유통'){
+                    chart_data.datasets[0].data.push(x.temp - 15);
+                }
+                else {
+                    chart_data.datasets[0].data.push(x.temp);
+                }
+                chart_data.datasets[1].data.push(x.hue);
+            }
+        });
+
+        var ctx = document.getElementById("myChart");
+        ctx.height = 300;
+        var myLineChart = new Chart(ctx, {
+            type: "line",
+            data: chart_data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                suggestedMin: -10,
+                                suggestedMax: 30,
+                            },
+                        },
+                    ],
+                },
+            },
+        });
+    }
+
+</script>

@@ -1,0 +1,183 @@
+<html>
+    <head>
+        <title>공정일지</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            let item = {};
+            let col = ['date', 'name', 'man_count', 'man_name', 'items', 'amount', 'faulty_amount', 'model']
+            $(function() {
+                item = JSON.parse(window.item);
+                col.forEach(function (k, i) {
+                    let val = item[k];
+                    if (val !== "" && val !== null) {
+                        if (k === 'items') {
+                            // TODO:
+                            for (let j = 0; j < val.length; j++) {
+                                $('#items_' + j + '_name').text(val[j].name);
+                                $('#items_' + j + '_required_amount').text(val[j].required_amount);
+                                $('#items_' + j + '_stock').text(val[j].stock);
+                            }
+                        } else {
+                            $('#' + k).text(val);
+                        }
+                    }
+                    console.log(val);
+
+                    if (i === col.length - 1) {
+                        window.print();
+                    }
+                });
+
+                window.onafterprint = function(){ window.close(); }
+            });
+
+
+        </script>
+        <style>
+
+@media print {
+    table {
+        height: 99%;
+    }
+}
+
+table, th, td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+table {
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+td, th {
+    border: 1px solid black;
+}
+
+.title {
+    font-size: 1.6em;
+}
+
+.label {
+    font-weight: bold;
+}
+
+.bggrey {
+    background-color: lightgray;
+}
+        </style>
+    </head>
+    <body>
+        <table width="800" height="1200">
+            <tr>
+                <td class="label" rowspan="3" style="font-size: 10px;">(주)동원엔텍</td>
+                <td class="label" colspan="5" rowspan="2">공&nbsp;정&nbsp;일&nbsp;지</td>
+                <td class="label" rowspan="3">결제</td>
+                <td class="label">작성</td>
+                <td class="label">검토</td>
+                <td class="label">대표</td>
+            </tr>
+            <tr>
+                <td rowspan="2"></td>
+                <td rowspan="2"></td>
+                <td rowspan="2"></td>
+            </tr>
+            <tr>
+                <td id="date" colspan="5">2020-XX-XX</td>
+            </tr>
+            <tr>
+                <td class="label bggrey">품명</td>
+                <td id="name" colspan="9">생산제품명</td>
+            </tr>
+            <tr>
+                <td class="label bggrey">Lot No.</td>
+                <td colspan="9"></td>
+            </tr>
+            <tr>
+                <td class="label bggrey" colspan="3">인원현황</td>
+                <td class="label bggrey" colspan="7">원료현황</td>
+            </tr>
+            <tr>
+                <td class="label bggrey">인원</td>
+                <td class="label bggrey" colspan="2">담당자</td>
+                <td class="label bggrey" colspan="2">원료명</td>
+                <td class="label bggrey" colspan="3">Lot No.</td>
+                <td class="label bggrey">소요량</td>
+                <td class="label bggrey">재고량</td>
+            </tr>
+            <tr>
+                <td id="man_count" rowspan="5"></td>
+                <td id="man_name" rowspan="5" colspan="2">공정담당자</td>
+                <td id="items_0_name" colspan="2"></td>
+                <td colspan="3"></td>
+                <td id="items_0_required_amount"></td>
+                <td id="items_0_stock"></td>
+            </tr>
+            <tr><td id="items_1_name" colspan="2"></td><td colspan="3"></td><td id="items_1_required_amount"></td><td id="items_1_stock"></td></tr>
+            <tr><td id="items_2_name" colspan="2"></td><td colspan="3"></td><td id="items_2_required_amount"></td><td id="items_2_stock"></td></tr>
+            <tr><td id="items_3_name" colspan="2"></td><td colspan="3"></td><td id="items_3_required_amount"></td><td id="items_3_stock"></td></tr>
+            <tr><td id="items_4_name" colspan="2"></td><td colspan="3"></td><td id="items_4_required_amount"></td><td id="items_4_stock"></td></tr>
+            <tr>
+                <td class="label bggrey" colspan="10">작업현황</td>
+            </tr>
+            <tr>
+                <td class="label" colspan="3">금일 생산 수량</td>
+                <td id="amount" colspan="7">생산진행수량</td>
+            </tr>
+            <tr>
+                <td class="label" colspan="3">불일치(부적합)품 수량</td>
+                <td id="faulty_amount" colspan="7">불량수량</td>
+            </tr>
+            <tr>
+                <td class="label bggrey" colspan="10">생산현황</td>
+            </tr>
+            <tr>
+                <td class="label bggrey" colspan="2" rowspan="2">MODEL</td>
+                <td class="label bggrey" colspan="2" rowspan="2">누계 생산현황</td>
+                <td class="label bggrey" colspan="4">공정률(%)</td>
+                <td class="label bggrey" colspan="2" rowspan="2">목표 생산량</td>
+            </tr>
+            <tr>
+                <td class="label bggrey" colspan="2">계획</td>
+                <td class="label bggrey" colspan="2">실적</td>
+            </tr>
+            <tr>
+                <td id="model" colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td class="label bggrey" colspan="10">생산관리</td>
+            </tr>
+            <tr>
+                <td class="label bggrey" colspan="4">관리 항목</td>
+                <td class="label bggrey" colspan="3">관리 요건</td>
+                <td class="label bggrey" colspan="3">결과</td>
+            </tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr><td colspan="4"></td><td colspan="3"></td><td colspan="3"></td></tr>
+            <tr>
+                <td class="label" style="height: 8%" colspan="2">특이사항</td>
+                <td style="height: 8%" colspan="8">&nbsp;</td>
+            </tr>
+
+        </table>
+    </body>
+</html>

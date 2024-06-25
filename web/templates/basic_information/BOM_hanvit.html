@@ -1,0 +1,1080 @@
+<!DOCTYPE HTML>
+<html>
+<header>
+    {% include "header.html" %}
+</header>
+<body style="overflow: hidden;">
+
+
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {#{% block title %}#}
+{#    <title>BOM 형식 생성</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<div class="show-error" style="display:none;"></div>
+<div>
+    <!-- 검색 -->
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center">
+                <div class="content-title col-1 align-self-stretch" id="n_bom_search">
+                    BOM 조회
+                </div>
+                <form class="col-11" method="GET" id="BOM_main-form" onsubmit="return BOM_search_submit(event)">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>생산제품명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control product-dropdown" id="search_product">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-1 px-0">
+                            <button class="btn button-search w-100">검색</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <div class="col-12 px-0">
+                <!-- 본문 -->
+                <div class="content-table col-12 px-0" style="overflow-x:auto; overflow-y:hidden; height: 251px;">
+                    <table id="BOM_data-table-up" class="table table-sm text-center">
+                        <thead>
+                        <tr>
+                            <th>순번</th>
+                            <th id="n_bom_code">BOM 코드</th>
+                            <th>생산제품명</th>
+                            <th>품명상세</th>
+                            <th>자재분류</th>
+                            <th data-tableexport-display="none">설계도면</th>
+                        </tr>
+                        </thead>
+                        <tbody id="BOMmaster_tbody">
+                        </tbody>
+                    </table>
+
+                    <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                         style="margin-top: -20px;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center" id="BOM_identity">
+                <div class="content-title col-1 align-self-stretch" id="n_bom_generate">
+                    BOM 생성
+                </div>
+                <form class="col-11">
+                    {% csrf_token %}
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label id="n_bom_code1">BOM 코드<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="bom_number_9" name="bom_number" placeholder="" maxlength="15">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>생산제품명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="product_name">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품명상세</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="detail">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>자재분류</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control division_dropdown"
+                                        name="item_division"
+                                ></select>
+                            </div>
+                        </div>
+
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설계도면</label>
+                            </div>
+                            <div class="content-input-group-input" style="border: #bebebe solid 1px; ">
+                                <input type="file" id="file-selector" class="fs-selector" style="line-height: 24px;"
+                                       accept="*" onchange='chk_file_type(this)'>
+                                <input class="form-control fs-delete" style="width: 48%;" id="cadfile" readonly>
+                                <button type="button" class="btn button-custom2 fs-delete"
+                                        style="width: 48%; float:right;">파일 삭제
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="row no-gutters justify-content-end m-2">
+                <div class="col-1 mr-2">
+                    <button class="btn button-custom2 w-100" type="button" onclick="reset()">선택 취소</button>
+                </div>
+                <div class="col-1 mr-2">
+                    <button class="btn button-custom2 w-100" type="button" id='n_bom_save' onclick="BOM_formsubmit()">BOM 형식 저장</button>
+                </div>
+                <div class="col-1 mr-2">
+                    <button class="btn button-custom2 w-100" type="button" id='n_bom_del' onclick="BOM_delete()">BOM 삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center" id="BOM_log_identity">
+                <div class="content-title col-1 align-self-stretch" id="n_bom_log_generate">
+                    작업일지 생성
+                </div>
+                <form class="col-11">
+                    {% csrf_token %}
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label id="log_date">작업날짜</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control datepicker" id="log_work_date" name="work_date">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>작업수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="amount" onkeyup="_chkNumber(this, 3)">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>불량수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="faulty_amount" onkeyup="_chkNumber(this, 3)">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>첨부파일</label>
+                            </div>
+                            <div class="content-input-group-input" style="border: #bebebe solid 1px; ">
+                                <input type="file" id="file-selector2" class="fs-selector" style="line-height: 24px;"
+                                       accept="*" onchange='chk_file_type(this)'>
+                                <input class="form-control fs-delete" style="width: 48%;" id="filename" readonly>
+                                <button type="button" class="btn button-custom2 fs-delete"
+                                        style="width: 48%; float:right;">파일 삭제
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>비고</label>
+                           </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="etc">
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="row no-gutters justify-content-end m-2">
+                <div class="col-1 mr-2">
+                    <button class="btn button-custom2 w-100" type="button" id='n_bom_save' onclick="BOM_log_formsubmit()">작업일지 생성</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/BOM_create_format.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_item.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+
+<script>
+    var bom_id = null;
+    {#let pre_bom_number = "" // BOM 코드번호 저장#}
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+
+    let nation1 = new Pnations(nation_data1, BOM_search);  // 인스턴스 명
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $(".datepicker").datepicker("setDate", "today");
+
+    function BOM_load_page() {
+        BOM_init();
+        BOM_search();
+
+        // Table export
+        $(parent.document).find("#excel-export").click(() => {
+            init_excel_export($('#BOM_data-table-up'), 'BOM조회');
+            init_excel_export($('#BOM_data-table-down'), 'BOM항목');
+        });
+    }
+
+
+    function BOM_search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+        bom_id = null;
+        reset();
+
+        BOM_search();
+        return false;
+    }
+
+
+    function BOM_search() {
+        let search_product = $('.content-search #search_product :selected').text();
+        if (search_product === "선택") search_product = null;
+
+        let query = "?page=" + nation1.page + "&";
+        if (search_product == '' || search_product == null){
+            // do nothing
+        } else{
+            query += "product_name=" + search_product + "&";
+        }
+
+
+        console.log(query);
+
+        api_gp("/bom/master/" + query, 'GET', {}, (data) => {
+            BOM_load_data(data);
+            {#pre_bom_number = "";#}
+        });
+    }
+
+    // starting point
+    $(function () {
+        set_naming();
+        refresh();
+    });
+
+
+    function set_naming(){
+        let enterprise_manage = get_userinfo().enterprise_manage;
+        if (enterprise_manage == '(주)건강생활연구소'){
+            $("#n_bom_search").text("조회");
+            $("#n_bom_code").text("코드");
+            $("#n_bom_generate").text("레시피 생성");
+            $("#n_bom_code1").text("코드");
+            $("#n_bom_list").text("레시피 항목");
+
+            $("#n_bom_model1").text("제품군");
+            $("#n_bom_model2").text("제품군");
+            $("#n_bom_save").text("형식 저장");
+            $("#n_bom_del").text("삭제");
+
+            $("#n_container").text("형태");
+            $("#n_color").text("Scent");
+            $("#n_type").text("브랜드");
+        }
+
+        if (enterprise_manage == '(주)온교육') {
+            $("#n_bom_code").text("품번");
+            $("#n_bom_code1").text("품번");
+            $("#bom_list_div").addClass("d-none");
+            $("#detail_bom_div").addClass("d-none");
+        }
+    }
+
+    function refresh() {
+        bom_id = null;
+        $('.fs-delete').css('display', 'none');
+        BOM_load_page();
+    }
+
+    function BOM_clear() {
+        // clear top
+        // table click highlight
+        $('#BOMmaster_tbody').parent().find('tr').removeClass('clicked');
+
+        // clear form
+        $("#BOM_identity [name=bom_number]").val("");  // 코드번호
+        $("#BOM_identity [name=product_name]").val("");  // 생산제품명
+        $("#BOM_identity [name=detail]").val("");  // 품명상세
+        $("#BOM_identity [name=item_division]").val(null).trigger('change');  // 자재분류
+
+        $("#BOM_identity [name=model_name]").val(null).trigger('change');  // 자재분류
+        $("#BOM_identity [name=bom_version]").val("");  // 버전
+        $("#BOM_identity [name=moq]").val("");  // moq
+
+        // $("#BOM_identity [name=customer]").val("");
+        $("#BOM_identity [name=customer]").val(null).trigger('change');  // 고객사
+        {#$("#BOM_identity [name=bom_name]").val("");#}
+
+        // clear bottom
+        bom_id = null;
+        reset_BOM_content();
+    }
+
+    function writeLog(_file) {
+        let userinfo = get_userinfo();
+        let file = decodeURI(_file);
+        let user = userinfo["name"];
+        let enterprise = userinfo["enterprise_name"];
+
+        console.log("print");
+        console.table(userinfo);
+
+        $.ajax({
+            url: "/write_log/",
+            type: "POST",
+            dataType: "json",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}', 'user': user, 'enterprise': enterprise, 'file': file,
+            },
+            success: function (data) {
+                // alert(data.message);
+                location.reload();
+            },
+            error: function (data) {
+                // alert(data.message);
+            },
+        });
+    }
+
+    function BOM_load_data(done) {
+        let rows = "";
+        console.table(done);
+
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let created_date = item.created_at;
+            let updated_date = item.updated_at;
+            if (item.detail_code != 0) {
+                // append it
+                let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                row += "<td>" + (num + i) + "</td>";
+                row += "<td class='d-none' name='bom_id'>" + item.id + "</td>";
+                row += "<td name='bom_number'>" + item.bom_number + "</td>";  // BOM 코드
+                row += "<td name='product_name'>" + item.product_name + "</td>";  // 생산제품명
+                row += "<td name='detail'>" + (item.detail ? item.detail : "") + "</td>";  // 품명상세
+
+                row += "<td name='item_division'" +
+                    "property='" + (item.item_division ? item.item_division.id : "") + "'>" +
+                    (item.item_division ? item.item_division.name : "") +
+                    "</td>";  // 자재분류
+                row += "<td name='file' data-tableexport-display=\"none\">" +
+                    (nullapply(item.file) ? "<a href='" + nullapply(item.file) +
+                        "' onclick=\"writeLog(this.href); window.open(this.href, '_blank', 'width=800, height=600'); return false;\">" +
+                        "<img src='../../../static/img/pdf_icon.png' width='20' height='20'></a>" : "") + "</td>";
+                row += "</tr>";
+                rows += row;
+            }
+        }
+
+        spinner();
+
+        nation1.nation_display(done);
+
+        $('#BOMmaster_tbody').html(rows);
+
+        if (bom_id != null){
+            $("#" + bom_id).addClass('clicked');
+        }
+
+
+        $('.fs-delete').filter('button').on('click', function () {
+            $('.fs-selector').css('display', 'inline-block');
+            $('.fs-delete').css('display', 'none');
+        });
+
+        $('#BOMmaster_tbody > tr').on('click', function () {
+            $("#BOM_identity [name='bom_number']").val($(this).find("[name='bom_number']").text());  // BOM 코드번호
+            $("#BOM_identity [name='product_name']").val($(this).find("[name='product_name']").text());  // 생산제품명
+            $("#BOM_identity [name='detail']").val($(this).find("[name='detail']").text());  // 품명상세
+            $("#BOM_identity [name='item_division']").val(
+                $(this).find("[name='item_division']").attr('property')).trigger('change');  // 자재분류
+            $("#BOM_identity [name='model_name']").val(
+                $(this).find("[name='model_name']").attr('property')).trigger('change');  // 모델
+            $("#BOM_identity [name='container']").val(
+                $(this).find("[name='container']").attr('property')).trigger('change');  // 용기타입
+            $("#BOM_identity [name='color']").val(
+                $(this).find("[name='color']").attr('property')).trigger('change');  // 칼라구분
+            $("#BOM_identity [name='type']").val(
+                $(this).find("[name='type']").attr('property')).trigger('change');  // 품종구분
+            $("#BOM_identity [name='moq']").val($(this).find("[name='moq']").text());
+
+            $("#BOM_identity [name='bom_version']").val($(this).find("[name='bom_version']").text());  // 버전
+            $("#BOM_identity [name='customer']").val($(this).find("[name='master_customer']").attr('property')).trigger('change');
+
+            bom_id = $(this).attr('id');
+            {#pre_bom_number = $(this).find("td[name=bom_number]").text(); // BOM 코드번호 저장#}
+            console.log('id of this row is : ', $(this).attr('id'));
+
+            $(".new_th").remove();
+            $(".new_td").remove();
+            //BOM 형식 데이터 하나 클릭시 아래 list에 자동으로 적용됨.
+            api_get_BOMmaster_only($(this).attr('id'), (data) => {
+                // {#console.table(data);#}
+                let tr_num = 0;
+                for (let key in data) {
+                    // {#console.log(key,' : ',data[key]);#}
+                    if (data[key] != -1) {
+                        tr_num++;
+                    }
+                }
+
+                for (let i = 0; i < tr_num; i++) {
+                    let index_num = i;
+                    var th = document.createElement('th');
+                    var td = document.createElement('td');
+                    th.setAttribute('ondrop', "drop(event)");
+                    th.setAttribute('ondragover', "allowDrop(event)");
+                    th.setAttribute('class', 'new_th');
+                    th.setAttribute('data-index', index_num.toString());
+                    th.innerText = "\u00a0";
+
+                    td.setAttribute('class', 'new_td');
+
+                    $(".BOM-list").append(th);
+                    $(".BOM-data").append(td);
+                }
+                console.log('this line\'s data is...');
+                console.log(data);
+
+                $(".BOM-list th").each(function (index) {
+
+                    if (index != 0) {
+                        for (let key in data) {
+
+                            if (key == 'version' || key == 'id' || key == 'enable' || key == 'enterprise' || key=='item') {
+
+                            } else {
+                                let name = get_key_name(key);
+                                let item = $('label[id="' + key + '"]');
+
+
+                                let cell = index == data[key];
+
+                                if (key == 'bom_number' && index == 1){
+                                    cell = true;
+                                    item =  $('label[id="' + "item" + '"]');
+                                }
+                                else if (key == 'item_name' && index == 2){
+                                    cell = true;
+                                }
+                                else if (key == 'required_amount' && index == 3){
+                                    cell = true;
+                                }
+                                // templet_cnt 필드명이 bom 항목에서는 사용안함
+                                else if (key == 'templet_cnt'){
+                                    cell = false;
+                                }
+                                else if (key == 'now_stock'){
+                                    cell = false;
+                                }
+                                else if (key == 'order_amount'){
+                                    cell = false;
+                                }
+                                else if (key == 'moq'){
+                                    cell = false;
+                                }
+                                else if (index <= 3) {
+                                    cell = false;
+                                }
+                                else if (key == 'bom_number' || key == 'item_name' || key == 'required_amount')
+                                    cell = false;
+                                else {
+                                    if (typeof data[key] === 'string' || data[key] instanceof String)
+                                        continue;
+                                }
+
+                                if (cell) {
+                                    console.log("name : ", name, key, item.parent());
+
+                                    item.parent().css('background-color', '#eee');
+                                    this.innerText = name;
+                                    this.removeAttribute('ondrop');
+                                    this.removeAttribute('ondragover');
+
+                                    item.attr('ondrop', "drop2(event)");
+                                    item.attr('ondragover', "allowDrop(event)");
+                                    this.setAttribute('id', key + "i");
+                                    this.setAttribute('draggable', "true");
+                                    this.setAttribute('ondragstart', "drag_to_item(event)");
+
+                                    break;
+                                } else {
+                                    this.removeAttribute('id');
+                                    this.removeAttribute('data-index');
+                                    this.removeAttribute('draggable');
+                                    this.removeAttribute('ondragstart');
+                                    //this.removeAttribute('background-color');
+                                    this.setAttribute('ondrop', "drop(event)");
+                                    this.setAttribute('ondragover', "allowDrop(event)");
+                                    this.setAttribute('data-index', index);
+                                    this.innerText = "\u00a0";
+                                }
+                            }
+                        }
+                    }
+                });
+
+                let _file = $(this).find("[name='file']")
+                if (_file.text() !== "") {
+                    // 동원엔텍 버튼 / 이미지 업로드 처리
+                    $('.fs-selector').css('display', 'none');
+                    $('.fs-delete').css('display', 'inline-block');
+                    let furls = decodeURI(_file.children().attr('href')).split('/');
+                    $('#cadfile').val(furls[furls.length - 1]);
+                } else {
+                    $('.fs-selector').css('display', 'inline-block');
+                    $('.fs-delete').css('display', 'none');
+                }
+            });
+
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+        });
+
+    }
+
+
+    function BOM_delete() {
+        let bom_number = $("#BOM_identity [name=bom_number]").val();
+
+        if (bom_number == "") {
+            alert("삭제할 형식을 먼저 선택해주십시오.");
+        } else {
+            let del = confirm("BOM 코드: " + bom_number + "을(를) 삭제하시겠습니까?\n해당되는 품목기준정보의 내용도 삭제 됩니다.");
+            if (del) {
+                api_delete_detail_BOMmaster(bom_id, () => {
+                    alert("삭제 되었습니다.");
+
+                    nation1.page = 1;
+                    bom_id = null;
+                    BOM_search();
+                    reset();
+                }, () => {
+                    alert("실패했습니다.");
+                }, () => {
+                });
+            }
+        }
+    }
+
+
+    function BOM_formsubmit(type) {
+        var error_list = "";
+        var error = false;
+
+        let product_name = $("#BOM_identity [name=product_name]").val()
+        if ((product_name == "") || (product_name == null)) {
+            error_list += "생산제품명 ";
+            error = true;
+        }
+
+        if (error) {
+            alert("필수 항목 : [" + error_list + "]이(가) 누락되었습니다.");
+
+        } else {
+            let bom_number = $("#BOM_identity [name=bom_number]").val();  // BOM 코드번호
+            let product_name = $("#BOM_identity [name=product_name]").val();  // 생산제품명
+            let detail = $("#BOM_identity [name=detail]").val();  // 품명상세
+            let item_division = $("#BOM_identity [name=item_division]").val();  // 자재분류
+            {#let bom_name = $("#BOM_identity [name=bom_name]").val();#}
+
+            let allData = {
+                "bom_number": bom_number,
+                "product_name": product_name,
+                "detail": detail,
+                "item_division": item_division,
+
+                "model_name": '',
+                "container": '',
+                "color": '',
+                "type": '',
+
+                "version": '',
+                "master_customer": '',
+                "moq": 0,
+                {#"bom_name": bom_name,#}
+
+                level: -1, item: 1, part: -1, part_num: -1, capacity: -1, size: -1, voltage: -1,
+                band: -1, unit: 5, tnb: -1, lnr: -1, required_amount: 3, location: 4, manufacturer: -1,
+                customer: 6, standard: -1, weight: -1, etc: -1, enable: 1, package: -1, item_name: 2, storage: -1
+            };
+
+            $(".BOM-list th").each(function (index) {
+                if (index != 0) {
+                    let bom_name = $(this).text();
+                    let index_num = $(this).attr('data-index');
+                    let data = create_data_priority(bom_name, index_num);
+                    Object.assign(allData, data);
+                }
+            });
+
+            console.table('allData', allData);
+
+            let form = new FormData();
+            for (let key in allData) {
+                form.append(key, allData[key]);
+                console.log('key : ' + key, ', value : ' + allData[key])
+            }
+
+            if ($('.fs-delete').css('display') === 'none') {
+                // 동원엔텍 이미지 처리
+                let fileSelector = document.getElementById('file-selector');
+                let file = fileSelector.files[0];
+                if (file === undefined) file = '';
+                form.append("file", file)
+                fileSelector.value = '';
+            }
+
+            if (bom_id === null) {
+
+                // create
+                let enterprise_name = get_userinfo().enterprise_name;
+                let add = '';
+                add = confirm("BOM을 생성하시겠습니까?");
+
+
+                if(add) {
+                    api_post_detail_BOMmaster(form, () => {
+                        alert("형식생성이 완료 되었습니다.");
+                        BOM_search();
+
+                        reset();
+
+                    }, () => {
+                        alert("형식생성이 실패 하였습니다.");
+                    });
+                }
+
+            } else {
+                // update
+                let edit = confirm("수정하시겠습니까?")
+                if(edit) {
+                    api_patch_detail_BOMmaster(bom_id, form, () => {
+                        alert("수정 되었습니다.");
+                        BOM_search();
+                        reset();
+                    }, () => {
+                        alert("실패했습니다.");
+                    });
+                }
+            }
+        }
+    }
+
+    function BOM_log_formsubmit(type) {
+        let work_date = $("#BOM_log_identity [name=work_date]").val();
+        let amount = $("#BOM_log_identity [name=amount]").val().replace(/[\{\}\[\]\/?,;:|\)*~`!^\+_<>@\#$%&\\\=\(\'\"]/g, '');
+        let faulty_amount = $("#BOM_log_identity [name=faulty_amount]").val().replace(/[\{\}\[\]\/?,;:|\)*~`!^\+_<>@\#$%&\\\=\(\'\"]/g, '');
+        let etc = $("#BOM_log_identity [name=etc]").val();  // 자재분류
+
+        let allData = {
+            "master": bom_id,
+            "work_date": work_date,
+            "amount": amount,
+            "faulty_amount": faulty_amount,
+            "etc": etc,
+        };
+
+        console.table('allData', allData);
+
+        let form = new FormData();
+        for (let key in allData) {
+            form.append(key, allData[key]);
+            console.log('key : ' + key, ', value : ' + allData[key])
+        }
+
+        if ($('.fs-delete').css('display') === 'none') {
+            // 동원엔텍 이미지 처리
+            let fileSelector = document.getElementById('file-selector2');
+            let file = fileSelector.files[0];
+            if (file === undefined) file = '';
+            form.append("file", file)
+            fileSelector.value = '';
+        }
+
+        for (let key of form.keys()) {
+          console.log("return form keys:" + key);
+        }
+
+        for (let value of form.values()) {
+          console.log("return form values:" + value);
+        }
+
+        if (bom_id === null) {
+            alert('BOM을 선택해 주십시오.')
+            return
+        } else {
+            // update
+            let add = confirm("등록하시겠습니까?")
+            if(add) {
+                api_post_BOMlog(form, () => {
+                    alert("등록 되었습니다.");
+                    reset();
+                }, () => {
+                    alert("실패했습니다.");
+                });
+            }
+        }
+    }
+
+
+    function get_key_name(key) {
+        let name;
+        switch (key) {
+            case "bom_number":
+                name = "품번";
+                break;
+            case "item_name":
+                name = "품명";
+                break;
+            case "required_amount":
+                name = "소요량";
+                break;
+            case "level":
+                name = "레벨";
+                break;
+            case "part":
+                name = "PART";
+                break;
+            case "part_num":
+                name = "PART no";
+                break;
+            case "capacity":
+                name = "용량";
+                break;
+            case "size":
+                name = "사이즈";
+                break;
+            case "voltage":
+                name = "전압";
+                break;
+            case "band":
+                name = "허용범위";
+                break;
+            case "unit":
+                name = "단위";
+                break;
+            case "tnb":
+                name = "T / B";
+                break;
+            case "lnr":
+                name = "L / R";
+                break;
+            case "location":
+                name = "자재위치";
+                break;
+            case "manufacturer":
+                name = "협력사";
+                break;
+            case "customer":
+                name = "고객사";
+                break;
+            case "standard":
+                name = "사양";
+                break;
+            case "weight":
+                name = "중량";
+                break;
+            case "etc":
+                name = "비고";
+                break;
+            case "package":
+                name = "Package";
+                break;
+            case "storage":
+                name = "생산공정(창고)";
+                break;
+            default:
+                name = key;
+                break;
+        }
+        return name;
+    }
+
+    function create_data_priority(bom_name, index_num) {
+        let data;
+        switch (bom_name) {
+            case "레벨":
+                data = {"level": index_num};
+                break;
+            case "품번":
+                data = {"item": index_num};
+                break;
+            case "PART":
+                data = {"part": index_num};
+                break;
+            case "PART no":
+                data = {"part_num": index_num};
+                break;
+            case "용량":
+                data = {"capacity": index_num};
+                break;
+            case "사이즈":
+                data = {"size": index_num};
+                break;
+            case "전압":
+                data = {"voltage": index_num};
+                break;
+            case "허용범위":
+                data = {"band": index_num};
+                break;
+            case "단위":
+                data = {"unit": index_num};
+                break;
+            case "T / B":
+                data = {"tnb": index_num};
+                break;
+            case "L / R":
+                data = {"lnr": index_num};
+                break;
+            case "소요량":
+                data = {"required_amount": index_num};
+                break;
+            case "자재위치":
+                data = {"location": index_num};
+                break;
+            case "협력사":
+                data = {"manufacturer": index_num};
+                break;
+            case "고객사":
+                data = {"customer": index_num};
+                break;
+            case "사양":
+                data = {"standard": index_num};
+                break;
+            case "중량":
+                data = {"weight": index_num};
+                break;
+            case "비고":
+                data = {"etc": index_num};
+                break;
+            case "단가":
+                data = {"product_remark": index_num};
+                break;
+            case "Package":
+                data = {"package": index_num};
+                break;
+            case "생산공정(창고)":
+                data = {"storage": index_num};
+                break;
+            case "품명":
+                data = {"item_name": index_num};
+                break;
+        }
+        return data;
+    }
+
+    function BOM_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === '.customer-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                } else if (selectors === '.product-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.product_name + "</option>";
+                } else{
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: '100%'});
+        }
+
+        // 생산제품명
+        api_gp('/bom/master_select/', 'GET', {}, (data) => {
+            make_dropdown(data, '.product-dropdown');
+        });
+
+        // 고객사
+        api_gp('/customers_select/', 'GET', {}, (data) => {
+            make_dropdown(data, '.customer-dropdown');
+        });
+
+        // 자재분류
+        api_gp("/codes_select/?group=118&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".division_dropdown");
+        });
+
+        // 모델 > 제품군
+        api_gp("/codes_select/?group=116&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".model-dropdown");
+        });
+
+        // 용기타입 > 형태
+        api_gp("/codes_select/?group=106&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".container_dropdown");
+        });
+
+        // 칼라구분 > Sent
+        api_gp("/codes_select/?group=119&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".color_dropdown");
+        });
+
+        // 품종구분 > 브랜드
+        api_gp("/codes_select/?group=115&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".type_dropdown");
+        });
+
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+    function chk_file_type(obj) {
+
+        var file_kind = obj.value.lastIndexOf('.');
+        var file_name = obj.value.substring(file_kind + 1, obj.length);
+        var file_type = file_name.toLowerCase();
+
+        var check_file_type = new Array();
+        check_file_type = ['pdf',];
+
+        let ret = fileCheck(obj);
+        return ret;
+    }
+
+    function fileCheck(file) {
+        // 사이즈체크
+        var maxSize = 1 * 1024 * 1024 //1MB
+        var fileSize = 0;
+
+        fileSize = file.files[0].size;
+        if (fileSize > maxSize) {
+            alert("파일 사이즈는 1MB 이내로 등록 가능합니다.");
+            return false;
+        }
+        return true;
+    }
+
+
+    function reset_BOM_content() {  // 항목 초기화
+        for (var i = 0; i < $(".new_th").length; i++) {
+            $(".new_th").remove();
+            $(".new_td").remove();
+        }
+
+        $(".BOM-item").each(function () {
+            console.log("id : ", $(this).attr('id') );
+
+            if ($(this).attr('id') === '단가') {
+                // do nothing
+            } else if ($(this).attr('id') === 'item') {
+                // do nothing
+            } else if ($(this).attr('id') === 'item_name') {
+                // do nothing
+            } else if ($(this).attr('id') === 'required_amount') {
+                // do nothing
+            } else {
+                this.style.backgroundColor = "#E7F9FF";
+                this.setAttribute('draggable', true);
+            }
+        });
+
+        $(".BOM-list th").each(function (index) {
+            if (!((index == 0) || (index == 1) || (index == 2) || (index == 3))){
+                this.setAttribute('data-index', index);
+                this.setAttribute('ondrop', "drop(event)");
+                this.setAttribute('ondragover', "allowDrop(event)");
+                this.removeAttribute('id');
+                this.removeAttribute('draggable');
+                this.removeAttribute('ondragstart');
+                this.innerText = "\u00a0";
+            } else {
+                // 순번, 품번, 품명, 소요량은 제외
+                {#this.innerText = "순번";#}
+            }
+        });
+    }
+
+    function reset() {  // 선택 취소
+        $('#BOM_identity input').val('');
+        $('#BOM_identity select').val('').trigger('change');
+        $('#BOM_log_identity input').val('');
+        $('#BOM_log_identity select').val('').trigger('change');
+        $(".datepicker").datepicker("setDate", "today");
+        $('#BOMmaster_tbody tr').removeClass('clicked');
+        bom_id = null;
+
+        reset_BOM_content();
+    }
+
+    function api_post_BOMlog(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/bom/log/",
+            headers: {
+                "Authorization": get_token()     // TODO: improve when replace it with something other one
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                // add cookie
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+</script>
+
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

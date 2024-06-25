@@ -1,0 +1,38 @@
+[
+  {
+    "model": "api.bommaster",
+    "pk": 1,
+    "fields": {
+      "bom_number": 20062300,
+      "bom_name": "123qw",
+      "product_name": "BOM \ud14c\uc2a4\ud2b8 \uc0c1\ud488",
+      "model_name": "\ubaa8\ub378\uba85",
+      "version": 1,
+      "master_customer": 1,
+      "level": -1,
+      "item": 1,
+      "part": 2,
+      "part_num": -1,
+      "capacity": -1,
+      "size": -1,
+      "voltage": -1,
+      "band": -1,
+      "unit": -1,
+      "tnb": -1,
+      "lnr": -1,
+      "required_amount": 3,
+      "location": -1,
+      "manufacturer": -1,
+      "customer": -1,
+      "etc": -1,
+      "weight": -1,
+      "standard": -1,
+      "enable": false,
+      "created_by": 1,
+      "updated_by": 1,
+      "created_at": "2020-06-23",
+      "updated_at": "2020-06-23",
+      "enterprise": 1
+    }
+  }
+]

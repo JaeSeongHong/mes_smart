@@ -1,0 +1,16 @@
+media/
+.idea/
+__pycache__
+main/__pycache__
+*.pyc
+venv/
+db.sqlite3
+api/migrations
+*.log
+*.pot
+*.pyc
+__pycache__/
+**/migrations/*
+data/
+log/
+uwsgi.ini

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+<div class="m-3">
+    {{ searchForm.media }}
+
+    <div class="card m-2 mt-4">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div class="col-12">
+                    <div class="row no-gutters">
+                        <div class="col-3 px-0" style="left:-1px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">01</label>
+                            </div>
+                            <div class="" id="pop_code01">
+                                {{ searchForm.codeName01 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">02</label>
+                            </div>
+
+                            <div class="" id="pop_code02">
+                                {{ searchForm.codeName02 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0" style="left:1px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">03</label>
+                            </div>
+                            <div class="" id="pop_code03">
+                                {{ searchForm.codeName03 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0" style="left:2px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">04</label>
+                            </div>
+                            <div class="" id="pop_code04">
+                                {{ searchForm.codeName04 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card m-2 mt-4">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div class="col-12">
+                    <div class="row no-gutters">
+                        <div class="col-3 px-0" style="left:-1px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">05</label>
+                            </div>
+                            <div class="" id="pop_code05">
+                                {{ searchForm.codeName05 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">06</label>
+                            </div>
+
+                            <div class="" id="pop_code06">
+                                {{ searchForm.codeName06 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0" style="left:1px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">07</label>
+                            </div>
+                            <div class="" id="pop_code07">
+                                {{ searchForm.codeName07 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0" style="left:2px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">08</label>
+                            </div>
+                            <div class="" id="pop_code08">
+                                {{ searchForm.codeName08 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card m-2 mt-4">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div class="col-12">
+                    <div class="row no-gutters">
+                        <div class="col-3 px-0" style="left:-1px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">09</label>
+                            </div>
+                            <div class="" id="pop_code09">
+                                {{ searchForm.codeName09 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">10</label>
+                            </div>
+
+                            <div class="" id="pop_code10">
+                                {{ searchForm.codeName10 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0" style="left:1px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">11</label>
+                            </div>
+                            <div class="" id="pop_code11">
+                                {{ searchForm.codeName11 }}
+                            </div>
+                        </div>
+                        <div class="col-3 px-0" style="left:2px;">
+                            <div class="">
+                                <label style="color:#8a8a8a; margin-left: 10px;">12</label>
+                            </div>
+                            <div class="" id="pop_code12">
+                                {{ searchForm.codeName12 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-no-gutters" style="margin-top:70px;">
+        <div class="col-3" style="left:70px; top:5px;">
+            <div>FONT SIZE &nbsp;(default 30, 10~130) &nbsp; : </div>
+        </div>
+
+        <input class="col-1 text-center" type="number" id="font_size"> </input>
+        <div class="col-7"></div>
+
+        <div class="col-1 d-flex justify-content-end">
+            <div class="col-12 btn btn-primary w-100 mr-3" onclick="save()"> 저장</div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    opener.popup = this;
+    items_led_id = null;
+
+    $("#font_size").val(30);
+
+
+    refresh();
+
+    function refresh(){
+
+
+        api_gp("/items_led/", "GET", {}, (done) => {
+            {#console.table(done);#}
+
+            if (done.length > 0) {
+
+                items_led_id = done[0].id;
+                $("#font_size").val(done[0].font_size);
+
+                var option01 = new Option(done[0].code01 ? done[0].code01.name : '', done[0].code01 ? done[0].code01.id : '', true, true);
+                var option02 = new Option(done[0].code02 ? done[0].code02.name : '', done[0].code02 ? done[0].code02.id : '', true, true);
+                var option03 = new Option(done[0].code03 ? done[0].code03.name : '', done[0].code03 ? done[0].code03.id : '', true, true);
+                var option04 = new Option(done[0].code04 ? done[0].code04.name : '', done[0].code04 ? done[0].code04.id : '', true, true);
+                var option05 = new Option(done[0].code05 ? done[0].code05.name : '', done[0].code05 ? done[0].code05.id : '', true, true);
+                var option06 = new Option(done[0].code06 ? done[0].code06.name : '', done[0].code06 ? done[0].code06.id : '', true, true);
+                var option07 = new Option(done[0].code07 ? done[0].code07.name : '', done[0].code07 ? done[0].code07.id : '', true, true);
+                var option08 = new Option(done[0].code08 ? done[0].code08.name : '', done[0].code08 ? done[0].code08.id : '', true, true);
+                var option09 = new Option(done[0].code09 ? done[0].code09.name : '', done[0].code09 ? done[0].code09.id : '', true, true);
+                var option10 = new Option(done[0].code10 ? done[0].code10.name : '', done[0].code10 ? done[0].code10.id : '', true, true);
+                var option11 = new Option(done[0].code11 ? done[0].code11.name : '', done[0].code11 ? done[0].code11.id : '', true, true);
+                var option12 = new Option(done[0].code12 ? done[0].code12.name : '', done[0].code12 ? done[0].code12.id : '', true, true);
+
+                if (done[0].code01 != null) {
+                    $("#id_codeName01").append(option01).trigger('change');
+                }
+                if (done[0].code02 != null) {
+                    $("#id_codeName02").append(option02).trigger('change');
+                }
+                if (done[0].code03 != null) {
+                    $("#id_codeName03").append(option03).trigger('change');
+                }
+                if (done[0].code04 != null) {
+                    $("#id_codeName04").append(option04).trigger('change');
+                }
+                if (done[0].code05 != null) {
+                    $("#id_codeName05").append(option05).trigger('change');
+                }
+                if (done[0].code06 != null) {
+                    $("#id_codeName06").append(option06).trigger('change');
+                }
+                if (done[0].code07 != null) {
+                    $("#id_codeName07").append(option07).trigger('change');
+                }
+                if (done[0].code08 != null) {
+                    $("#id_codeName08").append(option08).trigger('change');
+                }
+                if (done[0].code09 != null) {
+                    $("#id_codeName09").append(option09).trigger('change');
+                }
+                if (done[0].code10 != null) {
+                    $("#id_codeName10").append(option10).trigger('change');
+                }
+                if (done[0].code11 != null) {
+                    $("#id_codeName11").append(option11).trigger('change');
+                }
+                if (done[0].code12 != null) {
+                    $("#id_codeName12").append(option12).trigger('change');
+                }
+            }
+        });
+    }
+
+
+    function save(){
+
+        // Font Size 10 ~ 130 까지
+        let font_size = $("#font_size").val();
+        font_size = font_size *1;
+        if (font_size > 130 || font_size <10){
+            alert("FONT SIZE 허용범위 : 10 ~ 130");
+            return;
+        }
+
+        if (items_led_id){
+            modify();
+        }else{
+            create();
+        }
+    }
+
+
+    function modify() {
+        let data = get_data();
+
+        api_gp("/items_led/" + items_led_id + "/", "PATCH", data, (done) => {
+            alert("저장하였습니다.");
+
+            opener.refresh()
+            window.close();
+        });
+    }
+
+
+    function create(){
+        let data = get_data();
+
+        api_gp("/items_led/", "POST", data, (done) => {
+            alert("저장하였습니다.");
+
+            opener.refresh()
+            window.close();
+        });
+    }
+
+
+    function get_data() {
+        let id_codeName01 = $("#id_codeName01").val();
+        let id_codeName02 = $("#id_codeName02").val();
+        let id_codeName03 = $("#id_codeName03").val();
+        let id_codeName04 = $("#id_codeName04").val();
+        let id_codeName05 = $("#id_codeName05").val();
+        let id_codeName06 = $("#id_codeName06").val();
+        let id_codeName07 = $("#id_codeName07").val();
+        let id_codeName08 = $("#id_codeName08").val();
+        let id_codeName09 = $("#id_codeName09").val();
+        let id_codeName10 = $("#id_codeName10").val();
+        let id_codeName11 = $("#id_codeName11").val();
+        let id_codeName12 = $("#id_codeName12").val();
+        let font_size = $("#font_size").val();
+
+        return {
+            code01: id_codeName01,
+            code02: id_codeName02,
+            code03: id_codeName03,
+            code04: id_codeName04,
+            code05: id_codeName05,
+            code06: id_codeName06,
+            code07: id_codeName07,
+            code08: id_codeName08,
+            code09: id_codeName09,
+            code10: id_codeName10,
+            code11: id_codeName11,
+            code12: id_codeName12,
+            font_size: font_size,
+        };
+    }
+
+</script>
+</html>

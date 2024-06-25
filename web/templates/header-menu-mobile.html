@@ -1,0 +1,207 @@
+{% load static %}
+<div class="w-100 h-100 position-fixed d-none" style="background: rgba(0, 0, 0, 0.44); z-index: 6;" id="collapsed-topmenu-shadow"></div>
+<!-- 모바일 전용 메뉴 -->
+<div id="topmenu_mb">
+    <div class="menu-box h-100">
+        <div class="md1 row h-100 align-items-center">
+            <div class="col-2 d-flex justify-content-start">
+                <button class="btn btn-dark p-0 mh-100" id="sidebarToggle_open">
+                    <h2 class="display-4">&equiv;</h2>
+                </button>
+            </div>
+
+            <div class="col-8 d-flex justify-content-center align-items-center px-0">
+            </div>
+
+            <div class="col-2 d-flex">
+            </div>
+        </div>
+    </div>
+    <div id="menu-list_mb" class="col-6 px-0" style="display: none;">
+        <div id="list-header" class="d-flex justify-content-between align-items-center p-3">
+            <h2 class="mb-0" style="color: white;">MENU</h2>
+            <div>
+                <button class="btn btn-dark p-0 mh-100" id="sidebarToggle_close">
+                    <h1 class="display-4">&times;</h1>
+                </button>
+            </div>
+        </div>
+
+        <a style="display: none;" class="mobile-sm-8" onclick = "url_click('/BOM/lookup/', 'sm-8');">
+            <div class="card-header bg-white" id="menu-mobile-bom-lookup">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="sm-8 mb-0 font-weight-bold">BOM 조회</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a style="display: none;" class="mobile-sm-13" onclick = "url_click('/material/status/', 'sm-13');">
+            <div class="card-header bg-white" id="menu-mobile-item">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="sm-13 mb-0 font-weight-bold">자재재고현황</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a style="display: none;" class="mobile-sm-21" onclick ="url_click('/rental/status/', 'sm-21');">
+          <div class="card-header bg-white" id="menu-mobile-rental">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="sm-21 mb-0 font-weight-bold">대여현황 조회</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a style="display: none;" class="mobile-sm-18" onclick = "url_click('/process/progress_lookup/', 'sm-18');">
+            <div class="card-header bg-white" id="menu-mobile-process">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="sm-18 mb-0 font-weight-bold" id="mobile-sm-18">공정진행현황 조회</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% comment %}  // Todo 보류
+        <a style="display: none;" class="sm-27" onclick = "url_click('/process/progress_lookup/?s=1', '공정진행현황 조회');">
+            <div class="card-header bg-white" id="menu-mobile-process">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="mb-0 font-weight-bold">(실)공정진행현황 조회</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a style="display: none;" class="sm-25" onclick = "url_click('/warehouse/status/?code=100', '(원)자재현황 조회');">
+            <div class="card-header bg-white" id="menu-mobile-warehouse-100-status">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="mb-0 font-weight-bold">원부자재창고 재고현황</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+
+        <a style="display: none;" class="sm-25" onclick = "url_click('/warehouse/status/?code=500', '(완)자재현황 조회');">
+            <div class="card-header bg-white" id="menu-mobile-warehouse-500-status">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="mb-0 font-weight-bold">완제품창고 재고현황</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endcomment %}
+
+        <a style="display: none;" class="mobile-sm-23" onclick = "url_click('/monitoring/pc/', 'sm-23');">
+            <div class="card-header bg-white" id="menu-mobile-monitoring">
+                <div class="row no-gutters justify-content-between">
+                    <div class="col-11 d-flex align-items-center px-0">
+                        <h2 class="sm-23 mb-0 font-weight-bold">온습도 모니터링 조회</h2>
+                    </div>
+                    <div class="col-1 px-0 d-flex justify-content-center">
+                        <h2 class="mb-0 font-weight-bold">&#x2795;</h2>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        let permissions = get_userinfo().permissions;
+
+        for (let i = 0; i < AUTH_CNT_MAX; i++) {
+            let enabled = (permissions[i]) == '1';
+            if (enabled == true) $('.mobile-sm-' + i).css('display', 'block');
+        }
+
+        var width = window.outerWidth;
+        if ( width > 992 ) {
+            $('#header-menu-mobile').hide();
+        } else {
+            $('#header-menu-mobile').show();
+        }
+
+        let titleText = $('title').text();
+        console.log(titleText);
+
+        switch (titleText) {
+            case '자재현황 조회':
+                $('#menu-mobile-item').addClass('active');
+                $('#menu-mobile-item .col-1 h2').text('\u2796');
+                break;
+            case '대여현황 조회':
+                $('#menu-mobile-rental').addClass('active');
+                $('#menu-mobile-rental .col-1 h2').text('\u2796');
+                break;
+            case '공정진행현황 조회':
+                $('#menu-mobile-process').addClass('active');
+                $('#menu-mobile-process .col-1 h2').text('\u2796');
+                break;
+            case '원부자재창고 재고현황':
+                $('#menu-mobile-warehouse-100-status').addClass('active');
+                $('#menu-mobile-warehouse-100-status .col-1 h2').text('\u2796');
+                break;
+            case '완제품창고 재고현황':
+                $('#menu-mobile-warehouse-500-status').addClass('active');
+                $('#menu-mobile-warehouse-500-status .col-1 h2').text('\u2796');
+                break;
+            case '온습도 현황 조회':
+                $('#menu-mobile-monitoring').addClass('active');
+                $('#menu-mobile-monitoring .col-1 h2').text('\u2796');
+                break;
+        }
+    });
+    $(window).resize(function () {
+        var width = window.outerWidth;
+        if ( width > 768 ) {
+            $('#header-menu-mobile').hide();
+        } else {
+            $('#header-menu-mobile').show();
+        }
+    });
+
+    $('#sidebarToggle_open').on('click', function () {
+        $('#menu-list_mb').show();
+        $('#collapsed-topmenu-shadow')
+            .removeClass('d-none')
+            .on('click', function () {
+            $('#sidebarToggle_close').trigger('click');
+        });
+    })
+
+    $('#sidebarToggle_close').on('click', function () {
+        $('#menu-list_mb').hide();
+        $('#collapsed-topmenu-shadow').addClass('d-none');
+    });
+
+</script>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+{{ it.media }}
+{#<title>품목 기준정보관리</title>#}
+
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">품번</label>
+                                        <div class="content-input-group-input">
+                                        {{ it.it_code_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">품명</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.it_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">자재분류</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.it_division_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search_click();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+
+                    <div class="card">
+                        <div class="card-body" style="width: 100%">
+
+                            <table id="item_table" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%; table-layout: fixed;">
+                                <thead>
+                                    <tr>
+                                        <th>순번</th>
+                                        <th>품번</th>
+                                        <th>품명</th>
+                                        <th>품명상세</th>
+                                        <th>모델</th>
+                                        <th class="d-none">모델아이디</th>
+                                        <th>자재분류</th>
+                                        <th class="d-none">자재분류아이디</th>
+                                        <th>단위</th>
+                                        <th class="d-none">단위아이디</th>
+                                        <th>거래처</th>
+                                        <th class="d-none">거래처아이디</th>
+                                        <th>MOQ</th>
+                                        <th>안전재고수량</th>
+                                        <th>비고</th>
+                                        <th>표준단가</th>
+                                        <th>수수료율</th>
+                                        <th>TYPE</th>
+                                        <th class="d-none"></th>
+                                        <th class="d-none"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="item_tbody"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#detail_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="detail_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="item_master_form">
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    <label for=""><strong>*</strong>품번</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_code" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for=""><strong>*</strong>품명</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_name" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">품명상세</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_detail" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">자재분류</label>
+                                    <div>
+                                    {{ it.it_division_add }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">모델</label>
+                                    <div>
+                                    {{ it.it_model_add }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">단위</label>
+                                    <div>
+                                    {{ it.it_unit_add }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">거래처</label>
+                                    <div>
+                                    {{ it.it_customer_add }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">MOQ</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_moq" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">표준단가</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_standard_price" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">수수료율</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_fee_rate" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">안전재고수량</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_safe_amount" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">비고</label>
+                                    <input type="text" class="form-control form-control-sm" name="item_master_etc" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">QR</label>
+
+                                    <input type="button"  class="btn btn-secondary form-control form-control-sm" id="qr" onclick="show_qr_print($(this).val())"/>
+
+                                </div>
+
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                            <div class="btn btn-primary mr-3" onclick="qr_update()"> QR생성 </div>
+                            <div class="btn btn-primary mr-3" onclick="refresh_data()"> 초기화 </div>
+                            <div class="btn btn-primary mr-3" id="item_add-sm-4"> 등 록 </div>
+                            <div class="btn btn-primary mr-3" id="item_edit-sm-4"> 수 정 </div>
+                            <div class="btn btn-primary mr-3" id="item_delete-sm-4"> 삭 제 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_item.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+
+<!-- table 컬럼 사이즈 조정 -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+
+<script>
+    let main_table = null;
+    // 검색인자 - 품번, 품명, 자재분류(ac)
+    let it_code_sch = null;
+    let it_name_sch = null;
+    let it_nice_number_sch = null;
+    let it_brand_sch = null;
+    let it_item_group_sch = null;
+    let it_division_sch = null;
+
+    // add 항목 - 자재분류, 모델, 단위, 거래처, 용기타입, 칼라구분, 품종구분분
+    let it_click_div_id = null;
+    let it_click_div_name = null;
+
+    let it_click_model_id = null;
+    let it_click_model_name = null;
+
+    let it_click_unit_id = null;
+    let it_click_unit_name = null;
+
+    let it_click_cu_id = null;
+    let it_click_cu_name = null;
+
+    let it_click_con_id = null;
+    let it_click_con_name = null;
+
+    let it_click_color_id = null;
+    let it_click_color_name = null;
+
+    let it_click_kind_id = null;
+    let it_click_kind_name = null;
+
+    let it_click_brand_id = null;
+    let it_click_brand_name = null;
+
+    let it_click_item_group_id = null;
+    let it_click_item_group_name = null;
+
+    let it_click_purchase_from_id = null;
+    let it_click_purchase_from_name = null;
+    let it_click_purchase_from_code = null;
+
+    let it_click_purchase_from2_id = null;
+    let it_click_purchase_from2_name = null;
+    let it_click_purchase_from2_code = null;
+
+    let it_click_purchase_from3_id = null;
+    let it_click_purchase_from3_name = null;
+    let it_click_purchase_from3_code = null;
+
+    // 아이템 pk
+    let item_id_idx = null;
+    let item_name = null;
+
+    let item_qr_path = null;
+
+    let page1_size = 10000;
+
+    let nation_data1 = {
+        cname: 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: page1_size,
+    };
+
+    let nation1 = new Pnations(nation_data1, search);  // 인스턴스 명
+
+    $(function () {
+        main_table = $('#item_table').DataTable({
+            'ordering': false,
+            'dom': 'Blfrtip',
+            'autoWidth': false,
+            "columnDefs": [
+                  {
+                    "targets": [1, 2, 3, 10], // 타이틀 추가
+                      "resizable": true,
+                    render: function(data, type, row, meta) {
+                          return type === 'display' ? '<span title="' + data + '">' + data + '</span>' : data;
+                        }
+                  },{
+                    "targets": [5], // 모델아이디
+                    "visible": false, // 컬럼 숨김
+                    "searchable": false // 숨긴 컬럼에 대한 검색 비활성화 (선택 사항)
+                  },{
+                    "targets": [7], // 자재분류
+                    "visible": false,
+                    "searchable": false
+                  },{
+                    "targets": [9], // 단위
+                    "visible": false,
+                    "searchable": false
+                  },{
+                    "targets": [11], // 거래처
+                    "visible": false,
+                    "searchable": false
+                  },{
+                    "targets": [15], // 표준단가
+                    render: function(data, type, row) {
+                        if (type === 'display' && typeof data === 'number') {
+                          return '₩' + data.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                        }
+                        return data;
+                      }
+                  },{
+                    "targets": [18], // 품목아이디
+                    "visible": false,
+                    "searchable": false
+                  },
+                    {
+                    "targets": [19], // QR
+                    "visible": false,
+                    "searchable": false
+                  },
+                    {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                ]
+            })
+
+        // 버튼 활성화
+        $("#item_add-sm-4").prop('disabled', false).attr("class","btn btn-primary mr-3").on('click', function (){item_add()})
+
+        $("#item_edit-sm-4").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+        $("#item_delete-sm-4").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+
+        // 컬럼 사이즈 조정
+        $('table th').resizable({
+            handles: 'e',
+            stop: function(e, ui) {
+              $(this).width(ui.size.width);
+            }
+          });
+
+        search();
+        //refresh();
+        // Table export
+    });
+
+    function excel_upload() {
+        let form = new FormData();
+
+        let fileSelector = document.getElementById('excel');
+        let file = (fileSelector.files[0] ? fileSelector.files[0] : null);
+
+        form.append("csrfmiddlewaretoken", '{{ csrf_token }}')
+        form.append("excel", file)
+
+        api_excel_upload(form, () => {
+            alert("성공적으로 등록하였습니다.");
+
+            refresh_data();
+        });
+    }
+
+    function api_excel_upload(allData, done_callback) {
+        let v = allData.values();
+
+        for (let value of v){
+            console.log(value);
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/basic_informations/items/excelupload/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+    function refresh() {
+        location.href = "/basic_information/items/";
+    }
+
+    {% comment %}
+    function refresh() {
+        init_drop_down();
+        item_search();
+    }
+    {% endcomment %}
+
+    function search_click() {
+        nation1.page = 1;
+
+        it_code_sch = $('#id_it_code_sch').val();
+        it_name_sch = $('#id_it_name_sch').val();
+
+        it_division_sch = $('#id_it_division_sch').val();
+
+        search();
+    }
+
+    let order = ""
+
+    function search(ordering) {
+
+        if (ordering === '' || ordering === null || ordering=== undefined ){
+        } else {
+              order === ordering ? order = "-" +ordering : order = ordering
+        }
+
+        let query = "?page_size=" + page1_size + "&page=" + nation1.page +"&";
+
+        query += "ordering=" + order + "&";
+
+        if (it_code_sch == '' || it_code_sch == null || it_code_sch == '선택 및 검색') {
+        } else {
+            query += "&it_code_sch=" + it_code_sch;
+        }
+        if (it_name_sch == '' || it_name_sch == null || it_name_sch == '선택 및 검색') {
+        } else {
+            query += "&it_name_sch=" + it_name_sch;
+        }
+
+        if (it_division_sch == '' || it_division_sch == null || it_division_sch == '선택 및 검색') {
+        } else {
+            query += "&it_div_sch=" + it_division_sch;
+        }
+
+        //let multiSearch = $("#multiSearch").val()
+        //if (multiSearch !=='') query += '&total_search=' + multiSearch;
+
+        //console.log(query);
+        {#loading_start();#}
+        api_gp("/basic_information/items_read/" + query, "GET", {}, (done) => {
+            //console.log(done);
+            {#loading_finish();#}
+            draw_items_table(done);
+        });
+    }
+
+
+    function draw_items_table(done) {
+        main_table.rows().remove().draw();
+
+        main_table.rows.add(formatData(done.results)).draw();
+
+
+
+        if (item_id_idx != null) {
+            $("#" + item_id_idx).addClass('clicked');
+        }
+
+        $('#item_tbody > tr').on('click', function () {
+            let data = main_table.row(this).data();
+
+            setRowColor(this, 'M');
+
+
+            item_id_idx = data[18];
+            item_name = data[2];
+
+            $("#detail_item [name='item_master_code']").val(data[1]);
+            $("#detail_item [name='item_master_name']").val(data[2]);
+            $("#detail_item [name='item_master_detail']").val(data[3]);
+            let option = new Option(data[6], data[7], true, true); //자재구분
+            $("#id_it_division_add").append(option).trigger('change');
+
+            option = new Option(data[4], data[5], true, true); //모델
+            $("#id_it_model_add").append(option).trigger('change');
+
+            option = new Option(data[8], data[9], true, true); //단위
+            $('#id_it_unit_add').append(option).trigger('change');
+
+            option = new Option(data[10], data[11], true, true); //거래처
+            $('#id_it_customer_add').append(option).trigger('change');
+
+            $("#detail_item [name='item_master_moq']").val(data[12]);
+            $("#detail_item [name='item_master_safe_amount']").val(data[13]);
+
+            $("#detail_item [name='item_master_standard_price']").val(data[15]);// 표준단가
+            $("#detail_item [name='item_master_fee_rate']").val(data[16]);// 수수료율
+            $("#detail_item [name='item_master_etc']").val(data[14]);// 비고
+
+            $("#qr").val(data[19]);// qr
+
+
+            item_qr_path = $(this).find("[data-item='qr']").text();
+
+            // 버튼 활성화
+            $("#item_add-sm-4").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click');
+
+            $("#item_edit-sm-4").prop('disabled', false).attr("class","btn btn-primary mr-3").off('click').on('click', function (){item_edit()});
+            $("#item_delete-sm-4").prop('disabled', false).attr("class","btn btn-primary mr-3").off('click').on('click', function (){item_remove()});
+        });
+    }
+
+    function qr_update() {
+        if (!item_id_idx) {
+            alert('품목을 선택해 주세요.');
+            return;
+        }
+
+        let data = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: item_id_idx,
+        }
+
+        api_gp('/basic_information/items_qr_update/', 'post', data, (done) => {
+            alert('QR 생성이 완료되었습니다.');
+            search();
+
+            $("#qr").val(done.qr_path);
+
+        });
+
+        {% comment %}
+        api_item_update_qr(item_id_idx, (done) => {
+            alert('QR 생성이 완료되었습니다.');
+            search();
+            //refresh();
+        });
+        {% endcomment %}
+    }
+
+
+    function item_add() {
+        if ($("#detail_item [name='item_master_code']").val() == "") {
+            alert("품번을 입력해 주세요.");
+            return;
+        }
+
+        if ($("#detail_item [name='item_master_name']").val() == "") {
+            alert("품명을 입력해 주세요.");
+            return;
+        }
+
+        let data = get_data();
+        console.log(data)
+        api_gp("/basic_information/items_create/", "POST", data, (done) => {
+            nation1.page = 1;
+            item_id_idx = done.id;
+            item_name = done.name;
+
+            alert("추가하였습니다.");
+
+            search();
+            $("#qr").val(done.qr_path);
+        });
+    }
+
+
+    function item_edit() {
+        if (item_id_idx == null) {
+            alert("수정할 행을 선택해 주세요.");
+            return;
+        }
+
+        if ($('#code').val() == "") {
+            alert("품번을 입력해 주세요.");
+            return;
+        }
+
+        if ($('#name').val() == "") {
+            alert("품명을 입력해 주세요.");
+            return;
+        }
+
+        let data = get_data();
+
+
+        api_gp('/basic_information/items_update/', 'post', data, (done) => {
+            alert("수정했습니다..");
+
+            search();
+
+        });
+    }
+
+
+    function item_remove() {
+        if (item_id_idx == null) {
+            alert("삭제할 품목을 선택해 주세요.");
+            return;
+        }
+
+        if ($('#bom_division').val() == "BOM") {
+            alert("[BOM TYPE]은 [BOM 관리] > [BOM 형식 생성]에서 삭제하세요.");
+            return;
+        }
+
+        let allData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: item_id_idx,
+            qr_path: item_qr_path,// pk
+        }
+
+        let del = confirm(
+            "품목: " + item_name + "을(를) 삭제 하시겠습니까?"
+        );
+
+        if (del) {
+            api_gp('/basic_information/items_delete/', 'post', allData, (done_callback) => {
+                alert("삭제하였습니다.");
+                nation1.page = 1;
+
+                refresh_data();
+                search();
+
+            });
+        }
+    }
+
+    function show_qr_print(_imgurl) {
+
+        var url = "/material/qr_print/?param1=";
+        url = url + _imgurl;
+        var name = "QR Print";
+        var option = "width=1000px, height=1000px, location=no";
+        window.open(url, name, option);
+
+    }
+
+    function api_item_update_qr(id_data, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/basic_information/items_qr_update/",
+            headers: {
+                "Authorization": get_token()
+            },
+            data: {
+                id: id_data
+            },
+        })
+            .done(function (json) {
+                done_callback(json);
+            })
+            .fail(handle_error);
+    }
+
+
+    function get_data() {
+
+        return {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: item_id_idx,
+
+            code: $("#detail_item [name='item_master_code']").val(),  // 품번
+            name: $("#detail_item [name='item_master_name']").val(),  // 품명
+            detail: $("#detail_item [name='item_master_detail']").val(),  // 품명상세
+
+            item_division: $('#id_it_division_add').val(),  // 자재분류
+            unit: $('#id_it_unit_add').val(),  // 단위
+            model: $('#id_it_model_add').val(),  // 모델
+
+            purchase_from: $('#id_it_customer_add').val(), // 거래처
+
+
+            etc: $("#detail_item [name='item_master_etc']").val(),  // 비고
+            standard_price: $("#detail_item [name='item_master_standard_price']").val(),  // 표준단가
+
+            safe_amount: $("#detail_item [name='item_master_safe_amount']").val(),
+            fee_rate: $("#detail_item [name='item_master_fee_rate']").val(),
+
+            qr_path: ''
+        };
+    }
+
+    // 굳이?
+    function refresh_search_data() {
+        $("#code_sch").val("");
+        $("#name_sch").val("");
+        //$("#division_sch").val(null).trigger("change");
+    }
+
+
+    function refresh_data() {
+            item_id_idx = null;
+            item_name = null;
+
+            $("#detail_item [name='item_master_code']").val("");
+            $("#detail_item [name='item_master_name']").val("");
+            $("#detail_item [name='item_master_detail']").val("");
+            let option = new Option("", "", true, true); //자재구분
+            $("#id_it_division_add").append(option).trigger('change');
+
+            option = new Option("", "", true, true); //모델
+            $("#id_it_model_add").append(option).trigger('change');
+
+            option = new Option("", "", true, true); //단위
+            $('#id_it_unit_add').append(option).trigger('change');
+
+            option = new Option("", "", true, true); //거래처
+            $('#id_it_customer_add').append(option).trigger('change');
+
+            $("#detail_item [name='item_master_moq']").val("");
+
+            $("#detail_item [name='item_master_standard_price']").val("");// 표준단가
+            $("#detail_item [name='item_master_fee_rate']").val("");// 수수료율
+            $("#detail_item [name='item_master_etc']").val("");// 비고
+
+            $("#qr").val("");// qr
+
+
+            item_qr_path = null;
+
+            item_id_idx = null;
+             $('#item_tbody').find('tr').siblings().css('background-color', '');
+
+
+        // 버튼 활성화
+        $("#item_add-sm-4").prop('disabled', false).attr("class","btn btn-primary mr-3").off('click').on('click', function (){item_add()})
+
+        $("#item_edit-sm-4").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+        $("#item_delete-sm-4").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+    }
+
+    function formatData(results) {
+
+          return results.map((result, index) => [
+            index+1,
+            result.code,
+            result.name,
+            result.detail,
+            result.model_name,
+            result.model_id,
+            result.division_name,
+            result.division_id,
+            result.unit_name,
+            result.unit_id,
+            result.purchase_from_name,
+            result.purchase_from_id,
+            result.moq,
+            result.safe_amount,
+            result.etc,
+            result.standard_price,
+            result.fee_rate,
+            result.type_name,
+            result.id,
+            result.qr_path
+          ]);
+        }
+
+</script>
+
+</body>
+</html>

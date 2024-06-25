@@ -1,0 +1,168 @@
+{% include 'header.html' %}
+{% load static %}
+<div class="card m-2">
+    <div class="card-body p-2">
+        <div class="row no-gutters">
+            <div class="col-2 form-control text-center overflow-hidden">생산제품명</div>
+            <div class="col-2 form-control text-center" id="product_name"></div>
+            <div class="content-table col-12 p-2">
+                <table class="table table-sm text-center" style="min-width: 800px;">
+                    <thead>
+                    <tr id="bom_lookup_th">
+                    </tr>
+                    </thead>
+                    <tbody id="bom_lookup_detail_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 테이블 건수 조회 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <label class="mb-0">(<strong id="table_row-detail">0</strong>) 건 로딩</label>
+    </div>
+</div>
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script>
+
+    $(() => {
+        let columns = ['level', 'item', 'part', 'part_num', 'capacity', 'size', 'voltage', 'band',
+        'unit', 'tnb', 'lnr', 'required_amount', 'location', 'manufacturer', 'customer', 'etc',
+            'weight', 'standard', 'package', 'storage', 'item_name' ];
+        console.log(window.opener.$('#bom-lookup-tbody .clicked').attr('id'));
+        let id_BOM = window.opener.$('#bom-lookup-tbody .clicked').attr('id');
+        let now_tr = window.opener.$('#bom-lookup-tbody #' + id_BOM);
+        let now_tr_details = window.opener.$('#bom-lookup-tbody #' + id_BOM).data('details');
+
+        $('#product_name').html(window.opener.$('#bom-lookup-tbody .clicked [name=product_name]').text())
+
+        console.log('this id = ', id_BOM);
+        console.log(now_tr);
+        console.log(now_tr_details)
+
+        let now_columns = [];
+
+        columns.forEach((item) => {
+            if ( now_tr_details[item] !== '-1' ) {
+                now_columns[item] = now_tr_details[item];
+            }
+        });
+        console.table(now_columns);
+        now_columns.sort();
+
+        let arr = Object.values(now_columns);
+        console.table(arr);
+        let max = Math.max(...arr);
+        console.log(max);
+        let create_headers = "<th>순번</th>";
+
+        // header 생성
+        for (let i = 1; i < max+1; i++ ) {
+            let create_header = "<th id='th_" + i + "'></th>";
+            create_headers += create_header;
+        }
+        $('#bom_lookup_th').append(create_headers);
+
+        // input 생성
+        for (let item in now_columns) {
+            let now_columns_index = parseInt(now_columns[item]) + 1;
+
+            let korean_header = '';
+            switch(item) {
+                case 'level': korean_header = '레벨'; break;
+                case 'item': korean_header = '품번'; break;
+                case 'part': korean_header = 'PART'; break;
+                case 'part_num': korean_header = 'PART no'; break;
+                case 'capacity': korean_header = '용량'; break;
+                case 'size': korean_header = '사이즈'; break;
+                case 'voltage': korean_header = '전압'; break;
+                case 'band': korean_header = '허용범위'; break;
+                case 'unit': korean_header = '단위'; break;
+                case 'tnb': korean_header = 'T / B'; break;
+                case 'lnr': korean_header = 'L / R'; break;
+                case 'required_amount': korean_header = '소요량'; break;
+                case 'location': korean_header = '자재 위치'; break;
+                case 'manufacturer': korean_header = '거래처'; break;
+                case 'customer': korean_header = '고객사'; break;
+                case 'standard': korean_header = '사양'; break;
+                case 'weight': korean_header = '중량'; break;
+                case 'etc': korean_header = '비고'; break;
+                case 'package': korean_header = 'Package'; break;
+                case 'storage': korean_header = '생산공정(창고)'; break;
+                case 'item_name': korean_header = '품명'; break;
+                default: korean_header = ''; break;
+            }
+
+            $("#bom_lookup_th th:nth-child(" + now_columns_index +")").text(korean_header);
+        }
+        // {#console.log('data.id : ' + $(this).attr('id'));#}
+        api_gp('/bom/?master__id=' + id_BOM, 'GET', {}, (detail_data) => {
+            console.table(detail_data);
+            $('#table_row-detail').text(detail_data.length); // 로딩된 데이터 갯수 세기
+
+            let detail_rows = "";
+            let detail_list_num = 1;
+            // {#console.log(now_columns);#}
+
+            // 테이블 동적생성
+
+            for (let i = 0; i < detail_data.length; i++) {
+                let detail_item = detail_data[i];
+
+                let detail_row = "<tr id='" + detail_item.id + "' style='cursor:pointer;'>";
+                detail_row += "<td>" + (detail_list_num++) + "</td>";
+                for(let j = 0; j < max; j++) {
+                    let valid;
+                    for (let item in now_columns) {
+                        // {#console.log('j = ' + j);#}
+                        if(parseInt(now_columns[item]) === j+1) {
+                            // {#console.log(now_columns[item]);#}
+                            valid = item;
+                            break;
+                        } else {
+                            valid = 0;
+                        }
+                    }
+
+                    // item 이면 안쪽으로 타고 들어가게끔
+                    if(valid) {
+                        if (valid === 'item') {
+                            detail_row += "<td name='" + valid + "'>" + (detail_item[valid] ? detail_item[valid].code : "") + "</td>";
+                            detail_row += "<td class='d-none' name='" + valid + "_id'>" + (detail_item[valid] ? detail_item[valid].id : "") + "</td>";
+                        } else if (valid === 'customer' || valid === 'manufacturer' || valid === 'storage') {
+                            detail_row += "<td name='" + valid + "'>" + (detail_item[valid] ? detail_item[valid].name : '') + "</td>";
+                            detail_row += "<td class='d-none' name='" + valid + "_id'>" +(detail_item[valid] ? detail_item[valid].id : '') + "</td>";
+                        } else {
+                            detail_row += "<td name='" + valid + "'>" + detail_item[valid] + "</td>";
+                        }
+                    } else {
+                        detail_row += "<td></td>";
+                    }
+
+                }
+
+                detail_row += "</tr>"
+                detail_rows += detail_row;
+            }
+            $('#bom_lookup_detail_tbody').html(detail_rows);
+            // {#$('#bom_lookup_detail_tbody > tr').on('click', function () {#}
+            // {#    // table click highlight#}
+            // {#    $(this).parent().find('tr').removeClass('clicked');#}
+            // {#    $(this).addClass('clicked');#}
+            // {#    for (let item in now_columns) {#}
+            // {#        if(item === 'item') {#}
+            // {#            $('#detail_form [name="' + item + '"]').val($(this).find('[name="' + item + '_id"]').text()).trigger('change');#}
+            // {#        } else {#}
+            // {#            $('#detail_form [name="' + item + '"]').val($(this).find('[name="' + item + '"]').text());#}
+            // {#        }#}
+            // {#    }#}
+            // {# });#}
+
+            });
+    });
+
+</script>

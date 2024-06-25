@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+  <header>{% include "header.html" %}</header>
+  <body>
+    <!-- {#{% extends 'index.html' %}#} {##} {#{% block title %}#} {#
+    <title>온습도 모니터링 장비관리</title>#} {#{% endblock title %}#} {##} {#{%
+    block content %}#} -->
+    <div class="spinner" id="spinner">
+      <img src="../../../static/img/spinner.gif" width="150px" height="150px" />
+    </div>
+    <!-- 검색 -->
+    <form class="card m-2" id="monitoring_manage_search-form">
+      <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+          class="content-search row no-gutters align-items-center content-input-group"
+        >
+          <div class="content-title col-1 align-self-stretch">검색</div>
+          <div class="col-11">
+            <div class="row no-gutters">
+              <div class="content-input-group col-3 px-0">
+                <div class="content-input-group-header">
+                  <label>공장명</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control factory_select"
+                    name="factory__id"
+                  >
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                  </select>
+                </div>
+              </div>
+              <div class="content-input-group col-3 px-0">
+                <div class="content-input-group-header">
+                  <label>설비명</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control facilities_select"
+                    name="facilities__id"
+                  >
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                  </select>
+                </div>
+              </div>
+              <div class="content-input-group col-2 px-0">
+                <div class="content-input-group-header">
+                  <label>관리구분</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select class="form-control type_select" name="type__id">
+                  </select>
+                </div>
+              </div>
+              <div class="col-1 ml-auto px-0">
+                <button
+                  class="btn button-search rounded-0 w-100 h-100"
+                  onclick="monitoring_manage_load_table(true);return false;"
+                >
+                  검색
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- 내용 -->
+    <form class="card m-2" id="monitoring_manage_main-form">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-content w-100">
+          <div class="row no-gutters w-100 mb-2">
+            <div class="col-1 content-title">장비등록</div>
+            <div class="col-11">
+              <div class="row no-gutters">
+                <div class="content-input-group col-3">
+                  <div class="content-input-group-header">
+                    <label>공장명<strong>*</strong></label>
+                  </div>
+                  <div class="content-input-group-input">
+                    <select
+                      class="form-control factory_select"
+                      name="factory"
+                    ></select>
+                  </div>
+                </div>
+                <div class="content-input-group col-3">
+                  <div class="content-input-group-header">
+                    <label>설비명</label>
+                  </div>
+                  <div class="content-input-group-input">
+                    <select
+                      class="form-control facilities_select"
+                      name="facilities"
+                    ></select>
+                  </div>
+                </div>
+                <div class="content-input-group col-3">
+                  <div class="content-input-group-header">
+                    <label>온습도계 모델</label>
+                  </div>
+                  <div class="content-input-group-input">
+                    <input class="form-control" name="model" />
+                  </div>
+                </div>
+                <div class="content-input-group col-3">
+                  <div class="content-input-group-header">
+                    <label>시리얼 No</label>
+                  </div>
+                  <div class="content-input-group-input">
+                    <input class="form-control" name="serial" />
+                  </div>
+                </div>
+              </div>
+              <div class="row no-gutters">
+                <div class="content-input-group col-3">
+                  <div class="content-input-group-header">
+                    <label>관리구분<strong>*</strong></label>
+                  </div>
+                  <div class="content-input-group-input">
+                    <select
+                      class="form-control type_select"
+                      name="type"
+                    ></select>
+                  </div>
+                </div>
+                <div class="content-input-group col-3">
+                  <div class="content-input-group-header">
+                    <label>허용범위</label>
+                  </div>
+                  <div class="content-input-group-input">
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="threshold_low"
+                      />
+                      <div class="input-group-addon px-3 py-2">~</div>
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="threshold_high"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="content-input-group col-6">
+                  <div class="content-input-group-header">
+                    <label>기타</label>
+                  </div>
+                  <div class="content-input-group-input">
+                    <input class="form-control" name="etc" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row no-gutters w-100 justify-content-end">
+            <div class="col-1 px-0 mr-2">
+              <button
+                class="btn button-custom2 w-100"
+                role="button"
+                onclick="monitoring_manage_add(); return false;"
+              >
+                등록
+              </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+              <button
+                class="btn button-custom2 w-100"
+                role="button"
+                onclick="monitoring_manage_edit(); return false;"
+              >
+                수정
+              </button>
+            </div>
+            <div class="col-1 px-0">
+              <button
+                class="btn button-custom2 w-100"
+                role="button"
+                onclick="monitoring_manage_remove(); return false;"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12">
+          <table
+            id="monitoring_manage_data-table"
+            class="table table-sm text-center"
+            style="min-width: 1300px"
+          >
+            <thead>
+              <tr>
+                <th>순번</th>
+                <th>공장명</th>
+                <th>설비명</th>
+                <th>관리구분</th>
+                <th>온습도 적정범위</th>
+                <th>온습도계 모델</th>
+                <th>시리얼 No</th>
+                <th>등록자</th>
+                <th>등록일</th>
+                <th>기타</th>
+              </tr>
+            </thead>
+            <tbody id="monitoring_manage_main-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- 테이블 건수 조회 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <label class="mb-0"
+          >(<strong id="monitoring_manage_table_row">0</strong>) 건 로딩</label
+        >
+      </div>
+    </div>
+    <script>
+      var monitoring_id_idx;
+      var monitoring_columns = [
+        "factory",
+        "facilities",
+        "model",
+        "serial",
+        "type",
+        "threshold_low",
+        "threshold_high",
+        "etc",
+        "created_by",
+        "created_at",
+      ];
+      var monitoring_filters = ["factory__id", "facilities__id", "type__id"];
+
+      function monitoring_manage_load_table(is_search) {
+        function mock(data) {
+          $("#monitoring_manage_table_row").text(data.length); // 로딩된 데이터 갯수 세기
+
+          let rows = "";
+          let list_num = 1;
+          for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + list_num++ + "</td>";
+            row +=
+              "<td data-item='factory' property='" +
+              (item.factory ? item.factory.id : "") +
+              "'>" +
+              (item.factory ? item.factory.name : "") +
+              "</td>";
+            row +=
+              "<td data-item='facilities' property='" +
+              (item.facilities ? item.facilities.id : "") +
+              "'>" +
+              (item.facilities ? item.facilities.name : "") +
+              "</td>";
+            row +=
+              "<td data-item='type' property='" +
+              (item.type ? item.type.id : "") +
+              "'>" +
+              (item.type ? item.type.name : "") +
+              "</td>";
+            row +=
+              "<td data-item='threshold'>" +
+              (item.threshold_low ? item.threshold_low : "") +
+              "~" +
+              (item.threshold_high ? item.threshold_high : "") +
+              "</td>";
+            row +=
+              "<td data-item='model'>" +
+              (item.model ? item.model : "") +
+              "</td>";
+            row +=
+              "<td data-item='serial'>" +
+              (item.serial ? item.serial : "") +
+              "</td>";
+            row += "<td data-item='created_by'>" + item.created_by + "</td>";
+            row +=
+              "<td data-item='created_at'>" +
+              item.created_at.substring(0, 4) +
+              "-" +
+              item.created_at.substring(5, 7) +
+              "-" +
+              item.created_at.substring(8, 10) +
+              "</td>";
+            row +=
+              "<td data-item='etc'>" + (item.etc ? item.etc : "") + "</td>";
+
+            // {#row += "<td class='d-none' data-item='factory_id'>" + (item.factory ? item.factory.id : "") + "</td>";#}
+            // {#row += "<td class='d-none' data-item='facilities_id'>" + (item.facilities ? item.facilities.id : "") + "</td>";#}
+            // {#row += "<td class='d-none' data-item='type_id'>" + (item.type ? item.type.id : "") + "</td>";#}
+
+            row += "</tr>";
+
+            rows += row;
+          }
+          spinner();
+
+          $("#monitoring_manage_main-tbody").html(rows);
+          $("#monitoring_manage_main-tbody > tr").on("click", function () {
+            monitoring_columns.forEach((item) => {
+              if (
+                item === "factory" ||
+                item === "facilities" ||
+                item === "type"
+              ) {
+                $("#monitoring_manage_main-form [name='" + item + "']")
+                  .val(
+                    $(this)
+                      .find("[data-item='" + item + "']")
+                      .attr("property")
+                  )
+                  .trigger("change");
+              } else if (item === "threshold_low") {
+                let thresholds = $(this)
+                  .find("[data-item='threshold']")
+                  .text()
+                  .split("~");
+                $("#monitoring_manage_main-form [name='threshold_low']").val(
+                  thresholds[0]
+                );
+              } else if (item === "threshold_high") {
+                let thresholds = $(this)
+                  .find("[data-item='threshold']")
+                  .text()
+                  .split("~");
+                $("#monitoring_manage_main-form [name='threshold_high']").val(
+                  thresholds[1]
+                );
+              } else {
+                $("#monitoring_manage_main-form [name='" + item + "']").val(
+                  $(this)
+                    .find("[data-item='" + item + "']")
+                    .text()
+                );
+              }
+            });
+            monitoring_id_idx = $(this).attr("id");
+          });
+
+          // table click highlight
+          $("#monitoring_manage_main-tbody tr").on("click", function () {
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+          });
+
+          //Table pagination
+          $('.pagination-container').remove();
+          $('.table tbody').paginathing();
+        }
+
+        // filter
+        let query_params = "?";
+        if (is_search) {
+          monitoring_filters.forEach((item) => {
+            let val = $(
+              "#monitoring_manage_search-form [name='" + item + "']"
+            ).val();
+            if (val !== "선택" && val !== "")
+              query_params += "&" + item + "=" + val;
+          });
+        }
+
+        api_gp("/sensors/" + query_params, "GET", {}, (data) => {
+          mock(data);
+        });
+      }
+
+      function monitoring_manage_init() {
+        function make_dropdown(data, selectors) {
+          let list = "<option value=''>선택</option>";
+          for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            list +=
+              "<option value='" + item.id + "'>" + item.name + "</option>";
+          }
+          $(selectors).html(list);
+          $(selectors).select2({ width: "100%" });
+        }
+
+        // facilities dropdown
+        api_gp("/facilities/", "GET", {}, (data) => {
+          make_dropdown(data, ".facilities_select");
+        });
+
+        // TODO enable 필터 리팩토링
+        // factory dropdown
+        api_gp("/codes/?group=104&enable=true", "GET", {}, (data) => {
+          make_dropdown(data.results, ".factory_select");
+        });
+
+        // type dropdown
+        api_gp("/codes/?group=123&enable=true", "GET", {}, (data) => {
+          make_dropdown(data.results, ".type_select");
+        });
+
+        // main table
+        monitoring_manage_load_table(false);
+      }
+
+      function monitoring_manage_get_form_data() {
+        let data = {};
+        monitoring_columns.forEach((item) => {
+          if (item === "enable")
+            data[item] =
+              $('#monitoring_manage_main-form [name="' + item + '"]').val() ===
+              "사용";
+          else
+            data[item] = $(
+              '#monitoring_manage_main-form [name="' + item + '"]'
+            ).val();
+        });
+
+        return data;
+      }
+
+      function monitoring_manage_add() {
+        let data = monitoring_manage_get_form_data();
+        api_gp("/sensors/", "POST", data, (data) => {
+          alert("성공적으로 등록하였습니다.");
+          monitoring_manage_load_table(false);
+        });
+      }
+
+      function monitoring_manage_edit() {
+        let data = monitoring_manage_get_form_data();
+        api_gp("/sensors/" + monitoring_id_idx + "/", "PATCH", data, (data) => {
+          alert("성공적으로 수정하였습니다.");
+          monitoring_manage_load_table();
+        });
+      }
+
+      function monitoring_manage_remove() {
+        let data = monitoring_manage_get_form_data();
+        api_gp(
+          "/sensors/" + monitoring_id_idx + "/",
+          "DELETE",
+          data,
+          (data) => {
+            alert("성공적으로 삭제하였습니다.");
+            monitoring_manage_load_table();
+          }
+        );
+      }
+
+      $(() => {
+        refresh();
+
+        // Table export
+        $(parent.document).find("#excel-export").click(() =>
+          init_excel_export(
+            $("#monitoring_manage_data-table"),
+            "온습도모니터링장비관리"
+          )
+        );
+      });
+
+      function refresh() {
+        monitoring_manage_init();
+      }
+
+    function spinner(){
+     $("#spinner").remove();
+    }
+    </script>
+    <!-- {#{% endblock %}#} -->
+  </body>
+</html>

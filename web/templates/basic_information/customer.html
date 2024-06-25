@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+<header>
+    {% include "header.html" %}
+    <style>
+
+</style>
+</header>
+
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+{{ cu.media }}
+{% csrf_token %}
+<!-- {##}
+{#{% block title %}#}
+{#    <title>거래처 기준정보관리</title>#}
+{#{% endblock title %}#}
+
+{#{% block content %}#} -->
+
+
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">거래구분</label>
+                                        <div class="content-input-group-input">
+                                        {{ cu.cu_division_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">거래처명</label>
+                                        <div class="content-input-group-input">
+                                         {{ cu.cu_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 clearfix">
+                    <div class="gradient-buttons ml-5 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search_click();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-3 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+        <div class="row no-gutters ml-4 mr-4">
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <table id="customer_data-table" class="table table-hover table-striped table-bordered display nowrap" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>순번</th>
+                                        <th>거래처코드</th>
+                                        <th>거래처명</th>
+                                        <th>거래구분</th>
+                                        <th>사업자번호</th>
+                                        <th>대표자명</th>
+                                        <th>업태</th>
+                                        <th>종목</th>
+                                        <th>우편번호</th>
+                                        <th>주소</th>
+                                        <th>회사전화번호</th>
+                                        <th>팩스번호</th>
+                                        <th>담당자</th>
+                                        <th>직급</th>
+                                        <th>담당자 연락처</th>
+                                        <th>E-mail</th>
+                                        <th>비고</th>
+                                        <th>등록자</th>
+                                        <th>등록일</th>
+                                        <th>최종변경자</th>
+                                        <th>최종변경일</th>
+                                        <th class="d-none"></th>
+                                        <th class="d-none"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customer_tbody"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#detail_customer">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="detail_customer" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation">
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    <label for=""><strong>*</strong>거래처코드</label>
+                                    <input type="text" class="form-control form-control-sm" name="customer_code" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for=""><strong>*</strong>거래처명</label>
+                                    <input type="text" class="form-control form-control-sm" name="customer_name" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for=""><strong>*</strong>사업자번호</label>
+                                    <input type="text" class="form-control form-control-sm" name="licensee_number" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">대표자명</label>
+                                    <input type="text" class="form-control form-control-sm" name="customer_owner_name" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">업태</label>
+                                    <input type="text" class="form-control form-control-sm" name="business_conditions" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">종목</label>
+                                    <input type="text" class="form-control form-control-sm" name="business_event" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">우편번호</label>
+                                    <input type="text" class="form-control form-control-sm" name="office_post_code" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">주소</label>
+                                    <input type="text" class="form-control form-control-sm" name="office_address" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">전화번호</label>
+                                    <input type="text" class="form-control form-control-sm" name="office_phone" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">팩스</label>
+                                    <input type="text" class="form-control form-control-sm" name="office_fax_number" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">담당자</label>
+                                    <input type="text" class="form-control form-control-sm" name="person_in_charge" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">직급</label>
+                                    <input type="text" class="form-control form-control-sm" name="charge_level" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">담당자연락처</label>
+                                    <input type="text" class="form-control form-control-sm" name="charge_phone" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">E-mail</label>
+                                    <input type="text" class="form-control form-control-sm" name="email" autocomplete="off"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">거래구분</label>
+                                    <div class="content-input-group-input">
+                                    {{ cu.cu_division_add }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="">비고</label>
+                                    <input type="text" class="form-control form-control-sm" name="customer_note" autocomplete="off"/>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                            <div class="btn btn-primary mr-3" onclick="customer_refresh()"> 초기화 </div>
+                            <div class="btn btn-primary mr-3" id="customer_add-sm-1"> 등 록 </div>
+                            <div class="btn btn-primary mr-3" id="customer_edit-sm-1"> 수 정 </div>
+                            <div class="btn btn-primary mr-3" id="customer_delete-sm-1"> 삭 제 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+        </div>
+    </div>
+</div>
+<!-- 테이블 -->
+
+<!-- 모달  -->
+<div class="modal fade" id="checkModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" >관리자 비밀번호 입력</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="recipient-name" class="col-form-label">비밀번호를 입력후 수정해 주세요</label>
+            <input type="password" class="form-control" id="check_auth">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+        <button type="button" class="btn btn-primary" id="modal_check_but" onclick="check_click()" >확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/api_customer.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+<script>
+    let main_talbe = null;
+    // 검색인자
+    let cu_division_sch = null;
+    let cu_name_sch = null;
+
+    // add 항목
+    let cu_click_division_id = null;
+    let cu_click_division_name = null;
+
+    let customer_id;
+    let customer_name;
+    let page1_size = 100000;
+
+    let nation_data1 = {
+        cname: 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'customer_nation',
+        range: 5,
+        page_size: page1_size,
+    };
+
+    let nation1 = new Pnations(nation_data1, search); // 인스턴스 명
+
+    $(function () {
+        main_table = $('#customer_data-table').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                  {
+                    "targets": [21], // 숨길 컬럼의 인덱스(0부터 시작)
+                    "visible": false, // 컬럼 숨김
+                    "searchable": false // 숨긴 컬럼에 대한 검색 비활성화 (선택 사항)
+                  },
+                {
+                    "targets": [22], // 숨길 컬럼의 인덱스(0부터 시작)
+                    "visible": false, // 컬럼 숨김
+                    "searchable": false // 숨긴 컬럼에 대한 검색 비활성화 (선택 사항)
+                  }
+                ]
+            })
+        main();
+
+        // 버튼 활성화
+        $("#customer_add-sm-1").prop('disabled', false).attr("class","btn btn-primary mr-3").on('click', function (){customer_add()})
+
+        $("#customer_edit-sm-1").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+        $("#customer_delete-sm-1").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+    });
+
+    function main() {
+        search();
+    }
+
+    function refresh() {
+        location.href = "/basic_information/customers/";
+    }
+
+    function search_click() {
+        nation1.page = 1;
+
+        cu_division_sch = $('#id_cu_division_sch').val();
+        cu_name_sch = $('#id_cu_name_sch').val();
+
+        search();
+    }
+
+    function search() {
+        let query = "?page_size=" + page1_size + "&page=" + nation1.page;
+
+        if (cu_division_sch == '' || cu_division_sch == null || cu_division_sch == '선택') {
+        } else {
+            query += "&cu_division_sch=" + cu_division_sch;
+        }
+        if (cu_name_sch == '' || cu_name_sch == null || cu_name_sch == '선택') {
+        } else {
+            query += "&cu_name_sch=" + cu_name_sch;
+        }
+
+        loading_start();
+        api_gp("/basic_information/customers_read/" + query, "get", {}, (done) => {
+            loading_finish()
+            draw_customers_table(done);
+        });
+
+    }
+
+    function draw_customers_table(done) {
+        main_table.rows().remove().draw();
+
+        main_table.rows.add(formatData(done.results)).draw();
+
+        $('#customer_tbody > tr').on('click', function () {
+            let data = main_table.row(this).data();
+
+            setRowColor(this, 'M');
+
+            customer_id = data[21];
+            customer_name = data[2];
+
+            cu_click_division_id = data[22]
+            cu_click_division_name = data[3];
+
+            $("#detail_customer [name='customer_code']").val(data[1]);
+            $("#detail_customer [name='customer_code']").prop('disabled', true);
+            $("#detail_customer [name='customer_name']").val(customer_name);
+
+            // add 항목중에 거래구분
+            let option1 = new Option(cu_click_division_name, cu_click_division_id, true, true);
+            $('#id_cu_division_add').append(option1).trigger('change');
+
+
+            $("#detail_customer [name='licensee_number']").val(
+                data[4]
+            );
+            $("#detail_customer [name='licensee_number']").prop('disabled', true);
+            $("#detail_customer [name='customer_owner_name']").val(
+               data[5]
+            );
+            $("#detail_customer [name='business_conditions']").val(
+                data[6]
+            );
+            $("#detail_customer [name='business_event']").val(
+                data[7]
+            );
+            $("#detail_customer [name='office_post_code']").val(
+                data[8]
+            );
+            $("#detail_customer [name='office_address']").val(
+                data[9]
+            );
+            $("#detail_customer [name='office_phone']").val(
+                data[10]
+            );
+            $("#detail_customer [name='office_fax_number']").val(
+                data[11]
+            );
+            $("#detail_customer [name='person_in_charge']").val(
+                data[12]
+            );
+            $("#detail_customer [name='charge_level']").val(
+                data[13]
+            );
+            $("#detail_customer [name='charge_phone']").val(
+                data[14]
+            );
+            $("#detail_customer [name='email']").val(
+                data[15]
+            );
+            {% comment %}$("#detail_customer [name='customer_use_division']").val(
+                $(this).find("[name='customer_use_division']").text()
+            );{% endcomment %}
+            $("#detail_customer [name='customer_note']").val(
+                data[16]
+            );
+
+            // 버튼 활성화
+            $("#customer_add-sm-1").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+
+            $("#customer_edit-sm-1").prop('disabled', false).attr("class","btn btn-primary mr-3").off('click').on('click', function (){customer_edit()})
+            $("#customer_delete-sm-1").prop('disabled', false).attr("class","btn btn-primary mr-3").off('click').on('click', function (){customer_remove()})
+
+
+        });
+    }
+
+    // validation Test Code
+    function validationTest(el) {
+        let valid = true;
+        $(el)
+            .find("input")
+            .each(function () {
+                //            console.log($(this).attr('name') + ' : ' + $(this).parent().prev().find('strong').length);
+                let now = $(this);
+                if ($(this).parent().prev().find("strong").length) {
+                    if (now.val() == "") {
+                        now.css({border: "1px solid red"});
+                        valid = false;
+                        //                    console.log('validation false');
+                    } else {
+                        now.css({border: "1px solid green"});
+                        //                    console.log('validation true');
+                    }
+                }
+            });
+
+        $(el)
+            .find("select")
+            .each(function () {
+                //            console.log($(this).attr('name') + ' : ' + $(this).parent().prev().find('strong').length);
+                let now = $(this);
+                if ($(this).parent().prev().find("strong").length) {
+                    if (now.val() == "선택") {
+                        if (now.attr("aria-hidden")) {
+                            // check select2
+                            now.next().css({border: "1px solid red"});
+                        }
+                        now.css({border: "1px solid red"});
+                        valid = false;
+                        //                    console.log('validation false');
+                    } else {
+                        if (now.attr("aria-hidden")) {
+                            // check select2
+                            now.next().css({border: "1px solid green"});
+                        }
+                        now.css({border: "1px solid green"});
+                        //                    console.log('validation true');
+                    }
+                }
+            });
+
+        return valid;
+    }
+
+
+    function customer_add() {
+        if ($("#detail_customer [name='customer_code']").val() == "") {
+            alert("거래처코드를 입력해 주세요.");
+            return;
+        }
+        if ($("#detail_customer [name='customer_name']").val() == "") {
+            alert("거래처명을 입력해 주세요.");
+            return;
+        }
+        if ($("#detail_customer [name='licensee_number']").val() == "") {
+            alert("사업자번호를 입력해 주세요.");
+            return;
+        }
+
+        let allData = get_data();
+        api_gp('/basic_information/customers_create/', 'post', allData, (done) => {
+
+            nation1.page = 1;
+            customer_id = done.id;
+            // if 걸어서 정상적으로 추가 된 경우에만 추가 되었다 뜨게끔...
+            alert("추가되었습니다.");
+
+            search();
+        });
+    }
+
+    function customer_edit() {
+        if (customer_id == null) {
+            alert("테이블에서 항목을 먼저 선택하십시오.");
+        } else {
+
+            if ($("#detail_customer [name='customer_code']").val() == "") {
+                alert("거래처코드를 입력해 주세요.");
+                return;
+            }
+            if ($("#detail_customer [name='customer_name']").val() == "") {
+                alert("거래처명을 입력해 주세요.");
+                return;
+            }
+            if ($("#detail_customer [name='licensee_number']").val() == "") {
+                alert("사업자번호를 입력해 주세요.");
+                return;
+            }
+
+
+
+            if(get_cookie('enterprise_id')=="54"){
+                $('#modal_check_but').attr("value", "edit")
+                $('#checkModal').modal('show');
+            }else{
+                update_customers();
+            }
+
+
+
+        }
+    }
+
+    function check_click(){
+        let tname = $('#modal_check_but').attr('value');
+
+        if(get_cookie('snd_auth')!=$('#check_auth').val()){
+            alert('정확한 비밀번호를 입력해주세요')
+        }else{
+            if(tname=="edit"){
+                update_customers();
+
+            }else{
+                delete_customers();
+
+            }
+
+            $('#check_auth').val('')
+
+            $('#checkModal').modal('hide');
+
+        }
+    }
+
+    function update_customers(){
+         let allData = get_data();
+
+            api_gp('/basic_information/customers_update/', 'post', allData, (done) => {
+                //nation1.page = 1;
+                alert("수정되었습니다.");
+
+                search();
+                //수정후 데이터 초기화
+                customer_id = null;
+            });
+    }
+
+
+    function customer_remove() {
+
+        if (customer_id == null) {
+            alert("거래처를 먼저 선택하십시오.");
+        } else {
+            if(get_cookie('enterprise_id')=="54"){
+                $('#modal_check_but').attr("value", "del");
+                $('#checkModal').modal('show');
+            }else{
+                delete_customers();
+            }
+
+
+        }
+    }
+
+    function delete_customers(){
+        let allData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: customer_id,  // pk
+        }
+
+        var del = confirm(
+                "거래처: " + customer_name + "을(를) 삭제 하시겠습니까?"
+            );
+
+            if (del) {
+                api_gp('/basic_information/customers_delete/', 'post', allData, () => {
+                    alert("삭제하였습니다.");
+                    nation1.page = 1;
+
+                    search();
+                });
+            }
+    }
+
+    function get_data() {
+        let customer_code = $('#detail_customer [name="customer_code"]').val();
+        let customer_name = $('#detail_customer [name="customer_name"]').val();
+
+        let customer_division_code = $('#id_cu_division_add').val();
+        let customer_division = customer_division_code;
+
+        let licensee_number = $(
+            '#detail_customer [name="licensee_number"]'
+        ).val();
+        let customer_owner_name = $(
+            '#detail_customer [name="customer_owner_name"]'
+        ).val();
+        let business_conditions = $(
+            '#detail_customer [name="business_conditions"]'
+        ).val();
+        let business_event = $(
+            '#detail_customer [name="business_event"]'
+        ).val();
+        let office_post_code = $(
+            '#detail_customer [name="office_post_code"]'
+        ).val();
+        let office_address = $(
+            '#detail_customer [name="office_address"]'
+        ).val();
+        let office_phone = $('#detail_customer [name="office_phone"]').val();
+        let office_fax_number = $(
+            '#detail_customer [name="office_fax_number"]'
+        ).val();
+        let person_in_charge = $(
+            '#detail_customer [name="person_in_charge"]'
+        ).val();
+        let charge_level = $('#detail_customer [name="charge_level"]').val();
+        let charge_phone = $('#detail_customer [name="charge_phone"]').val();
+        let email = $('#detail_customer [name="email"]').val();
+        let customer_use_division =
+            $('#detail_customer [name="customer_use_division"]').val() == "사용";
+        let customer_note = $('#detail_customer [name="customer_note"]').val();
+
+        return {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: customer_id,
+
+            code: customer_code,
+            name: customer_name,
+            division: customer_division,
+            licensee_number: licensee_number,
+            owner_name: customer_owner_name,
+            business_conditions: business_conditions,
+            business_event: business_event,
+            postal_code: office_post_code,
+            address: office_address,
+            office_phone: office_phone,
+            office_fax: office_fax_number,
+            charge_name: person_in_charge,
+            charge_level: charge_level,
+            charge_phone: charge_phone,
+            email: email,
+            {#enable: customer_use_division,#}
+            etc: customer_note,
+        };
+    }
+
+    // Table export
+    $(parent.document).find("#excel-export").click(() =>
+        init_excel_export($("#customer_data-table"), "거래처기준정보")
+    );
+
+    function customer_refresh() {
+        $("[name='customer_code']").val("");  // 거래처코드
+        $("[name='customer_name']").val("");  // 거래처명
+        $("[name='licensee_number']").val("");  // 사업자번호
+        $("[name='customer_owner_name']").val("");  // 대표자명
+        $("[name='business_conditions']").val("");  // 업태
+        $("[name='business_event']").val("");  // 종목
+        $("[name='office_post_code']").val("");  // 우편번호
+        $("[name='office_address']").val("");  // 주소
+        $("[name='office_phone']").val("");  // 전화번호
+        $("[name='office_fax_number']").val("");  // 팩스번호
+        $("[name='person_in_charge']").val("");  // 담당자
+        $("[name='charge_level']").val("");  // 직급
+        $("[name='charge_phone']").val("");  // 담당자 연락처
+        $("[name='email']").val("");  // E-mail
+
+        let option1 = new Option('', '', true, true);
+        $('#id_cu_division_add').append(option1).trigger('change');
+
+        //$("[name='customer_division']").val(null).trigger("change");  // 거래구분
+        $("[name='customer_note']").val("");  // 비고
+
+        $('#customer_tbody').find('tr').removeClass('clicked');
+
+        // 버튼 활성화
+        $("#customer_add-sm-1").prop('disabled', false).attr("class","btn btn-primary mr-3").on('click', function (){customer_add()})
+
+        $("#customer_edit-sm-1").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+        $("#customer_delete-sm-1").prop('disabled', true).attr("class","btn btn-primary mr-3 disabled").off('click')
+
+        //search();
+
+    }
+    function api_excel_upload(allData, done_callback) {
+        let v = allData.values();
+
+        for (let value of v){
+            console.log(value);
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/basic_information/customers_excel/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+    function formatData(results) {
+
+          return results.map((result, index) => [
+            index+1,
+            result.code,
+            result.name,
+            result.division_name,
+            result.licensee_number,
+            result.owner_name,
+            result.business_conditions,
+            result.business_event,
+            result.postal_code,
+            result.address,
+            result.office_phone,
+            result.office_fax,
+            result.charge_name,
+            result.charge_level,
+            result.charge_phone,
+            result.email,
+            result.etc,
+            result.created_by,
+            result.created_at,
+            result.updated_by,
+            result.updated_at,
+            result.id,
+            result.division_id
+          ]);
+        }
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

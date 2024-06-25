@@ -1,0 +1,112 @@
+{% include 'header.html' %}
+{% load static %}
+
+<div id="print_content" style="display: block;" xmlns="http://www.w3.org/1999/html">
+    <img id="print_img" src="" class="logo-img" alt="logo"/>
+</div>
+
+<div style="position:absolute;bottom:22px;left:20px;">
+    <div style="display: inline-block;">
+        &nbsp; 가로크기 :
+        <input id="land_size" size="10" placeholder="px" style="text-align:right;" />
+    </div>
+
+    <div style="display: inline-block; margin-top: 10px;">
+        &nbsp;&nbsp;&nbsp; 세로크기 :
+        <input id="port_size" size="10" placeholder="px" style="text-align:right;" />
+    </div>
+
+    <div style="display: inline-block; margin-top: 10px; margin-left:50px; width:120px;height:30px;">
+        <select class="form-control pt-0 pb-0" style="top:2px; height: 28px;" id="canvas">
+            <option value="size: A4 portrait; margin:1rem;">A4</option>
+            <option value="size: 10in 7in; landscape; margin:1rem;">10:7</option>
+        </select>
+    </div>
+
+    <br/>
+
+    <div style="display: inline-block;">
+        &nbsp; 가로위치 :
+        <input id="land_position" size="10" placeholder="px" style="text-align:right;"/>
+    </div>
+
+    <div style="display: inline-block; margin-top: 10px;">
+        &nbsp;&nbsp;&nbsp; 세로위치 :
+        <input id="port_position" size="10" placeholder="px" style="text-align:right;"/>
+
+    </div>
+
+    <button style="margin-top:-1px;margin-left:50px; padding-bottom:10px; width:120px;height:30px;" onclick="qr_print()">인쇄</button>
+</div>
+
+<script>
+    function getParam(sname) {
+
+        var params = location.search.substr(location.search.indexOf("?") + 1);
+        var sval = "";
+        params = params.split("&");
+
+        for (var i = 0; i < params.length; i++) {
+
+            temp = params[i].split("=");
+
+            if ([temp[0]] == sname) {
+                sval = temp[1];
+            }
+        }
+        return sval;
+    }
+
+    $("#land_size").val();
+
+
+    $("#land_size").on("propertychange change keyup paste input", function () {
+
+        $("#print_img").css("width", $("#land_size").val());
+        $("#print_img").css("height", $("#port_size").val());
+    });
+
+    $("#port_size").on("propertychange change keyup paste input", function () {
+        $("#print_img").css("width", $("#land_size").val());
+        $("#print_img").css("height", $("#port_size").val());
+    });
+
+
+    $("#land_position").on("propertychange change keyup paste input", function () {
+        var currentVal = $(this).val();
+        $("#print_img").css("margin-left", currentVal);
+    });
+
+    $("#port_position").on("propertychange change keyup paste input", function () {
+        var currentVal = $(this).val();
+        $("#print_img").css("margin-top", currentVal);
+    });
+
+    let imgurl = "/data/uploads/qrcodeIMG/" + getParam("param1");
+    $("#print_img").attr("src", imgurl);
+
+    function qr_print() {
+        $("#print_img").attr("src", imgurl);
+
+        let canvas_size = $('#canvas :selected').val();
+        let divToPrint = document.getElementById('print_content');
+
+        let printDest =
+            '<style>' +
+            '@media print {@page {' + canvas_size + '} body{padding:1rem;}}' +
+            '.table, .table thead th, .table tbody th, .table tbody td, .div { border: 1px #000 !important; color: #000; !important }' +
+            // 'div { margin-left: 70px;}' +
+            ' thead th { background-color:#e9ecef }' +
+            '  </style>' +
+
+            divToPrint.innerHTML;
+
+        $(printDest).printThis({ });
+    }
+
+    window.onload = function () {
+        $("#land_size").val($("#print_img").width());
+        $("#port_size").val($("#print_img").height());
+    }
+
+</script>

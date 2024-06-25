@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+
+<!-- BOM 등록 -->
+<div id="bom_register">
+    <!-- 검색 -->
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center">
+                <div class="content-title col-1 align-self-stretch" id="n_bom_search">BOM 조회</div>
+                <form
+                        class="col-11 .content-search"
+                        id="BOM_manage_main-form"
+                        onsubmit="return BOM_manage_search_submit(event)"
+                >
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>생산제품명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control product-dropdown" id="search_product">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>고객사</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control customer-dropdown" id="search_customer">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-1 px-0">
+                            <button class="btn button-search w-100">검색</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <div class="col-12 px-0">
+                <!-- 본문 -->
+                <div class="content-table col-12 px-0 mb-2" style="overflow-x:auto; overflow-y:hidden; height:251px">
+                    <table
+                            id="BOM_manage_data-table-up"
+                            class="table table-sm text-center"
+                    >
+                        <thead>
+                        <tr>
+                            <th>순번</th>
+                            <th id="n_bom_code">BOM 코드</th>
+                            <th>생산제품명</th>
+
+                            <th id="n_bom_model1">모델</th>
+                            <th>버전</th>
+                            <th>고객사</th>
+
+                            <th>최초 등록일</th>
+                            <th>최초 등록자</th>
+                            <th>최종 변경자</th>
+                            <th>최종 변경일</th>
+                        </tr>
+                        </thead>
+                        <tbody id="bom_manage_tbody"></tbody>
+                    </table>
+
+                    <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                         style="margin-top: -20px;">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 형식내용 -->
+<form>
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div class="content-title col-1 align-self-stretch">형식내용</div>
+                <div class="col-11">
+                    <div class="row no-gutters" id="detail_form">
+                        <!-- input 생성할때 이 부분을 계속 생성하면 됩니다.
+                            <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>{# your name here #}</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control">
+                                </div>
+                            </div>
+                            input 생성할때 이 부분을 계속 생성하면 됩니다. -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters d-flex justify-content-end">
+        <div class="col-1 px-0 mr-2">
+            <button
+                    type="button"
+                    class="btn button-custom2 w-100"
+                    onclick="document.getElementById('file-selector').click();"
+            >
+                엑셀 업로드
+            </button>
+            <input
+                    type="file"
+                    id="file-selector"
+                    style="display: none"
+                    accept=".xlsx, .xls"
+            />
+        </div>
+        <div class="col-1 px-0 mr-2">
+            <button type="button" class="btn button-custom2 w-100" id="item_add">
+                자재추가
+            </button>
+        </div>
+        <div class="col-1 px-0 mr-2">
+            <button type="button" class="btn button-custom2 w-100" id="item_edit">
+                자재수정
+            </button>
+        </div>
+        <div class="col-1 px-0 mr-2">
+            <button
+                    type="button"
+                    class="btn button-custom2 w-100"
+                    id="item_delete"
+            >
+                자재삭제
+            </button>
+        </div>
+    </div>
+</form>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x:auto; overflow-y:hidden;height: 385px">
+            <table
+                    id="BOM_manage_data-table-down"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr id="bom_manage_th">
+                    <th>순번</th>
+                </tr>
+                </thead>
+                <tbody id="bom_manage_detail_tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.min.js" integrity="sha512-W/mRQs9ZSFpF14X/4aRgQss7+HRsVXsph+Y6DGLeqIqK8IpO+rQz0ISUEXkTeeKF7tivoGv+Ru7SpocS/1qahg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+
+<script>
+    // radio change 이벤트
+    $("#bom_copy, #bom_copy_btn").hide();
+
+    $("input[name=BOM_group]").change(function () {
+        var radioValue = $(this).val();
+        if (radioValue === "register_BOM") {
+            $("#bom_copy, #bom_copy_btn").hide();
+            $("#bom_register, #bom_register_btn").fadeIn();
+        } else if (radioValue === "copy_BOM") {
+            $("#bom_register, #bom_register_btn").hide();
+            $("#bom_copy, #bom_copy_btn").fadeIn();
+        }
+    });
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+
+    let nation1 = new Pnations(nation_data1, BOM_search);  // 인스턴스 명
+
+    var text = null;
+
+    // {#function showPopup() {#}
+    // {#    var url = "add";#}
+    // {#    var name = "BOM 추가";#}
+    // {#    var option = "width=900, height=250, location=no";#}
+    // {#    window.open(url, name, option);#}
+    // {# }#}
+    var bom_columns = [
+        "item",  // 품번
+        "item_name",  // 품명
+        "required_amount",  // 소요량
+
+        "level",  // 레벨
+        "part",  // PART
+        "part_num",  // PART no
+        "capacity",  // 용량
+        "size",  // 사이즈
+        "voltage",  // 전압
+        "band",  // 허용범위
+        "lnr",  // L/R
+        "tnb",  // T/B
+
+        "package",  // Package
+        "storage",  // 생산공정(창고)
+        "location",  // 자재위치
+        "standard",  // 사양
+        "etc",  // 비고
+        "unit",  // 단위
+        "weight",  // 중량
+        "manufacturer",  // 협력사 (제조사)
+        "customer",  // 고객사
+
+    ];
+    var now_bom_columns = [];
+
+    // starting point
+    $(function () {
+        set_naming();
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() => {
+            init_excel_export($("#BOM_manage_data-table-up"), "BOM조회");
+            init_excel_export($("#BOM_manage_data-table-down"), "BOM");
+        });
+    });
+
+
+    function set_naming(){
+        let enterprise_manage = get_userinfo().enterprise_manage;
+        if (enterprise_manage == '(주)건강생활연구소'){
+            $("#n_bom_search").text("조회");
+            $("#n_bom_code").text("코드");
+
+            $("#n_bom_model1").text("제품군");
+        }
+
+        if (enterprise_manage == '(주)온교육'){
+            $("#n_bom_code").text("품번");
+        }
+    }
+
+
+    function refresh() {
+        let c = getParameters("customer");
+        let bn = getParameters("bom_name");
+
+        if (c === "선택") c = "";
+        if (bn === "선택") bn = "";
+        api_get_BOMmaster(c, bn, (data) => {
+            // {#console.table(data);#}
+            BOM_manage_load_data(data);
+        });
+        init();
+    }
+
+    function BOM_manage_load_data(done) {
+        console.table(done);
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        let rows = "";
+        let list_num = data.length;
+        let customer_option = "<option value=''>선택</option>";
+        let bom_name_option = "<option value=''>선택</option>";
+        let bom_name_option_list = [];
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let created_date = item.created_at;
+            let updated_date = item.updated_at;
+            if (item.detail_code !== 0) {
+                // append it
+                let row =
+                    "<tr id='" +
+                    item.id +
+                    "' style='cursor:pointer;' data-details=" +
+                    '\'{"product_name":"' +
+                    item.product_name +
+                    '", "level":"' +
+                    item.level +
+                    '", "item":"' +
+                    item.item +
+                    '",' +
+                    '"part":"' +
+                    item.part +
+                    '", "part_num":"' +
+                    item.part_num +
+                    '", "capacity":"' +
+                    item.capacity +
+                    '",' +
+                    '"size":"' +
+                    item.size +
+                    '", "voltage":"' +
+                    item.voltage +
+                    '", "band":"' +
+                    item.band +
+                    '", ' +
+                    '"unit":"' +
+                    item.unit +
+                    '", "tnb":"' +
+                    item.tnb +
+                    '", "lnr":"' +
+                    item.lnr +
+                    '", ' +
+                    '"required_amount":"' +
+                    item.required_amount +
+                    '", "location":"' +
+                    item.location +
+                    '", "manufacturer":"' +
+                    item.manufacturer +
+                    '", ' +
+                    '"customer":"' +
+                    item.customer +
+                    '", "standard":"' +
+                    item.standard +
+                    '", "weight":"' +
+                    item.weight +
+                    '", ' +
+                    '"etc":"' +
+                    item.etc +
+                    '", "package":"' +
+                    item.package +
+                    '", "enable":"' +
+                    item.enable +
+                    '", ' +
+                    '"storage":"' +
+                    item.storage +
+                    '", "item_name":"' +
+                    item.item_name +
+                    "\" }'>";
+                row += "<td>" + (num + i) + "</td>";
+                row += "<td name='bom_number'>" + item.bom_number + "</td>";  // BOM 코드
+                row += "<td name='product_name'>" + item.product_name + "</td>";  // 생산제품명
+
+                row += "<td name='model_name'>" + (item.model_name ? item.model_name.name : "") + "</td>";  // 모델
+                row += "<td name='version'>" + (item.version ? item.version : "") + "</td>";  // 버전
+                row +=
+                    "<td name='master_customer'>" +
+                    (item.master_customer ? item.master_customer.name : "") +
+                    "</td>";  // 고객사
+                row +=
+                    "<td name='created_at'>" +
+                    created_date.substring(0, 4) +
+                    "-" +
+                    created_date.substring(5, 7) +
+                    "-" +
+                    created_date.substring(8, 10) +
+                    "</td>";
+                row += "<td name='created_by'>" + item.created_by + "</td>";
+                row += "<td name='updated_by'>" + item.updated_by + "</td>";
+                row +=
+                    "<td name='updated_at'>" +
+                    updated_date.substring(0, 4) +
+                    "-" +
+                    updated_date.substring(5, 7) +
+                    "-" +
+                    updated_date.substring(8, 10) +
+                    "</td>";
+                row += "</tr>";
+
+                customer_option += "<option>" + item.customer + "</option>";
+                if (bom_name_option_list.indexOf(item.bom_name) === -1) {
+                    // DISTINCT
+                    bom_name_option_list.push(item.bom_name);
+                    bom_name_option +=
+                        "<option value=" +
+                        item.bom_name +
+                        ">" +
+                        item.bom_name +
+                        "</option>";
+                }
+
+                rows += row;
+            }
+        }
+
+        spinner();
+
+        nation1.nation_display(done);
+        $("#bom_manage_tbody").html(rows);
+
+        if (text != null){
+            $("#" + text).addClass('clicked');
+        }
+
+        //$(".content-search [name='customer']").html(customer_option);
+        //$(".content-search [name='bom_name']").html(bom_name_option);
+
+        $("#bom_manage_tbody > tr").on("click", function () {
+            // {#console.log('data.id : ' + $(this).attr('id'));#}
+            // table click highlight
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+            text = $(this).attr("id");
+
+            let bom_number = $(this).find("[name='bom_number']").text();
+            let now_tr_details = $(this).data("details");
+            now_bom_columns = [];
+            // 테이블 클리어 후 re-draw
+            $("#bom_manage_th, #bom_manage_detail_tbody, #detail_form").empty();
+
+            bom_columns.forEach((item) => {
+                if (now_tr_details[item] !== "-1") {
+                    now_bom_columns[item] = now_tr_details[item];
+                    {#console.log(now_bom_columns[item]);#}
+                }
+            });
+            {#console.table(now_bom_columns);#}
+            now_bom_columns.sort();
+
+            let arr = Object.values(now_bom_columns);
+            {#console.table(arr);#}
+            let max = Math.max(...arr);
+            {#console.log(max);#}
+            let create_inputs = "";
+            let create_headers = "<th>순번</th>";
+
+            // header 생성
+            for (let i = 1; i < max + 1; i++) {
+                let create_header = "<th id='th_" + i + "'></th>";
+                create_headers += create_header;
+            }
+            $("#bom_manage_th").append(create_headers);
+
+            // input 생성
+            for (let item in now_bom_columns) {
+                let now_bom_columns_index = parseInt(now_bom_columns[item]) + 1;
+
+                let korean_header = "";
+                korean_header = get_key_name(item);
+                let create_input = "";
+                if (item === "item") {
+                    create_input =
+                        '<div class="content-input-group col-3 px-0">\n' +
+                        '   <div class="content-input-group-header">\n' +
+                        '      <label id="' +
+                        item +
+                        '">' +
+                        korean_header +
+                        "<strong>*</strong>" +
+                        "</label>\n" +
+                        "   </div>\n" +
+                        '   <div class="content-input-group-input">\n' +
+                        '      <select class="form-control item_dropdown" name="' +
+                        item +
+                        '"></select>\n' +
+                        "   </div>\n" +
+                        "</div>";
+
+                    api_gp("/items_select/", "GET", {}, (items_data) => {
+                        let append_list = "<option value=''>선택</option>";
+                        for (let i = 0; i < items_data.length; i++) {
+                            let item_detail = items_data[i];
+
+                            if(!(item_detail.code == bom_number)){
+                                append_list +=
+                                "<option value='" +
+                                item_detail.id +
+                                "'>" +
+                                item_detail.code +
+                                "</option>";
+                            }
+                        }
+                        $("#detail_form [name=" + item + "]").html(append_list).select2({width: "100%"});
+
+                        $("#detail_form [name=" + item + "]").on('select2:select', function (e) {
+                            let select2_data = e.params.data;
+                            if (select2_data.id === '') {
+                                $("[name=item_name]").val(null).trigger('change');
+                            } else {
+                                let id = $(this).val();
+                                $("[name=item_name]").val(id).trigger('change');
+                            }
+                        });
+                    });
+                } else if (item === "item_name") {
+                    create_input =
+                        '<div class="content-input-group col-3 px-0">\n' +
+                        '   <div class="content-input-group-header">\n' +
+                        '      <label id="' +
+                        item +
+                        '">' +
+                        korean_header +
+                        "<strong>*</strong>" +
+                        "</label>\n" +
+                        "   </div>\n" +
+                        '   <div class="content-input-group-input">\n' +
+                        '      <select class="form-control item_dropdown" name="' +
+                        item +
+                        '"></select>\n' +
+                        "   </div>\n" +
+                        "</div>";
+
+                    api_gp("/items_select/", "GET", {}, (items_data) => {
+                        let append_list = "<option value=''>선택</option>";
+                        for (let i = 0; i < items_data.length; i++) {
+                            let item_detail = items_data[i];
+
+                            if(!(item_detail.code == bom_number)){
+                                append_list +=
+                                "<option value='" +
+                                item_detail.id +
+                                "'>" +
+                                item_detail.name +
+                                "</option>";
+                            }
+                        }
+                        $("#detail_form [name=" + item + "]").html(append_list).select2({width: "100%"});
+
+                        $("#detail_form [name=" + item + "]").on('select2:select', function (e) {
+                            let select2_data = e.params.data;
+                            if (select2_data.id === '') {
+                                $("[name=item]").val(null).trigger('change');
+                            } else {
+                                let id = $(this).val();
+                                $("[name=item]").val(id).trigger('change');
+                            }
+                        });
+                    });
+                } else if (item === "required_amount") {
+                    create_input =
+                        '<div class="content-input-group col-3 px-0">\n' +
+                        '   <div class="content-input-group-header">\n' +
+                        '      <label id="' +
+                        item +
+                        '">' +
+                        korean_header +
+                        "<strong>*</strong>" +
+                        "</label>\n" +
+                        "   </div>\n" +
+                        '   <div class="content-input-group-input">\n' +
+                        '      <input class="form-control" name="' +
+                        item +
+                        '" id="required_amount_id" onkeyup="_chkNumber(this, 3)">\n' +
+                        "   </div>\n" +
+                        "</div>";
+                } else if (item === "customer" || item === "manufacturer") {
+                    create_input =
+                        '<div class="content-input-group col-3 px-0">\n' +
+                        '   <div class="content-input-group-header">\n' +
+                        '      <label id="' +
+                        item +
+                        '">' +
+                        korean_header +
+                        "</label>\n" +
+                        "   </div>\n" +
+                        '   <div class="content-input-group-input">\n' +
+                        '      <select class="form-control item_dropdown" name="' +
+                        item +
+                        '"></select>\n' +
+                        "   </div>\n" +
+                        "</div>";
+
+                    api_gp("/customers/", "GET", {}, (items_data) => {
+                        let append_list = "<option value=''>선택</option>";
+                        for (let i = 0; i < items_data.length; i++) {
+                            let item_detail = items_data[i];
+                            append_list +=
+                                "<option value='" +
+                                item_detail.id +
+                                "'>" +
+                                item_detail.name +
+                                "</option>";
+                        }
+                        $("#detail_form [name=" + item + "]")
+                            .html(append_list)
+                            .select2({
+                                width: "100%",
+                            });
+                    });
+                } else if (item === "storage") {
+                    create_input =
+                        '<div class="content-input-group col-3 px-0">\n' +
+                        '   <div class="content-input-group-header">\n' +
+                        '      <label id="' +
+                        item +
+                        '">' +
+                        korean_header +
+                        "</label>\n" +
+                        "   </div>\n" +
+                        '   <div class="content-input-group-input">\n' +
+                        '      <select class="form-control item_dropdown" name="' +
+                        item +
+                        '"></select>\n' +
+                        "   </div>\n" +
+                        "</div>";
+
+                    api_gp(
+                        "/codes/?group=109&enable=true",
+                        "GET",
+                        {},
+                        (items_data) => {
+                            let append_list = "<option value=''>선택</option>";
+                            for (let i = 0; i < items_data.length; i++) {
+                                let item_detail = items_data[i];
+                                append_list +=
+                                    "<option value='" +
+                                    item_detail.id +
+                                    "'>" +
+                                    item_detail.name +
+                                    "</option>";
+                            }
+                            $("#detail_form [name=" + item + "]")
+                                .html(append_list)
+                                .select2({
+                                    width: "100%",
+                                });
+                        }
+                    );
+                } else {
+                    create_input =
+                        '<div class="content-input-group col-3 px-0">\n' +
+                        '   <div class="content-input-group-header">\n' +
+                        '      <label id="' +
+                        item +
+                        '">' +
+                        korean_header +
+                        "</label>\n" +
+                        "   </div>\n" +
+                        '   <div class="content-input-group-input">\n' +
+                        '      <input class="form-control" name="' +
+                        item +
+                        '">\n' +
+                        "   </div>\n" +
+                        "</div>";
+                }
+
+                create_inputs += create_input;
+
+                $(
+                    "#bom_manage_th th:nth-child(" + now_bom_columns_index + ")"
+                ).text(korean_header);
+            }
+            $("#detail_form").prepend(create_inputs);
+
+            get_detail_table($(this).attr("id"), max);
+        });
+
+    }
+
+    // 자재 추가
+    $("#item_add").on("click", function (e) {
+        let upload_data = get_form_data();
+        console.log(upload_data);
+
+        api_gp("/bom/", "POST", upload_data, (data) => {
+            alert("성공적으로 등록하였습니다.");
+            {#console.log("text : ", text);#}
+            $("#BOM_manage_data-table-up #" + text).click();
+            // TODO: window reload or click event here for show changed data
+        });
+
+    });
+
+    // 자재 수정
+    $("#item_edit").on("click", function (e) {
+        {#e.preventDefault();#}
+        let upload_data = get_form_data();
+        // clicked class 는 테이블이 클릭되면 나타납니다. 이를 이용하여 tbody 밑의 선택된 id를 찾아서 가져옵니다.
+        let BOM_manage_id = $("#bom_manage_detail_tbody")
+            .find(".clicked")
+            .attr("id");
+
+        {#console.table(upload_data);#}
+        api_gp("/bom/" + BOM_manage_id + "/", "PATCH", upload_data, (data) => {
+            alert("성공적으로 수정하였습니다.");
+            {#console.log("text : ", text);#}
+            $("#BOM_manage_data-table-up #" + text).click();
+            // TODO: window reload or click event here for show changed data
+        });
+    });
+
+    // 자재 삭제
+    $("#item_delete").on("click", function (e) {
+        e.preventDefault();
+        let upload_data = get_form_data();
+        // clicked class 는 테이블이 클릭되면 나타납니다. 이를 이용하여 tbody 밑의 선택된 id를 찾아서 가져옵니다.
+        let BOM_manage_id = $("#bom_manage_detail_tbody")
+            .find(".clicked")
+            .attr("id");
+        api_gp("/bom/" + BOM_manage_id + "/", "DELETE", upload_data, (data) => {
+            alert("성공적으로 삭제하였습니다.");
+            {#console.log("text : ", text);#}
+            $("#BOM_manage_data-table-up #" + text).click();
+            // TODO: window reload or click event here for show changed data
+        });
+    });
+
+    function get_detail_table(BOM_manage_id, max) {
+        api_gp(
+            "/bom/?master__id=" + BOM_manage_id,
+            "GET",
+            {},
+            (detail_data) => {
+                {#console.table(detail_data);#} // for test
+                $("#table_row-detail").text(detail_data.length); // 로딩된 데이터 갯수 세기
+
+                let detail_rows = "";
+                let detail_list_num = 1;
+                // {#console.log(now_bom_columns);#}
+
+                // 테이블 동적생성
+
+                for (let i = 0; i < detail_data.length; i++) {
+                    let detail_item = detail_data[i];
+
+                    {#console.log("detail item : " + JSON.stringify(detail_item));#}
+                    {#console.log("detail data : " + JSON.stringify(detail_data[i]));#}
+
+                    let detail_row =
+                        "<tr id='" + detail_item.id + "' style='cursor:pointer;'>";
+                    detail_row += "<td>" + detail_list_num++ + "</td>";
+                    for (let j = 0; j < max; j++) {
+                        let valid;
+                        for (let item in now_bom_columns) {
+                            // {#console.log('j = ' + j);#}
+                            if (parseInt(now_bom_columns[item]) === j + 1) {
+                                // {#console.log(now_bom_columns[item]);#}
+                                valid = item;
+                                break;
+                            } else {
+                                valid = 0;
+                            }
+                        }
+
+                        // item 이면 안쪽으로 타고 들어가게끔
+                        if (valid) {
+                            if (valid === "item") {
+                                detail_row +=
+                                    "<td name='" +
+                                    valid +
+                                    "' property='" +
+                                    (detail_item[valid] ? detail_item[valid].id : "") +
+                                    "'>" +
+                                    (detail_item[valid] ? detail_item[valid].code : "") +
+                                    "</td>";
+                                // {#detail_row += "<td class='d-none' name='" + valid + "_id'>" + detail_item[valid].id + "</td>";#}
+                            } else if (valid === "item_name") {
+                                detail_row +=
+                                    "<td name='" +
+                                    valid +
+                                    "' property='" +
+                                    (detail_item[valid] ? detail_item[valid].id : "") +
+                                    "'>" +
+                                    (detail_item[valid] ? detail_item[valid] : "") +
+                                    "</td>";
+                            } else if (
+                                valid === "customer" ||
+                                valid === "manufacturer" ||
+                                valid === "storage"
+                            ) {
+                                detail_row +=
+                                    "<td name='" +
+                                    valid +
+                                    "' property='" +
+                                    (detail_item[valid] ? detail_item[valid].id : "") +
+                                    "'>" +
+                                    (detail_item[valid] ? detail_item[valid].name : "") +
+                                    "</td>";
+                                // {#detail_row += "<td class='d-none' name='" + valid + "_id'>" + (detail_item[valid] ? detail_item[valid].id : '') + "</td>";#}
+                            } else if (valid === "required_amount") {
+                                detail_row +=
+                                    "<td name='" +
+                                    valid +
+                                    "'>" +
+                                    nullapply(detail_item[valid] ? detail_item[valid].toLocaleString() : 0) +
+                                    "</td>";
+                            } else {
+                                detail_row +=
+                                    "<td name='" +
+                                    valid +
+                                    "'>" +
+                                    nullapply(detail_item[valid]) +
+                                    "</td>";
+                            }
+                        } else {
+                            detail_row += "<td></td>";
+                        }
+                    }
+
+                    detail_row += "</tr>";
+                    detail_rows += detail_row;
+                }
+
+                $('#BOM_manage_data-table-down + .pagination-container').remove();
+
+                $(function () {
+                    //Table pagination
+                    $('#bom_manage_detail_tbody').paginathing({
+                        perPage: 10,
+                        insertAfter: '#BOM_manage_data-table-down'
+                    });
+                });
+
+                $("#bom_manage_detail_tbody").html(detail_rows);
+                $("#bom_manage_detail_tbody > tr").on("click", function () {
+
+                    // table click highlight
+                    $(this).parent().find("tr").removeClass("clicked");
+                    $(this).addClass("clicked");
+                    for (let item in now_bom_columns) {
+                        if (
+                            item === "customer" ||
+                            item === "manufacturer" ||
+                            item === "storage"
+                        ) {
+                            $('#detail_form [name="' + item + '"]')
+                                .val(
+                                    $(this)
+                                        .find('[name="' + item + '"]')
+                                        .attr("property")
+                                )
+                                .trigger("change");
+
+                        }else if (item === "item"){
+                            $('#detail_form [name=item]')
+                                .val(
+                                    $(this)
+                                        .find('[name="' + item + '"]')
+                                        .attr("property")
+                                )
+                                .trigger("change");
+
+                            $('#detail_form [name=item_name]')
+                                .val(
+                                    $(this)
+                                        .find('[name="' + item + '"]')
+                                        .attr("property")
+                                )
+                                .trigger("change");
+                        } else if (item === "item_name"){
+                            // Do nothing
+                        } else {
+                            $('#detail_form [name="' + item + '"]').val(
+                                $(this)
+                                    .find('[name="' + item + '"]')
+                                    .text()
+                            );
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    function BOM_manage_search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+        text = null;
+        BOM_search();
+        return false;
+    }
+
+
+    function BOM_search() {
+        let search_customer = $('.content-search #search_customer :selected').text();
+        if (search_customer === "선택") search_customer = null;
+        let search_product = $('.content-search #search_product :selected').text();
+        if (search_product === "선택") search_product = null;
+        //var bom_name = myform['bom_name'].text;
+
+        let query = "?page=" + nation1.page + "&";
+        if (search_customer == '' || search_customer == null){
+            // do nothing
+        } else {
+            query += "master_customer__name=" + search_customer + "&";
+        }
+        if (search_product == '' || search_product == null){
+            // do nothing
+        } else {
+            query += "product_name=" + search_product;
+        }
+
+        api_gp("/bom/master/" + query, "GET", {}, (data) => {
+            BOM_manage_load_data(data);
+        });
+    }
+
+
+    function get_form_data() {
+        let _item = $("#detail_form [name=item]").val();
+        let _item_name = $("#detail_form [name=item_name] :selected").text();
+        let _required_amount = $("#detail_form [name=required_amount]").val().replace(/,/g, '');
+
+        let _level = $("#detail_form [name=level]").val();
+        let _part = $("#detail_form [name=part]").val();
+        let _part_num = $("#detail_form [name=part_num]").val();
+        let _capacity = $("#detail_form [name=capacity]").val();
+        let _size = $("#detail_form [name=size]").val();
+        let _voltage = $("#detail_form [name=voltage]").val();
+        let _band = $("#detail_form [name=band]").val();
+        let _unit = $("#detail_form [name=unit]").val();
+        let _tnb = $("#detail_form [name=tnb]").val();
+        let _lnr = $("#detail_form [name=lnr]").val();
+
+        let _location = $("#detail_form [name=location]").val();
+        let _manufacturer = $("#detail_form [name=manufacturer]").val();
+        let _customer = $("#detail_form [name=customer]").val();
+        let _etc = $("#detail_form [name=etc]").val();
+        let _weight = $("#detail_form [name=weight]").val();
+        let _standard = $("#detail_form [name=standard]").val();
+        let _master = $("#bom_manage_tbody").find(".clicked").attr("id");
+        let _package = $("#detail_form [name=package]").val();
+        let _storage = $("#detail_form [name=storage]").val();
+
+
+        return {
+            item: _item ? _item : "",
+            item_name: _item_name ? _item_name : "",
+            required_amount: parseFloat(_required_amount ? _required_amount : 0),
+            level: _level ? _level : "",
+            part: _part ? _part : "",
+            part_num: _part_num ? _part_num : "",
+            capacity: _capacity ? _capacity : "",
+            size: _size ? _size : "",
+            voltage: _voltage ? _voltage : "",
+            band: _band ? _band : "",
+            unit: _unit ? _unit : "",
+            tnb: _tnb ? _tnb : "",
+            lnr: _lnr ? _lnr : "",
+            location: _location ? _location : "",
+            manufacturer: _manufacturer ? _manufacturer : "",
+            customer: _customer ? _customer : "",
+            etc: _etc ? _etc : "",
+            weight: _weight ? _weight : "",
+            standard: _standard ? _standard : "",
+            package: _package ? _package : 0,
+            // clicked class 는 테이블이 클릭되면 나타납니다. 이를 이용하여 tbody 밑의 선택된 id를 찾아서 가져옵니다.
+            storage: _storage ? _storage : "",
+
+
+            master: _master ? _master : "",
+
+            // TODO: need more data for upload?
+        };
+    }
+
+    function get_form_data_excel(excelObj, done_callback) {
+        let _item = excelObj["품번"];
+
+        let _item_name = excelObj["품명"];
+        let _required_amount = excelObj["소요량"];
+
+        let _level = excelObj["레벨"];
+        let _part = excelObj["PART"];
+        let _part_num = excelObj["PART no"];
+        let _capacity = excelObj["용량"];
+        let _size = excelObj["사이즈"];
+        let _voltage = excelObj["전압"];
+        let _band = excelObj["허용범위"];
+        let _unit = excelObj["단위"];
+        let _tnb = excelObj["T / B"];
+        let _lnr = excelObj["L / R"];
+
+        let _location = excelObj["자재 위치"];
+        let _manufacturer = excelObj["거래처"];
+        let _customer = excelObj["고객사"];
+        let _etc = excelObj["비고"];
+        let _weight = excelObj["중량"];
+        let _standard = excelObj["사양"];
+        let _master = $("#bom_manage_tbody").find(".clicked").attr("id");
+        let _master_number = $("#bom_manage_tbody").find(".clicked").find("[name='bom_number']").text();
+        let _package = excelObj["Package"];
+        let _storage = excelObj["생산공정(창고)"];
+
+        done_callback({
+            item: _item ? _item : null,
+            item_name: _item_name ? _item_name : null,
+            required_amount: parseFloat(_required_amount ? _required_amount : 0),
+            level: _level ? _level : null,
+            part: _part ? _part : null,
+            part_num: _part_num ? _part_num : null,
+            capacity: _capacity ? _capacity : null,
+            size: _size ? _size : null,
+            voltage: _voltage ? _voltage : null,
+            band: _band ? _band : null,
+            unit: _unit ? _unit : null,
+            tnb: _tnb ? _tnb : null,
+            lnr: _lnr ? _lnr : null,
+            location: _location ? _location : null,
+            manufacturer: _manufacturer ? _manufacturer : null,
+            customer: _customer ? _customer : null,
+            etc: _etc ? _etc : null,
+            weight: _weight ? _weight : null,
+            standard: _standard ? _standard : null,
+            package: _package ? _package : 0,
+            storage: _storage ? _storage : null,
+
+
+            master: _master ? _master : "",
+            master_number: _master_number ? _master_number : "",
+
+            // TODO: need more data for upload?
+        });
+    }
+
+    function get_key_name(key) {
+        let name;
+        switch (key) {
+            case "level":
+                name = "레벨";
+                break;
+            case "item":
+                name = "품번";
+                break;
+            case "part":
+                name = "PART";
+                break;
+            case "part_num":
+                name = "PART no";
+                break;
+            case "capacity":
+                name = "용량";
+                break;
+            case "size":
+                name = "사이즈";
+                break;
+            case "voltage":
+                name = "전압";
+                break;
+            case "band":
+                name = "허용범위";
+                break;
+            case "unit":
+                name = "단위";
+                break;
+            case "tnb":
+                name = "T / B";
+                break;
+            case "lnr":
+                name = "L / R";
+                break;
+            case "required_amount":
+                name = "소요량";
+                break;
+            case "location":
+                name = "자재위치";
+                break;
+            case "manufacturer":
+                name = "협력사";
+                break;
+            case "customer":
+                name = "고객사";
+                break;
+            case "standard":
+                name = "사양";
+                break;
+            case "weight":
+                name = "중량";
+                break;
+            case "etc":
+                name = "비고";
+                break;
+            case "package":
+                name = "Package";
+                break;
+            case "storage":
+                name = "생산공정(창고)";
+                break;
+            case "item_name":
+                name = "품명";
+                break;
+            default:
+                name = key + "_error";
+                break;
+        }
+        return name;
+    }
+
+    function excelToJSDate(excelDate) {
+        var date = new Date(Math.round((excelDate - (25569)) * 86400 * 1000));
+        var converted_date = date.toISOString().split('T')[0];
+        return converted_date;
+    }
+
+    function init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === ".customer-dropdown") {
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                } else if (selectors === '.product-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.product_name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // 생산제품명
+        api_gp("/bom/master_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".product-dropdown");
+        });
+
+        // 고객사
+        api_gp("/customers_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".customer-dropdown");
+        });
+
+        // for file upload
+        const fileSelector = document.getElementById("file-selector");
+        let trick = false;
+        fileSelector.addEventListener("change", (event) => {
+            // if (trick === true) {
+            //     trick = false;
+            //     return;
+            // }
+
+            var input = event.target;
+            var reader = new FileReader();
+            reader.onload = function(){
+                var fileData = reader.result;
+                var wb = XLSX.read(fileData, {type : 'binary'});
+                wb.SheetNames.forEach(function(sheetName){
+                    var rowObj =XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {range: 13}).map(row => _.mapKeys(row, (value, key) => key.trim()))
+                    for(var i = 0; i < rowObj.length; i++) {
+                        var ObjData = rowObj[i];
+                        if (!ObjData['품번']) continue;
+                        get_form_data_excel(ObjData, function(upload_data) {
+                            console.log(upload_data);
+                            api_gp("/bom/", "POST", upload_data, (data) => {
+                                alert("성공적으로 등록하였습니다.");
+                                console.log("text : ", text);
+                                $("#BOM_manage_data-table-up #" + text).click();
+                                // TODO: window reload or click event here for show changed data
+                            });
+                        });
+                    }
+                })
+            };
+            reader.readAsBinaryString(input.files[0]);
+
+            // trick = true;
+            // $("#file-selector").val("");
+        });
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

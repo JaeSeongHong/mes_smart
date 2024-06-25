@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow-y: hidden;">
+
+<!-- spinner -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 검색 -->
+<form class="no-gutters" id="order_search">
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div class="content-title col-1 align-self-stretch">조회</div>
+                <div class="row no-gutters col-11">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>거래처</label>
+                        </div>
+
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control customer-name-dropdown"
+                                    id="customer_search"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>출하현황</label>
+                        </div>
+
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control work-status-dropdown"
+                                    id="export_status"
+                            >
+                                <option value="">전체</option>
+                                <option value="미출하">미출하</option>
+                                <option value="일부출하">일부출하</option>
+                                <option value="출하완료">출하완료</option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="content-input-group col-5 px-0">
+                        <div class="content-input-group-header">
+                            <label>납기예정일</label>
+                        </div>
+                        <div class="input-group input-daterange">
+                            <input
+                                    type="text"
+                                    class="form-control h-100 created_at_after datepicker"
+                                    id="startdate"
+                                    autocomplete="off"
+                            />
+                            <div class="input-group-addon px-3">~</div>
+                            <input
+                                    type="text"
+                                    class="form-control h-100 created_at_before datepicker"
+                                    id="enddate"
+                                    autocomplete="off"
+                            />
+                        </div>
+                        <div class="col-2 px-0">
+                            <a
+                                    class="btn button-custom2 w-100"
+                                    role="button"
+                                    onclick="main_search()"
+                            >검색</a
+                            >
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<!-- 주문정보 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x:auto; overflow-y: hidden; height:253px;">
+            <table
+                    id="ordering_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th style="width:70px;">순번</th>
+                    <th>주문번호</th>
+                    <th>거래처</th>
+                    <th>담당자</th>
+                    <th>공급가</th>
+                    <th>출하현황</th>
+                    <th>납기예정일</th>
+                </tr>
+                </thead>
+                <tbody id="ordering_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 출하내역 상세 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x:auto; overflow-y: scroll; height:253px;">
+            <table
+                    id="export_table"
+                    class="table table-sm text-center"
+            >
+                <thead id="export_thead">
+                <tr>
+                    <th style="width:70px;">순번</th>
+                    <th>품번</th>
+                    <th>품명</th>
+                    <th>주문수량</th>
+                    <th>출하수량</th>
+                    <th>미출하</th>
+                    <th>출하일자</th>
+                    <th>출하주소</th>
+
+                    <th>단가</th>
+                    <th name='supply_price'>공급가</th>
+                    <th name='surtax'>부가세</th>
+                    <th name='item_supply_total'>합계</th>
+                    <th>작성자</th>
+                </tr>
+                </thead>
+                <tbody id="export_table_body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="card m-2">
+
+    {# NOTE #}
+    <div class="card-body col-12 p-0">
+        <div class="row no-gutters card-body p-2">
+            <div class="content-title col-1 align-self-stretch">합계금액</div>
+            <form id="sum_form" class="col-11 w-100">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>공급가</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="supply_price" class="form-control" disabled/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>부가세</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="surtax" class="form-control" disabled/>
+                        </div>
+                    </div>
+
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>총합계</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="supply_total" class="form-control" disabled/>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row no-gutters card-body p-2">
+            <div class="content-title col-1 align-self-stretch">NOTE</div>
+            <form id="note_form" class="col-11 w-100">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>납기희망일</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="due_date" class="form-control datepicker" disabled/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>결제조건</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="pay_option" class="form-control" disabled/>
+                        </div>
+                    </div>
+
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>품질보증기한</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="guarantee_date" class="form-control datepicker" disabled/>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>납품장소</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="deliver_place" class="form-control" disabled/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>비고</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <input id="note" class="form-control" disabled/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>부가세포함</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                        >
+                            <div class="form-control" style="background-color:#e9ecef;">
+                                <input class="w-100 align-center" type="checkbox" id="surtax_chk" checked
+                                       style="width: 20px; height: 20px;" disabled/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card m-2">
+    <div class="card-body col-12 p-0">
+        <div class="row no-gutters card-body p-2">
+            <div class="content-input-group col-3 px-0" style="margin-bottom: 6px">
+                        <div class="content-input-group-header">
+                            <label>사업장 구분</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control enterprise_search"
+                                    id="enterprise_search"
+                            ></select>
+                        </div>
+                    </div>
+        <div class="col-12" id="detail_enterprise">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>회사명</label>
+                        </div>
+                        <input class="form-control" id="enterprise_name"
+                        disabled/>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>사업자번호</label>
+                        </div>
+                        <input class="form-control" id="enterprise_licensee_number"
+                        disabled/>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>대표자명</label>
+                        </div>
+                        <input class="form-control" id="enterprise_owner_name"
+                        disabled/>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>대표번호</label>
+                        </div>
+                        <input class="form-control" id="enterprise_owner_phone"
+                        />
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>업태</label>
+                        </div>
+                        <input class="form-control" id="enterprise_business_conditions"
+                        disabled/>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>종목</label>
+                        </div>
+                        <input class="form-control" id="enterprise_business_event"
+                        disabled/>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>팩스번호</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="enterprise_fax"/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>비고</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="enterprise_remark"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3">
+                        <div class="content-input-group-header">
+                            <label>우편번호</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="enterprise_postal_code"/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-6">
+                        <div class="content-input-group-header">
+                            <label>주소</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="enterprise_address"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Button -->
+        <div class="row no-gutters w-100 mt-1 pb-2 pr-1 justify-content-end">
+            <div class="col-1 px-0 mr-1">
+                <button class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="craete_pdf_download();">
+                    PDF출력
+                </button>
+                </div>
+            <div class="col-1 px-0 mr-2">
+                <button class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="send_email();">
+                    메일발송
+                </button>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="visibility: hidden" id="print">
+    <div>
+    <div class="col-12" id="print_title"
+         style="font-size:20pt; word-spacing: 2em; text-align: center; font-weight: bolder; text-decoration: underline double; margin-bottom: 1em; margin-top: 0.5em;">
+        거 래 명 세 서
+    </div>
+
+    <!-- 자사정보 -->
+    <div id="enter_info">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-12">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6">
+                            <div class="content-input-group-input" style="min-width: 100%;">
+                                <div id="ordering_ex_created_at" style="display: block; width: 100%; text-align: center; font-size: 15pt;">2021년 월 일</div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-6" style="border-top: 3px black solid; border-left: 3px black solid; border-right: 3px black solid;">
+                            <div class="content-input-group-header" style="border-right: 1px black solid;">
+                                <label>사업자등록번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div id="ordering_ex_licensee_number" class="form-control"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6">
+                            <div class="content-input-group-input" style="text-align: center; min-width: 100%;">
+                                <div id="information" style="display: block; width: 100%; text-align: center; font-size: 15pt;">발주 내용은 하기와 같습니다.</div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3" style="border-top: 1px black solid; border-left: 3px black solid; border-right: 1px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>상호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div id="ordering_ex_enterprise_name" class="form-control"></div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3" style="border-top: 1px black solid; border-right: 3px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>대표자</label>
+                            </div>
+                            <div id="sign" class="content-input-group-input">
+                                <div id="ordering_ex_enterprise_owner_name" class="form-control" style="float: left"></div>
+                                <div class="form-control" style="text-align: right; max-width: 20%; position: relative; display: inline-block">
+                                    (인)
+                                    <img id="sign_img" style="width: 100px; height: 100px; position: absolute; right: -25px; bottom: -25px ; z-index: 1" src="{% static 'img/sign-ban-icon.png' %}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6">
+                            <div class="content-input-group-input" style="min-width: 100%;">
+                                <div style="display: block; width: 100%; text-align: center"></div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-6" style="border-top: 1px black solid; border-left: 3px black solid; border-right: 3px black solid;">
+                            <div class="content-input-group-header" style="border-right: 1px black solid;">
+                                <label>사업장 소재지</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div id="ordering_ex_enterprise_address" class="form-control"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6">
+                            <div style="display: block; width: 100%; text-align: center; font-size: 15pt; font-weight: bolder">
+                                <label id="total">총액 : </label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div id="ordering_ex_item_supply_total" style="display: block; width: 100%; text-align: left; font-size: 15pt; font-weight: bolder;">-</div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2" style="border-top: 1px black solid; border-left: 3px black solid; border-bottom: 3px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>업태</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div id="ordering_ex_business_conditions" class="form-control"></div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4" style="border-top: 1px black solid; border-bottom: 3px black solid; border-left: 1px black solid; border-right: 3px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>종목</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="form-control" id="ordering_ex_business_event"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 거래처정보 -->
+    <div id="customer_info">
+        <div class="row no-gutters card-body p-2">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-12">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6" style="border-top: 3px black solid; border-left: 3px black solid; border-right: 1px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>거래처</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="form-control item_code" id="ordering_ex_customer_name"></div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-6" style="border-top: 3px black solid;border-right: 3px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>담당자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="form-control" id="ordering_ex_charge_name"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6" style="border-top: 1px black solid; border-left: 3px black solid; border-right: 1px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>주소</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="form-control" id="ordering_ex_customer_address"></div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-6" style="border-top: 1px black solid; border-right: 3px black solid;">
+                            <div class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>연락처</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="form-control" id="ordering_ex_charge_phone"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6" style="border-top: 1px black solid; border-left: 3px black solid; border-right: 1px black solid;border-bottom: 3px black solid">
+                            <div id="deliver_place_col" class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>납품주소</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div id="ordering_ex_deliver_place" class="form-control item_code"></div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-6" style="border-top: 1px black solid;border-right: 3px black solid;border-bottom: 3px black solid">
+                            <div id="due_date_col" class="content-input-group-header col-2" style="border-right: 1px black solid;">
+                                <label>납품일</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div id="ordering_ex_due_date" class="form-control"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" id="print_detail_title"
+         style="font-size:20pt; word-spacing: 2em; text-align: center; font-weight: bolder; margin-top: 0.6em; margin-bottom: 0.3em;">
+        내 용
+    </div>
+</div>
+    <!-- 테이블 -->
+<div id="ordering_ex_detail_info">
+    <div class="row no-gutters card-body page-break p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow: auto; height: auto;">
+            <table
+                    id="ordering_ex_detail_table"
+                    class="table table-sm text-center"
+            >
+                <thead id="ordering_ex_detail_thead">
+                <tr>
+                    <th style="border-top: 3px black solid; border-bottom: 3px black solid; border-left: 3px black solid; border-right: 1px black solid">순번</th>
+                    <th style="border-top: 3px black solid; border-bottom: 3px black solid; border-right: 1px black solid">품명</th>
+                    <th style="border-top: 3px black solid; border-bottom: 3px black solid; border-right: 1px black solid">품명 상세</th>
+                    <th style="border-top: 3px black solid; border-bottom: 3px black solid; border-right: 1px black solid">수량</th>
+                    <th style="border-top: 3px black solid; border-bottom: 3px black solid; border-right: 1px black solid">단가</th>
+                    <th style="border-top: 3px black solid; border-bottom: 3px black solid; border-right: 1px black solid">합계 금액</th>
+                    <th style="border-top: 3px black solid; border-bottom: 3px black solid; border-right: 3px black solid">비고</th>
+                </tr>
+                </thead>
+                <tbody id="ordering_ex_detail_tbody"></tbody>
+                <thead id="ordering_ex_detail_tfoot">
+                <tr id="ordering_ex_total_info">
+                    <th colspan="3" style="border-top: 3px black solid; border-bottom: 3px black solid; border-left: 3px black solid; border-right: 1px black solid">총액</th>
+                    <th id="ordering_ex_total_price" colspan="3" style="text-align: right; border-top: 3px black solid; border-bottom: 3px black solid; border-right: 1px black solid"></th>
+                    <th name="ordering_ex_surtax" colspan="1" style="color: red; border-top: 3px black solid; border-bottom: 3px black solid; border-right: 3px black solid;">VAT 포함</th>
+                </tr>
+                <td id="sign_on" colspan="12" style="font-weight: bold; text-align: right;word-spacing: 9em;padding-right: 1.5em;padding-top: 1em;">인수자 (서명)</td>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>
+
+<script src="{% static 'js/html2canvas.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/jspdf.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_ordering.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+
+<script>
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+    let nation1 = new Pnations(nation_data1, ordering_search);  // 인스턴스 명
+
+    let ordering_id = null;
+    let ordering_code = null;
+    let myinfo_id = null;
+    let exported = null;
+    let customer_email = null;
+    let enter_email = null;
+    let enter_fax = null;
+    let enter_call = null;
+    let logo_img = null;
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    function isNumber(value) {
+        return typeof value === 'number' && isFinite(value);
+    }
+
+    $(function () {
+        refresh();
+    });
+
+
+    $('#detail_enterprise #enterprise_postal_code').on("click", function () {
+        addrPostCodeFinder(
+            document.querySelector('#detail_enterprise #enterprise_postal_code'),
+            document.querySelector('#detail_enterprise #enterprise_address')
+        );
+    });
+
+
+    function refresh() {
+        init_drop_down();
+
+        let now = new Date();
+        let first_date = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        $("#startdate").datepicker("setDate", first_date);
+        $("#enddate").datepicker("setDate", "today");
+
+        ordering_id = null;
+        myinfo_id = null;
+
+        ordering_search();
+    }
+
+
+    function reset_enterprise_info() {
+        $("#enterprise_search").val(null).trigger("change");  // 사업장구분
+        $("#enterprise_name").val("");  // 기업명
+        $("#enterprise_licensee_number").val("");  // 사업자번호
+        $("#enterprise_owner_name").val("");  // 대표자명
+        $("#enterprise_business_conditions").val("");  // 업태
+        $("#enterprise_business_event").val("");  // 종목
+        $("#enterprise_fax").val("");  // 팩스
+        $("#enterprise_owner_phone").val("");  // 대표자번호
+        $("#enterprise_postal_code").val("");  // 우편번호
+        $("#enterprise_address").val("");  // 주소
+        $("#enterprise_remark").val("");  // 비고
+    }
+
+
+    function print(){
+        if (ordering_id == null) {
+            alert("주문서를 먼저 선택해 주세요.");
+            return;
+        }
+        if(exported === '미출하'){
+            alert("출하된 항목인지 확인해 주세요.");
+            return;
+        }
+        if (myinfo_id == null ||  myinfo_id === "") {
+            alert("사업장을 선택해 주세요");
+            return;
+        }
+        window.open('/basic_information/print_page/', 'print_page', 'width=1600, height=900');
+    }
+
+
+    function init_drop_down() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+
+                if (selectors === '.customer-name-dropdown') {
+                    let a = "<option value='" + item.id + "'" +
+                        " data-name='" + (item.charge_name ? item.charge_name : '') + "'" +
+                        " data-level='" + (item.charge_level ? item.charge_level : '') + "'" +
+                        " data-phone='" + (item.charge_phone ? item.charge_phone : '') + "'" +
+                        " data-email='" + (item.email ? item.email : '') + "'" + "'>" +
+                        item.name + "</option>";
+                    list += "<option value='" + item.id + "'" +
+                        " data-name='" + (item.charge_name ? item.charge_name : '') + "'" +
+                        " data-level='" + (item.charge_level ? item.charge_level : '') + "'" +
+                        " data-phone='" + (item.charge_phone ? item.charge_phone : '') + "'" +
+                        " data-email='" + (item.email ? item.email : '') + "'" + "'>" +
+                        item.name + "</option>";
+                } else if (selectors === ".enterprise_search"){
+                    list += "<option value='" + item.id + "'" +
+                        " data-licensee_number='" + (item.licensee_number ? item.licensee_number : "") + "'" +  // 사업자번호
+                        " data-company_name='" + (item.company_name ? item.company_name : "") + "'" +  // 자사명
+                        " data-owner_name='" + (item.owner_name ? item.owner_name : "") + "'" +  // 대표자명
+                        " data-business_conditions='" + (item.business_conditions ? item.business_conditions : "") + "'" +  // 업태
+                        " data-business_event='" + (item.business_event ? item.business_event : "") + "'" +  // 종목
+                        " data-post_code='" + (item.post_code ? item.post_code : "") + "'" +  //  우편번호
+                        " data-address='" + (item.address ? item.address : "") + "'" +  // 주소
+                        " data-office_phone='" + (item.office_phone ? item.office_phone : "") + "'" +  // 회사전화번호
+                        " data-office_fax='" + (item.office_fax ? item.office_fax : "") + "'" +  // 팩스번호
+                        " data-email='" + (item.email ? item.email : "") + "'" +  // 이메일
+                        " data-note='" + (item.note ? item.note : "") + "'" +  // 비고
+                        " data-file='" + (item.file ? item.file : "") + "'" +  // 날인
+                        " data-logo='" + (item.logo ? item.logo : "") + "'" +  // 로고
+                        "'>" + item.company_division + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        api_gp("/customers_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".customer-name-dropdown"); // 거래처
+        });
+
+        api_gp("/myinfo/", "GET", {}, (data) => {
+            let done = data.results;
+            make_dropdown(done, ".enterprise_search");
+
+            $("#enterprise_search").on('select2:select', function (e) {
+                let select2_data = e.params.data;
+                if (select2_data.id === ''){
+                    myinfo_id = $(this).val();
+                    reset_enterprise_info()
+                } else {
+                    myinfo_id = $(this).val();
+
+                    let name = $(this).find("option:selected").data("company_name");
+                    $("#enterprise_name").val(name).trigger('change');
+                    $("#ordering_ex_enterprise_name").html(name).trigger('change');
+
+                    let licensee_number = $(this).find("option:selected").data("licensee_number");
+                    $("#enterprise_licensee_number").val(licensee_number).trigger('change');
+                    $("#ordering_ex_licensee_number").html(licensee_number).trigger('change');
+
+                    let owner_name = $(this).find("option:selected").data("owner_name");
+                    $("#enterprise_owner_name").val(owner_name).trigger('change');
+                    $("#ordering_ex_enterprise_owner_name").html(owner_name).trigger('change');
+
+                    let owner_phone = $(this).find("option:selected").data("office_phone");
+                    $("#enterprise_owner_phone").val(owner_phone).trigger('change');
+
+                    let business_conditions = $(this).find("option:selected").data("business_conditions");
+                    $("#enterprise_business_conditions").val(business_conditions).trigger('change');
+                    $("#ordering_ex_business_conditions").html(business_conditions).trigger('change');
+
+                    let business_event = $(this).find("option:selected").data("business_event");
+                    $("#enterprise_business_event").val(business_event).trigger('change');
+                    $("#ordering_ex_business_event").html(business_event).trigger('change');
+
+                    let fax = $(this).find("option:selected").data("office_fax");
+                    $("#enterprise_fax").val(fax).trigger('change');
+
+                    let postal_code = $(this).find("option:selected").data("post_code");
+                    $("#enterprise_postal_code").val(postal_code).trigger('change');
+
+                    let address = $(this).find("option:selected").data("address");
+                    $("#enterprise_address").val(address).trigger('change');
+                    $("#ordering_ex_enterprise_address").html(address).trigger('change');
+
+                    let note = $(this).find("option:selected").data("note");
+                    $("#enterprise_remark").val(note).trigger('change');
+
+                    let file = $(this).find("option:selected").data("file");
+                    $('#sign_img').attr("src", file);
+
+                    enter_email = $(this).find("option:selected").data("email");
+                    enter_fax = $(this).find("option:selected").data("office_fax");
+                    enter_call = $(this).find("option:selected").data("office_fax");
+                    logo_img = $(this).find("option:selected").data("logo");
+                }
+            })
+        });
+    }
+
+    function ordering_search(){
+        let customer = $('#customer_search :selected').val();
+        let export_status = $("#export_status").val();
+        let startdate = $("#startdate").val();
+        let enddate = $("#enddate").val();
+
+        // 주문관리 필터링
+        let query = "?page=" + nation1.page;
+
+        if (customer == '' || customer == null || customer == '선택'){
+        } else { query += "&code_id=" + customer; }
+        if (export_status == '' || export_status == null || export_status == '선택'){
+        } else { query += "&export_status=" + export_status; }
+        if (startdate == '' || startdate == null || startdate == '선택'){
+        } else { query += "&fr_due_date=" + startdate; }
+        if (enddate == '' || enddate == null || enddate == '선택'){
+        } else { query += "&to_due_date=" + enddate; }
+
+        {#console.log(query);#}
+        api_gp("/ordering_input/" + query, "GET", {}, (done) => {
+            draw_ordering_table(done);
+        });
+    }
+
+
+    function draw_ordering_table(done) {
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+        let rows = "";
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            if (item.customer_code != 0) {
+                // append it
+                let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                row += "<td>" + (num + i) + "</td>";  // 순번
+                row += "<td name='ordering_code'>" + item.ordering_code + "</td>";  // 주문번호
+                row += "<td name='customer_name'>" + (item.code_name ? item.code_name : "") + "</td>";  // 거래처
+                row +=
+                    "<td name='person_in_charge'>" +
+                    (item.charge_name ? item.charge_name : "") +
+                    "</td>";  // 거래처담당자
+
+                row += "<td name='provide_sum'>" + (item.provide_sum ? item.provide_sum.toLocaleString() : "") + "</td>";  // 공급가합
+
+                row += "<td class='d-none' name='due_date'>" + (item.due_date ? item.due_date : "") + "</td>";  // 납기희망일
+                row += "<td class='d-none' name='pay_option'>" + (item.pay_option ? item.pay_option : "") + "</td>";  // 결제조건
+                row += "<td class='d-none' name='guarantee_date'>" + (item.guarantee_date ? item.guarantee_date : "") + "</td>";  // 품질보증기한
+                row += "<td class='d-none' name='deliver_place'>" + (item.deliver_place ? item.deliver_place : "") + "</td>";  // 남품장소
+                row += "<td class='d-none' name='note'>" + (item.note ? item.note : "") + "</td>";  // 비고
+                row += "<td class='d-none' name='email'>" + (item.email ? item.email : "") + "</td>";  // 비고
+                row += "<td class='d-none' name='provide_surtax'>" + item.provide_surtax + "</td>";  // 부가세포함
+
+                row += "<td name='export_status'>" + (item.export_status ? item.export_status : "") + "</td>";  // 출하현황
+                row += "<td>" + (item.due_date ? item.due_date : "") + "</td>";  // 납기예정일
+                row += "</tr>";
+
+                rows += row;
+            }
+        }
+
+        nation1.nation_display(done);
+        $("#ordering_tbody").html(rows);
+
+        // click check
+        if (ordering_id != null){
+            $("#ordering_tbody #" + ordering_id).addClass('clicked');
+        }
+
+        $("#ordering_tbody > tr").on("click", function () {
+
+            // table click highlight
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+
+            ordering_id = $(this).attr("id");
+            ordering_code = $(this).find("[name='ordering_code']").text();
+            exported = $(this).find("[name='export_status']").text();
+            customer_email = $(this).find("[name='email']").text();
+            let checked = $(this).find("[name='provide_surtax']").text();
+            if (checked == 'true') {
+                $('#surtax_chk').prop("checked", true);
+            } else {
+                $('#surtax_chk').prop("checked", false);
+            }
+
+            $("#pay_option").val($(this).find("td[name=pay_option]").text());  // 결제조건
+            $("#due_date").val($(this).find("td[name=due_date]").text());   // 납기일
+            $("#guarantee_date").val($(this).find("td[name=guarantee_date]").text());  // 품질보증기한
+            $("#deliver_place").val($(this).find("td[name=deliver_place]").text());  // 남품장소
+            $("#note").val($(this).find("td[name=note]").text());  // NOTE 내용고정
+
+            api_gp('/ordering_input/' + ordering_id + '/', 'GET', {}, (done)=>{
+                set_ordering_ex_pdf(done);
+            })
+
+            let query = "?";
+            query += "ordering_id=" + ordering_id + "&";
+            api_gp("/ordering_ex_items_input/" + query, "GET", {}, (done) => {
+                load_export_table(done);
+            });
+        });
+
+        spinner();
+    }
+
+
+    function export_remain_count(_order_qty, _ext_qty){
+        let order_qty = _order_qty;
+        let ext_qty = _ext_qty;
+        let remain_qty = 0;
+
+        if( (order_qty == null) || (order_qty == "") ){
+            order_qty = 0;
+        }else {
+            order_qty = parseFloat(order_qty);
+        }
+
+        if( (_ext_qty == null) || (_ext_qty == "") ){
+            ext_qty = 0;
+        }else{
+            ext_qty = parseFloat(ext_qty);
+        }
+
+        remain_qty = order_qty - ext_qty;
+        if (remain_qty < 0) remain_qty = 0;
+
+        return remain_qty;
+    }
+
+    function set_ordering_ex_pdf(done){
+        $("#ordering_ex_created_at").html(done.created_at);
+        $("#ordering_ex_customer_name").html(done.code_name);
+        $("#ordering_ex_charge_name").html(done.charge_name);
+        $("#ordering_ex_customer_address").html(done.address);
+        $("#ordering_ex_charge_phone").html(done.charge_phone);
+        $("#ordering_ex_deliver_place").html(done.deliver_place);
+        $("#ordering_ex_due_date").html(done.due_date);
+    }
+
+
+    function load_export_table(done) {
+        {#console.table(done)#}
+
+        let checked = $('#surtax_chk').is(":checked");
+        if (checked) {
+            $('#export_thead tr').eq(0).find("th[name=surtax]").removeClass("d-none");
+            $('#export_thead tr').eq(0).find("th[name=item_supply_total]").removeClass("d-none");
+            $('#ordering_ex_detail_tfoot tr').eq(0).find("th[name=ordering_ex_surtax]").html("VAT 포함");
+        } else {
+            $('#export_thead tr').eq(0).find("th[name=surtax]").addClass("d-none");
+            $('#export_thead tr').eq(0).find("th[name=item_supply_total]").addClass("d-none");
+            $('#ordering_ex_detail_tfoot tr').eq(0).find("th[name=ordering_ex_surtax]").html("VAT 미포함");
+        }
+
+        let rows = "";
+        let rrows = "";
+        let list_num = 1;
+        for (let i = 0; i < done.length; i++) {
+            let item = done[i];
+
+            let remain = export_remain_count(item.quantity, item.export_now_quantity);
+
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + list_num++ + "</td>";
+            row += "<td name='ordering' class='d-none'>" + item.ordering + "</td>";  // 주문서 ID
+            row += "<td name='ordering_item' class='d-none'>" + item.ordering_item + "</td>";  // 주문항목 ID
+            row += "<td name='ordering_ex_item' class='d-none'>" + item.id + "</td>";  // 출하항목 ID
+            row += "<td name='item_num' class='d-none'>" + item.num + "</td>";  // 출하번호
+            row += "<td name='item_id' class='d-none'>" + item.item.id + "</td>";  // 품번 ID
+            row += "<td name='code'>" + (item.item ? item.item.code : "") + "</td>";  // 품번
+            row += "<td name='name'>" + (item.item ? item.item.name : "") + "</td>";  // 품명
+
+            row += "<td name='quantity'>" + (item.quantity ? item.quantity.toLocaleString() : "") + "</td>";  // 주문수량
+
+            if (item.out) {
+                row += "<td name='export_quantity'>" + (item.export_quantity ? item.export_quantity.toLocaleString() : "") + "</td>";  // 출하수량
+                row += "<td name='export_remian'>" + "" + "</td>";  // 미출하수량
+            } else {
+                row += "<td name='export_quantity'>" + "" + "</td>";  // 출하수량
+                row += "<td name='export_remian'>" + (item.export_quantity ? item.export_quantity.toLocaleString() : "") + "</td>";  // 미출하수량
+            }
+
+            row += "<td name='export_date'>" + (item.export_date ? item.export_date : "") + "</td>";  // 출하일자
+            row += "<td name='export_address'>" + (item.export_address ? item.export_address : "") + "</td>";  // 출하주소
+
+            row += "<td name='item_price'>" + (item.item_price ? item.item_price.toLocaleString() : 0) + "</td>";  // 단가
+            row += "<td name='supply_price'>" + (item.supply_price ? item.supply_price.toLocaleString() : 0) + "</td>";  // 공급가
+
+            if (checked) {
+                row += "<td name='surtax'>" + (item.surtax ? item.surtax.toLocaleString() : 0) + "</td>";  // 부가세
+                row += "<td name='item_supply_total'>" + (item.item_supply_total ? item.item_supply_total.toLocaleString() : 0) + "</td>";  // 합계
+            } else {
+                row += "<td class='d-none' name='surtax'>" + (item.surtax ? item.surtax.toLocaleString() : 0) + "</td>";  // 부가세
+                row += "<td class='d-none' name='item_supply_total'>" + (item.item_supply_total ? item.item_supply_total.toLocaleString() : 0) + "</td>";  // 합계
+            }
+
+            row += "<td class='d-none' name='provide_surtax'>" + item.provide_surtax + "</td>";  // 부가세포함
+
+            row += "<td name='username'>" + item.updated_by + "</td>";  // 작성자
+            row += "</tr>";
+
+            rows += row;
+
+
+            let exported_item_price =
+                item.item_price * item.export_quantity;
+            let isOut = item.out;
+            let lists = 1;
+
+            if (isOut) {
+                let rrow = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                rrow += "<td class = 'd-none' name = 'item_id'>" + item.id + "</td>";
+                rrow += "<td style='border-left: 3px black solid'>" + (lists++) + "</td>";
+                rrow += "<td name = 'item_name'>" + (item.item.name ? item.item.name : "") + "</td>";
+                rrow += "<td name = 'item_detail'>" + (item.item.detail ? item.item.detail : "") + "</td>";
+                rrow += "<td name = 'item_quantity'>" + (item.export_quantity ? item.export_quantity.toLocaleString() : 0) + "</td>";
+                rrow += "<td name = 'item_price'>" + (item.item_price ? item.item_price.toLocaleString() : 0) + "</td>";
+                rrow += "<td name = 'ordering_ex_supply_price' style='text-align: right'>" + (exported_item_price ? exported_item_price.toLocaleString() : 0) + " - " + "</td>";
+                rrow += "<td class = 'd-none' name = 'ordering_ex_surtax'>" + item.surtax + "</td>";
+                rrow += "<td name = 'item_remark' style='border-right: 3px black solid'>" + (item.remarks ? item.remarks : "") + "</td>";
+
+                rrow += "</tr>";
+                rrows += rrow;
+            }
+
+            $("#export_table_body").html(rows);
+            $("#ordering_ex_detail_tbody").html(rrows);
+
+            $("#export_table_body > tr").on("click", function () {
+
+                // table click highlight
+                $(this).parent().find("tr").removeClass("clicked");
+                $(this).addClass("clicked");
+            });
+
+            count_total();
+            ordering_ex_count_total();
+        }
+
+
+        function count_total() {
+            let checked = $('#surtax_chk').is(":checked");
+
+            let table = $('#export_table_body tr');
+            let sum_supply_price = 0;
+            let sum_surtax = 0;
+            let sum_supply_total = 0;
+
+            for (let i = 0; i < table.length; i++) {
+                let tr = table.eq(i);
+                let supply_price = tr.find("td[name=supply_price]").text().replace(/,/g, "");  // 공급가
+                let surtax = tr.find("td[name=surtax]").text().replace(/,/g, "");  // 부가세
+
+
+                supply_price = parseFloat(supply_price);
+                if (!isNumber(supply_price)) {
+                    supply_price = 0;
+                }
+
+                surtax = parseFloat(surtax);
+                if (!isNumber(surtax)) {
+                    surtax = 0;
+                }
+
+                sum_supply_price += supply_price;
+
+                if (checked == true) {
+                    sum_surtax += surtax;
+                    sum_supply_total += supply_price + surtax;
+                } else {
+                    sum_supply_total += supply_price;
+                }
+            }
+            $("#supply_price").val(sum_supply_price.toLocaleString());
+            $("#surtax").val(sum_surtax.toLocaleString());
+            $("#supply_total").val(sum_supply_total.toLocaleString());
+        }
+    }
+
+    function ordering_ex_count_total(){
+       let checked = $('#surtax_chk').is(":checked");
+
+        let table = $('#ordering_ex_detail_tbody tr');
+        let sum_total = 0;
+        let sum_surtax = 0;
+
+        for(let i = 0; i < table.length ; i++){
+            let tr = table.eq(i);
+            let supply_price = tr.find("td[name=ordering_ex_supply_price]").text().replace(/,/g, "");
+            let surtax = parseFloat(supply_price) / 10;
+
+            supply_price = parseFloat(supply_price);
+            if (!isNumber(supply_price)){
+                supply_price = 0;
+            }
+
+            surtax = parseFloat(surtax);
+            if (!isNumber(surtax)){
+                surtax = 0;
+            }
+
+            sum_total += supply_price;
+            sum_surtax += surtax;
+        }
+        if(checked)
+            sum_total += sum_surtax;
+
+        $('#ordering_ex_total_price').html(sum_total.toLocaleString() + " -");
+        $('#ordering_ex_item_supply_total').html(sum_total.toLocaleString() + " -");
+    }
+
+    $('#enterprise_address').change(function () {
+        $('#ordering_ex_enterprise_address').html($('#enterprise_address').val());
+    })
+
+    function main_search() {
+        nation1.page = 1;
+        ordering_id = null;
+
+        ordering_search();
+        $("#export_table_body").empty();
+    }
+
+    function craete_pdf(){
+        if (ordering_id == null) {
+            alert("주문서를 먼저 선택해 주세요.");
+            return;
+        }
+        if(exported === '미출하'){
+            alert("출하된 항목인지 확인해 주세요.");
+            return;
+        }
+        if (myinfo_id == null ||  myinfo_id === "") {
+            alert("사업장을 선택해 주세요");
+            return;
+        }
+        html2canvas($('#print')[0], {scrollX: -8.5, scrollY: -window.scrollY, onclone: function (clonedDoc) {
+                $(clonedDoc).find('#print').css('visibility', 'visible');
+            }}).then(function (canvas) { //저장 영역 div id
+
+            // 캔버스를 이미지로 변환
+            var imgData = canvas.toDataURL('image/png');
+
+            var imgWidth = 200; // 이미지 가로 길이(mm) / A4 기준 210mm
+            var pageHeight = imgWidth * 1.414;  // 출력 페이지 세로 길이 계산 A4 기준
+            var imgHeight = canvas.height * imgWidth / canvas.width;
+            var heightLeft = imgHeight;
+            var margin = 4; // 출력 페이지 여백설정
+            var doc = new jsPDF('p', 'mm');
+            var position = 10;
+
+            // 첫 페이지 출력
+            doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            // 한 페이지 이상일 경우 루프 돌면서 출력
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            let pdf = new Blob([doc.output('blob')], {type: 'application/pdf'});
+            let enterprise_name = $('#ordering_ex_enterprise_name').text();
+
+            let form = new FormData();
+            form.append("file", pdf);
+            form.append("customer_email", customer_email);
+            form.append("enter_email", enter_email);
+            form.append("enter_fax", enter_fax);
+            form.append("enter_call", enter_call);
+            form.append("logo_img", logo_img)
+            form.append("enterprise_name", enterprise_name);
+
+            if (form == null) {
+                return;
+            }
+
+            api_send_email(form, (done) => {
+                alert('메일 전송 완료');
+            });
+        });
+    }
+
+
+    function craete_pdf_download(){
+        if (ordering_id == null) {
+            alert("주문서를 먼저 선택해 주세요.");
+            return;
+        }
+        if(exported === '미출하'){
+            alert("출하된 항목인지 확인해 주세요.");
+            return;
+        }
+        if (myinfo_id == null ||  myinfo_id === "") {
+            alert("사업장을 선택해 주세요");
+            return;
+        }
+        html2canvas($('#print')[0], {scrollX: -8.5, scrollY: -window.scrollY, onclone: function (clonedDoc) {
+                $(clonedDoc).find('#print').css('visibility', 'visible');
+            }}).then(function (canvas) { //저장 영역 div id
+
+            // 캔버스를 이미지로 변환
+            var imgData = canvas.toDataURL('image/png');
+
+            var imgWidth = 200; // 이미지 가로 길이(mm) / A4 기준 210mm
+            var pageHeight = imgWidth * 1.414;  // 출력 페이지 세로 길이 계산 A4 기준
+            var imgHeight = canvas.height * imgWidth / canvas.width;
+            var heightLeft = imgHeight;
+            var margin = 4; // 출력 페이지 여백설정
+            var doc = new jsPDF('p', 'mm');
+            var position = 10;
+
+            // 첫 페이지 출력
+            doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            // 한 페이지 이상일 경우 루프 돌면서 출력
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            doc.save('거래명세서-' + ordering_code + '.pdf')
+        });
+    }
+
+
+    // 메일 전송
+    function send_email() {
+
+        if (ordering_id == null) {
+            alert("리스트를 선택해 주세요.");
+            return;
+        }
+        if (myinfo_id === null || myinfo_id === "") {
+            alert("사업장을 선택해 주세요.");
+            return;
+        }
+
+        if (!confirm('메일을 전송하시겠습니까?')) return;
+
+        {#let checked_value = $("input[id=mail_checkbox]:checked")#}
+        {% comment %}let send_checked = $("#list_tbody").find(".clicked").find("[name='send_chk']").text();
+
+        if (send_checked == '발송'){
+            if (!confirm('메일을 다시 전송하시겠습니까?')) return;
+        } else if (send_checked == '미발송'){
+            if (!confirm('메일을 전송하시겠습니까?')) return;
+        }{% endcomment %}
+
+        craete_pdf();
+        {% comment %}api_gp('/order_s/sendmail/', 'post', {'pk': 0}, () => {
+            alert('메일 전송 완료');
+
+        });{% endcomment %}
+
+        // 메일 전송 완료시 리스트 Update
+        {#let upload_data = {#}
+        {#    send_chk: true,#}
+        {#    send_try: true,#}
+        {##}
+        {##}
+        {#api_gp("/order_s/" + list_id + "/", "PATCH", upload_data, (done) => {#}
+        {#    let ret = done.send_chk;#}
+        {#    let send_date = done.send_date;#}
+        {##}
+        {#    if (ret == true){#}
+        {#        $("#list_tbody").find(".clicked").find("[name='send_chk']").text('발송');#}
+        {#        $("#list_tbody").find(".clicked").find("[name='send_date']").text(send_date);#}
+        {#        alert('메일 전송 완료');#}
+        {#    }else{#}
+        {#        alert('예외가 발생했습니다. 관리자에게 문의 하세요.');#}
+        {#    }#}
+        {#);#}
+    }
+
+
+    function api_send_email(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/ordering_ex/sendmail_pdf/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>

@@ -1,0 +1,126 @@
+{% include 'header.html' %}
+{% load static %}
+
+<div class="row no-gutters" style="margin: 16px 0 0 0 ;">
+    <div class="content-input-group col-5 pl-2">
+        <div class="content-input-group-header">
+            <label>파일</label>
+        </div>
+        <div class="content-input-group-input" style="border: #bebebe solid 1px; ">
+            <input type="file" id="file-selector" style="line-height: 24px;" accept=".doc, .png, .jpg, .jpeg, .docx, .xls, .xlsx, .hwp, .pdf">
+        </div>
+    </div>
+    <div class="content-input-group col-5 pr-2">
+        <div class="content-input-group-header">
+            <label>파일 설명</label>
+        </div>
+        <div class="content-input-group-input">
+            <input class="form-control" id="file-desc">
+        </div>
+    </div>
+    <div class="content-input-group col-2 px-0" style="display: inline-block; width: 100%;">
+        <div class="content-input-group-input" style="float: right; width: 100%;">
+            <button type="button" class="btn button-custom2" style="margin-right:8px; float: right; width: 100%;" onclick="upload()">파일 업로드</button>
+        </div>
+    </div>
+</div>
+<div class="card m-2">
+    <div class="card-body p-2">
+        <div class="row no-gutters">
+            <div class="content-table col-12">
+                <table class="table table-sm text-center" style="min-width: 800px;">
+                    <thead>
+                    <tr id="th">
+                        <th style="width: 30%;">파일명</th>
+                        <th style="width: 50%;">파일 설명</th>
+                        <th>다운로드</th>
+                        <th>삭제</th>
+                    </tr>
+                    </thead>
+                    <tbody id="detail_tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script>
+    let id;
+    $(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        id = urlParams.get('id');
+        reload();
+    });
+
+    function reload() {
+        api_gp('/facilities/files/?facility=' + id, 'GET', {}, function (data) {
+            render(data);
+        });
+    }
+
+    function render(data) {
+        let rows = "";
+        let list_num = 1;
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "'>";
+
+            let furls = decodeURI(data[i]['file']).split('/');
+            row += "<td>" + furls[furls.length - 1].split('.')[0] + "</td>";
+
+            row += "<td>" + nullapply(item.title) + "</td>";
+            row += "<td><a href='" + nullapply(item.file) + "' target='_blank' download>다운로드</a></td>";
+            row += "<td><a href='#' class='deletec'>삭제</a></td></tr>";
+            rows += row;
+        }
+
+        $('#detail_tbody').html(rows);
+        $('.deletec').on('click', function() {
+            // TODO: 삭제 버튼 시..
+            if (confirm("삭제하시겠습니까?") === true) {
+                let _id = $(this).parent().parent().attr('id');
+                api_gp('/facilities/files/' + _id + '/', 'DELETE', {}, function (data) {
+                    alert("삭제되었습니다.");
+                    window.reload();
+                });
+            }
+        });
+    }
+
+    function upload() {
+        let desc = $('#file-desc').val();
+        const fileSelector = document.getElementById('file-selector');
+        const file = fileSelector.files[0];
+        let form = new FormData();
+        form.append("file", file);
+        form.append("title", desc);
+        form.append("facility", id);
+
+        $.ajax({
+            type: 'POST',
+            url: '/facilities/files/',
+            headers: {
+                "Authorization": get_token()     // TODO: improve when replace it with something other one
+            },
+            processData: false,
+            contentType: false,
+            data: form
+        })
+        .done(function (json) {
+            // add cookie
+            console.log(json);
+            alert('등록 완료되었습니다.');
+            window.reload();
+        })
+        .fail(function (xhr, status, errorThrown) {
+            // console.log(xhr, status, errorThrown);
+            console.log(xhr.responseText);
+            alert(xhr.responseText);
+        })
+        .always(function (xhr, status) {
+            console.log(xhr, status);
+        });
+    }
+</script>

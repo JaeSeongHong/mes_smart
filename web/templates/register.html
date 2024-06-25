@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Register Page</title>
+    {% include 'header.html' %}
+  </head>
+  <body style="background-color: #f8f8f8">
+    <div class="container">
+      <div class="row no-gutters justify-content-center">
+        <div class="card col-6 my-5">
+          <div class="card-body p-5">
+            <h2 class="text-center mb-5"><strong>아이디 요청</strong></h2>
+            <form class="" method="POST">
+              {% csrf_token %}
+              <!-- <input type="hidden" name="next" value="">
+                    {{form.as_p}} >> 기본으로 내장된 로그인 폼을 아래와 같이 커스터마이징 한다-->
+              <label>사용자명<strong style="color: red">*</strong></label>
+              <input
+                class="form-control mb-3"
+                type="text"
+                placeholder="사용자명"
+              />
+              <label>ID<strong style="color: red">*</strong></label>
+              <input class="form-control mb-3" type="text" placeholder="ID" />
+              <label>비밀번호<strong style="color: red">*</strong></label>
+              <input
+                class="form-control mb-3"
+                type="password"
+                placeholder="비밀번호"
+              />
+              <label>입사일자<strong style="color: red">*</strong></label>
+              <input
+                class="form-control datepicker mb-2"
+                placeholder="입사일자"
+              />
+              <label>주소<strong style="color: red">*</strong></label>
+              <div class="d-flex mb-2">
+                <div class="col-4 pl-0">
+                  <input
+                    class="form-control"
+                    placeholder="우편번호"
+                    id="postCode"
+                  />
+                </div>
+                <div class="col-4 pl-0">
+                  <button
+                    class="btn button-custom w-100"
+                    type="button"
+                    id="searchAddress"
+                  >
+                    검색
+                  </button>
+                </div>
+              </div>
+              <input
+                class="form-control mb-5"
+                placeholder="주소"
+                id="address"
+              />
+              <div class="d-flex mt-5">
+                <div class="col-6 pl-0 pr-1">
+                  <button
+                    class="btn btn-secondary w-100"
+                    type="button"
+                    onclick="history.back();"
+                  >
+                    취소
+                  </button>
+                </div>
+                <div class="col-6 pr-0 pl-1">
+                  <a
+                    class="btn button-custom w-100"
+                    role="button"
+                    href="/accounts/register/ok"
+                    >저장</a
+                  >
+                </div>
+              </div>
+
+              <!-- {#                    <input type="hidden" name="next" value="">#} -->
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+      });
+      $(".datepicker").datepicker("setDate", "today");
+      $("#searchAddress").on("click", function () {
+        addrPostCodeFinder(
+          document.getElementById("postCode"),
+          document.getElementById("address")
+        );
+      });
+    </script>
+  </body>
+</html>

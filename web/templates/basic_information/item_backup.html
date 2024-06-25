@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+{{ it.media }}
+{#<title>품목 기준정보관리</title>#}
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="content-title col-1 align-self-stretch">검색</div>
+            <div class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>품번</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="code_sch"/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>품명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input class="form-control" id="name_sch"/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>자재분류</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            {{ it.it_division_sch }}
+
+                        </div>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-search rounded-0 w-100 h-100" type="button" onclick="search_click();">
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form id="item_master" class="content-content w-100">
+            {% csrf_token %}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">내용</div>
+                <div class="col-11" id="detail_itemmaster">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품번<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="code"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="name"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품명상세</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="detail"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>자재분류</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ it.it_division_add }}
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label id="n_model1">모델</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ it.it_model_add }}
+
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>단위</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ it.it_unit_add }}
+
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>거래처</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ it.it_customer_add }}
+
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>MOQ</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="moq" onkeyup="_chkNumber(this, 3)"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label id="n_container">용기타입</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ it.it_container_add }}
+
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label id="n_color">칼라구분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ it.it_color_add }}
+
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label id="n_type">품종구분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ it.it_kind_add }}
+
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label title="표준단가 : 입고된 마지막 단가 &#10;관리자만 수정하시기 바랍니다">표준단가</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input title="표준단가 : 입고된 마지막 단가 &#10;관리자만 수정하시기 바랍니다" class="form-control"
+                                       id="standard_price" onkeyup="_chkNumber(this, 2)"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6">
+                            <div class="content-input-group-header">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="etc"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>TYPE</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="bom_division" disabled/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>QR</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="btn button-custom2 w-100" id="qr"
+                                       type="button" onclick="show_qr_print($(this).val())"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row no-gutters w-100 justify-content-end">
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            type="button"
+                            class="btn button-custom2 w-100"
+                            onclick="refresh_data()"
+                    >
+                        초기화
+                    </button>
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            type="button"
+                            class="btn button-custom2 w-100"
+                            onclick="qr_update()"
+                    >
+                        QR생성
+                    </button>
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            type="button"
+                            class="btn button-custom2 w-100"
+                            onclick="item_add()"
+                    >
+                        추가
+                    </button>
+                </div>
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="modify()"
+                    >
+                        수정
+                    </button>
+                </div>
+                <div class="col-1 px-0">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="remove()"
+                    >
+                        삭제
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:420px;">
+            <table
+                    id="item_table"
+                    class="table table-sm text-center"
+                    style="min-width: 1300px"
+            >
+                <thead>
+                <tr>
+                    <th rowspan="2">순번</th>
+                    <th rowspan="2">품번</th>
+                    <th rowspan="2">품명</th>
+                    <th rowspan="2">품명상세</th>
+                    <th rowspan="2">자재분류</th>
+
+                    <th rowspan="2" id="n_model2">모델</th>
+                    <th rowspan="2">단위</th>
+
+                    <th rowspan="2">거래처</th>
+                    <th rowspan="2">MOQ</th>
+
+                    <th rowspan="2">비고</th>
+                    <th rowspan="2">표준단가</th>
+                    <th rowspan="2">TYPE</th>
+                </tr>
+                </thead>
+                <tbody id="item_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_item.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+
+<script>
+    // 검색인자 - 품번, 품명, 자재분류(ac)
+    let it_code_sch = null;
+    let it_name_sch = null;
+    let it_div_sch = null;
+
+    // add 항목 - 자재분류, 모델, 단위, 거래처, 용기타입, 칼라구분, 품종구분분
+    let it_click_div_id = null;
+    let it_click_div_name = null;
+
+    let it_click_model_id = null;
+    let it_click_model_name = null;
+
+    let it_click_unit_id = null;
+    let it_click_unit_name = null;
+
+    let it_click_cu_id = null;
+    let it_click_cu_name = null;
+
+    let it_click_con_id = null;
+    let it_click_con_name = null;
+
+    let it_click_color_id = null;
+    let it_click_color_name = null;
+
+    let it_click_kind_id = null;
+    let it_click_kind_name = null;
+
+    // 아이템 pk
+    let item_id_idx = null;
+    let item_name = null;
+
+    let item_qr_path = null;
+
+    let page1_size = 10;
+
+    let nation_data1 = {
+        cname: 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: page1_size,
+    };
+
+    let nation1 = new Pnations(nation_data1, search);  // 인스턴스 명
+
+    $(function () {
+        set_naming();
+        search();
+        //refresh();
+        // Table export
+    });
+
+
+    function set_naming() {
+        let enterprise_manage = get_userinfo().enterprise_manage;
+        if (enterprise_manage == '(주)건강생활연구소') {
+            $("#n_model1").text("제품군");
+            $("#n_model2").text("제품군");
+
+            $("#n_container").text("형태");
+            $("#n_color").text("Scent");
+            $("#n_type").text("브랜드");
+        }
+    }
+
+    function refresh() {
+        location.href = "/basic_information/items/";
+    }
+
+    {% comment %}
+    function refresh() {
+        init_drop_down();
+        item_search();
+    }
+    {% endcomment %}
+
+    function search_click() {
+        nation1.page = 1;
+
+        it_code_sch = $('#code_sch').val();
+        it_name_sch = $('#name_sch').val();
+        it_div_sch = $("#id_it_division_sch").val();
+
+        search();
+    }
+
+
+    function search() {
+        let query = "?page_size=" + page1_size + "&page=" + nation1.page;
+
+        if (it_code_sch == '' || it_code_sch == null || it_code_sch == '선택') {
+        } else {
+            query += "&it_code_sch=" + it_code_sch;
+        }
+        if (it_name_sch == '' || it_name_sch == null || it_name_sch == '선택') {
+        } else {
+            query += "&it_name_sch=" + it_name_sch;
+        }
+        if (it_div_sch == '' || it_div_sch == null || it_div_sch == '선택') {
+        } else {
+            query += "&it_div_sch=" + it_div_sch;
+        }
+
+        loading_start();
+        api_gp("/basic_information/items_read/" + query, "GET", {}, (done) => {
+            loading_finish();
+            draw_items_table(done);
+        });
+    }
+
+
+    function draw_items_table(done) {
+
+        console.table(done);
+
+        let data = done.results;
+        let num = (((nation1.page * 1) - 1) * nation_data1["page_size"]) + 1;
+
+        let rows = "";
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";  // 순번
+
+            row += "<td data-item='code'>" + item.code + "</td>";  // 품번
+            row += "<td data-item='name'>" + item.name + "</td>";  // 품명
+            row += "<td data-item='detail'>" + nullapply(item.detail) + "</td>";  // 품명상세
+            row += "<td data-item='division' " +
+                "property='" + (item.division_id ? item.division_id : "") + "'>" +
+                (item.division_id ? item.division_name : "") + "</td>";  // 자재분류
+            row += "<td data-item='model' property='" + (item.model_id ? item.model_id : "") + "'>" +
+                (item.model_id ? item.model_name : "") + "</td>";  // 모델
+
+
+            row += "<td style='display: none' data-item='container' property='" + (item.container_id ? item.container_id : "") + "'>" +
+                (item.container_id ? item.container_name : "") + "</td>";  // 용기타입
+
+            row += "<td style='display: none' data-item='color' property='" + (item.color_id ? item.color_id : "") + "'>" +
+                (item.color_id ? item.color_name : "") + "</td>";  // 칼라구분
+
+            row += "<td style='display: none' data-item='type' property='" + (item.type_id ? item.type_id : "") + "'>" +
+                (item.type_id ? item.type_name : "") + "</td>";  // 품종구분
+
+
+            row += "<td data-item='unit' property='" + (item.unit_id ? item.unit_id : "") + "'>" +
+                (item.unit_id ? item.unit_name : "") + "</td>";  // 단위
+            row += "<td data-item='customers' property='" + (item.from_id ? item.from_id : "") + "'>" +
+                (item.from_id ? item.from_name : "") + "</td>";  // 거래처
+
+            row += "<td data-item='moq'>" + (item.moq ? item.moq.toLocaleString() : 0) + "</td>";  // MOQ
+            row += "<td data-item='etc'>" + (item.etc ? item.etc : "") + "</td>";  // 비고
+            row += "<td data-item='standard_price'>" +
+                (item.standard_price ? item.standard_price.toLocaleString() : 0) + "</td>";  // 표준단가
+            row += "<td data-item='bom_division'>" + (item.bom_division_id ? "BOM" : "일반") + "</td>";  // BOM 구분
+            row += "<td class='d-none' data-item='qr' property='" + (item.qr_path ? item.qr_path : "") + "'>" +
+                (item.qr_path ? item.qr_path : "") + "</td>";  // 품종구분
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+
+        $('#item_tbody').html(rows);
+
+        console.log('찍혀있는 id 값은?');
+        console.log(item_id_idx);
+        console.log($("#" + item_id_idx));
+
+        if (item_id_idx != null) {
+            $("#" + item_id_idx).addClass('clicked');
+        }
+
+        $('#item_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            item_id_idx = $(this).attr("id");
+            item_name = $(this).find("[data-item='name']").text();
+
+            $("#code").val($(this).find("[data-item='code']").text());  // 품번
+            $("#name").val($(this).find("[data-item='name']").text());  // 품명
+            $("#detail").val($(this).find("[data-item='detail']").text());// 품명상세
+
+            it_click_div_id = $(this).find("[data-item='division']").attr("property");
+            it_click_div_name = $(this).find("[data-item='division']").text();
+
+            it_click_model_id = $(this).find("[data-item='model']").attr("property");
+            it_click_model_name = $(this).find("[data-item='model']").text();
+
+            it_click_unit_id = $(this).find("[data-item='unit']").attr("property");
+            it_click_unit_name = $(this).find("[data-item='unit']").text();
+
+            it_click_cu_id = $(this).find("[data-item='customers']").attr("property");
+            it_click_cu_name = $(this).find("[data-item='customers']").text();
+
+            it_click_con_id = $(this).find("[data-item='container']").attr("property");
+            it_click_con_name = $(this).find("[data-item='container']").text();
+
+            it_click_color_id = $(this).find("[data-item='color']").attr("property");
+            it_click_color_name = $(this).find("[data-item='color']").text();
+
+            it_click_kind_id = $(this).find("[data-item='type']").attr("property");
+            it_click_kind_name = $(this).find("[data-item='type']").text();
+
+            let option1 = new Option(it_click_div_name, it_click_div_id, true, true);
+            $('#id_it_division_add').append(option1).trigger('change');
+
+            let option2 = new Option(it_click_model_name, it_click_model_id, true, true);
+            $('#id_it_model_add').append(option2).trigger('change');
+
+            let option3 = new Option(it_click_unit_name, it_click_unit_id, true, true);
+            $('#id_it_unit_add').append(option3).trigger('change');
+
+            let option4 = new Option(it_click_cu_name, it_click_cu_id, true, true);
+            $('#id_it_customer_add').append(option4).trigger('change');
+
+            let option5 = new Option(it_click_con_name, it_click_con_id, true, true);
+            $('#id_it_container_add').append(option5).trigger('change');
+
+            let option6 = new Option(it_click_color_name, it_click_color_id, true, true);
+            $('#id_it_color_add').append(option6).trigger('change');
+
+            let option7 = new Option(it_click_kind_name, it_click_kind_id, true, true);
+            $('#id_it_kind_add').append(option7).trigger('change');
+
+
+            $("#moq").val($(this).find("[data-item='moq']").text());// MOQ
+            $("#etc").val($(this).find("[data-item='etc']").text());// 비고
+            $("#standard_price").val($(this).find("[data-item='standard_price']").text());// 표준단가
+            $("#bom_division").val($(this).find("[data-item='bom_division']").text());// BOM 구분
+            $("#qr").val($(this).find("[data-item='qr']").text());// qr
+
+            item_qr_path = $(this).find("[data-item='qr']").text();
+        });
+    }
+
+    function qr_update() {
+        if (!item_id_idx) {
+            alert('품목을 선택해 주세요.');
+            return;
+        }
+
+        let data = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: item_id_idx,
+        }
+
+        console.log(data);
+
+        api_gp('/basic_information/items_qr_update/', 'post', data, (done) => {
+            alert('QR 생성이 완료되었습니다.');
+            search();
+
+            console.log(done);
+
+            $("#qr").val(done.qr_path);
+            $("#bom_division").val(done.bom_division_name);
+
+        });
+
+        {% comment %}
+        api_item_update_qr(item_id_idx, (done) => {
+            alert('QR 생성이 완료되었습니다.');
+            search();
+            //refresh();
+        });
+        {% endcomment %}
+    }
+
+
+    function item_add() {
+        if ($('#code').val() == "") {
+            alert("품번을 입력해 주세요.");
+            return;
+        }
+
+        if ($('#name').val() == "") {
+            alert("품명을 입력해 주세요.");
+            return;
+        }
+
+        let data = get_data();
+        api_gp("/basic_information/items_create/", "POST", data, (done) => {
+            nation1.page = 1;
+            item_id_idx = done.id;
+            item_name = done.name;
+
+            alert("추가하였습니다.");
+
+            search();
+            $("#qr").val(done.qr_path);
+            $("#bom_division").val(done.bom_division_name);
+        });
+    }
+
+
+    function modify() {
+        if (item_id_idx == null) {
+            alert("수정할 행을 선택해 주세요.");
+            return;
+        }
+
+        if ($('#code').val() == "") {
+            alert("품번을 입력해 주세요.");
+            return;
+        }
+
+        if ($('#name').val() == "") {
+            alert("품명을 입력해 주세요.");
+            return;
+        }
+
+        if ($('#bom_division').val() == "BOM") {
+            let enterprise_manage = get_userinfo().enterprise_manage;
+            if (enterprise_manage == '(주)건강생활연구소') {
+                alert("[BOM TYPE]은 [레시피 관리] > [레시피 형식]에서 수정하세요.");
+            } else {
+                alert("[BOM TYPE]은 [BOM 관리] > [BOM 형식 생성]에서 수정하세요.");
+            }
+
+            return;
+        }
+
+        let data = get_data();
+
+        api_gp('/basic_information/items_update/', 'post', data, (done) => {
+            alert("수정했습니다..");
+
+            search();
+
+        });
+    }
+
+
+    function remove() {
+        if (item_id_idx == null) {
+            alert("삭제할 품목을 선택해 주세요.");
+            return;
+        }
+
+        if ($('#bom_division').val() == "BOM") {
+            alert("[BOM TYPE]은 [BOM 관리] > [BOM 형식 생성]에서 삭제하세요.");
+            return;
+        }
+
+        let allData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: item_id_idx,
+            qr_path: item_qr_path,// pk
+        }
+
+        let del = confirm(
+            "품목: " + item_name + "을(를) 삭제 하시겠습니까?"
+        );
+
+        if (del) {
+            api_gp('/basic_information/items_delete/', 'post', allData, (done_callback) => {
+                alert("삭제하였습니다.");
+                nation1.page = 1;
+
+                refresh_data();
+                search();
+
+            });
+        }
+    }
+
+    function show_qr_print(_imgurl) {
+
+        var url = "/material/qr_print/?param1=";
+        url = url + _imgurl;
+        var name = "QR Print";
+        var option = "width=1000px, height=1000px, location=no";
+        window.open(url, name, option);
+
+    }
+
+    function api_item_update_qr(id_data, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/basic_information/items_qr_update/",
+            headers: {
+                "Authorization": get_token()
+            },
+            data: {
+                id: id_data
+            },
+        })
+            .done(function (json) {
+                done_callback(json);
+            })
+            .fail(handle_error);
+    }
+
+
+    function get_data() {
+        let standard_price = $("#standard_price").val().replace(/,/g, "");// 표준단가
+
+        console.log('표준단가는');
+        console.log(standard_price)
+
+        if (standard_price == '' || standard_price == null) {
+            standard_price = '0';
+        }
+
+
+        return {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: item_id_idx,
+
+            code: $("#code").val(),  // 품번
+            name: $("#name").val(),  // 품명
+            detail: $("#detail").val(),  // 품명상세
+
+            item_division: $('#id_it_division_add').val(),  // 자재분류
+            unit: $('#id_it_unit_add').val(),  // 단위
+            model: $('#id_it_model_add').val(),  // 모델
+            container: $('#id_it_container_add').val(),  // 용기타입
+            color: $('#id_it_color_add').val(),  // 칼라구분
+            type: $('#id_it_kind_add').val(),  // 품종구분
+            purchase_from: $('#id_it_customer_add').val(),  // 거래처
+
+            moq: $("#moq").val().replace(/,/g, ""),  // MOQ
+            etc: $("#etc").val(),  // 비고
+            standard_price: standard_price,  // 표준단가
+
+            qr_path: '',
+        };
+    }
+
+    // 굳이?
+    function refresh_search_data() {
+        $("#code_sch").val("");
+        $("#name_sch").val("");
+        //$("#division_sch").val(null).trigger("change");
+    }
+
+
+    function refresh_data() {
+        //refresh_search_data();
+
+        $("#code").val("");  // 품번
+        $("#name").val("");  // 품명
+        $("#detail").val("");  // 품명상세
+
+        // 7개의 ac, 타입, qr
+        let option1 = new Option('', '', true, true);
+        $('#id_it_division_add').append(option1).trigger('change');
+
+        let option2 = new Option('', '', true, true);
+        $('#id_it_model_add').append(option2).trigger('change');
+
+        let option3 = new Option('', '', true, true);
+        $('#id_it_unit_add').append(option3).trigger('change');
+
+        let option4 = new Option('', '', true, true);
+        $('#id_it_customer_add').append(option4).trigger('change');
+
+        let option5 = new Option('', '', true, true);
+        $('#id_it_container_add').append(option5).trigger('change');
+
+        let option6 = new Option('', '', true, true);
+        $('#id_it_color_add').append(option6).trigger('change');
+
+        let option7 = new Option('', '', true, true);
+        $('#id_it_kind_add').append(option7).trigger('change');
+
+        $("#bom_division").val("");
+        $("#qr").val("");
+
+        $("#moq").val("");  // MOQ
+        $("#etc").val("");  // 비고
+        $("#standard_price").val(0);  // 표준단가
+
+        item_id_idx = null;
+        $('#item_tbody').find('tr').removeClass('clicked');
+    }
+
+</script>
+
+</body>
+</html>

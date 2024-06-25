@@ -1,0 +1,80 @@
+{% include 'header.html' %}
+{% load static %}
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2 m-0">
+        <!-- 본문 -->
+        <div
+                class="row no-gutters m-0"
+        >
+            <div class="col-12 mt-3">
+                <h1 class="text-center"> KPI DATA </h1>
+            </div>
+            <div class="col-2"> </div>
+            <div class="col-8 m-4">
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>생산량</label>
+                    </div>
+                    <input class="col-6 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                           id="kpi_p"
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>완제품 불량률</label>
+                    </div>
+                    <input class="col-6 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                           id="kpi_q"
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>개당 작업공수</label>
+                    </div>
+                    <input class="col-6 w-100 text-center form-control m-0 p-0"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white;" readonly
+                           id="kpi_c"
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>출하납기 준수율</label>
+                    </div>
+                    <input class="col-6 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                           id="kpi_d"
+                    />
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+    let kpi_p = '{{ P }}';  // 생산량 향상
+    let kpi_q = '{{ Q }}';  // 완제품 불량률
+    let kpi_c = '{{ C }}';  // 개당 작업공수
+    let kpi_d = '{{ D }}';  // 출하납기 준수율
+
+    $('#kpi_p').val(kpi_p + ' EA/월');
+    $('#kpi_q').val(kpi_q + ' %');
+    $('#kpi_c').val(kpi_c + ' 분');
+    $('#kpi_d').val(kpi_d + ' %');
+
+    console.log('p', kpi_p)
+    console.log('q', kpi_q)
+    console.log('c', kpi_c)
+    console.log('d', kpi_d)
+
+</script>

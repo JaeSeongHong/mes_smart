@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+{{ oc.media }}
+<!-- {#{% block title %}#}
+{#    <title>사용자 기준정보관리</title>#}
+{#{% endblock title %}#}
+{#{% block content %}#} -->
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="content-title col-1 align-self-stretch">검색</div>
+            <form class="col-11" id="order_company_search">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>기업명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            {{ oc.oc_name_sch }}
+                            {#                            <select#}
+                            {#                                    class="form-control company_name_dropdown"#}
+                            {#                                    name="search_name"#}
+                            {#                            >#}
+                            {#                            </select>#}
+                        </div>
+                    </div>
+
+                    <div class="col-1 px-0">
+                        <button class="btn button-search rounded-0 w-100 h-100"
+                                type="button"
+                                onclick="search_click();"
+                        >
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form class="content-content w-100" id="order_company_content">
+            {% csrf_token %}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">기업등록</div>
+                <div class="col-11" id="order_company_detail_content">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>기업명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="name"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설명</label></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="explain"/>
+                            </div>
+                        </div>
+
+                        <div class="col-1 px-0 mr-2">
+                            <button
+                                    type="button"
+                                    class="btn button-custom2 w-100 add"
+                                    onclick="order_company_add()"
+                            >
+                                추가
+                            </button>
+                        </div>
+                        <div class="col-1 px-0 mr-2">
+                            <button
+                                    type="button"
+                                    class="btn button-custom2 w-100"
+                                    onclick="order_company_edit()"
+                            >
+                                수정
+                            </button>
+                        </div>
+                        <div class="col-1 px-0">
+                            <button
+                                    type="button"
+                                    class="btn button-custom2 w-100"
+                                    onclick="delete_order_company()"
+                            >
+                                삭제
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row no-gutters w-100 justify-content-end">
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12">
+            <table
+                    id="order_company-table"
+                    class="table table-sm text-center"
+                    style="min-width: 1300px"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>기업명</th>
+                    <th>설명</th>
+                    <th>등록자</th>
+                    <th>등록일</th>
+                    <th>수정일</th>
+                </tr>
+                </thead>
+                <tbody id="order_company_main-tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation">
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- 테이블 건수 조회 -->
+
+<script src="{% static 'js/api_order_company.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    console.log("login user data ::", get_userinfo());
+
+    let order_company_idx = null; //pk
+    let order_company_name = null;
+
+    let oc_name_sch = null;
+
+    let page1_size = 15;
+
+    let nation_data1 = {
+        cname: 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: page1_size,
+    };
+
+    let nation1 = new Pnations(nation_data1, refresh);
+
+    function refresh() {
+        // initial data loading
+        request_table();
+    }
+
+    function request_table() {
+        let query = "?page_size=" + page1_size + "&page=" + nation1.page;
+
+        if (oc_name_sch == '' || oc_name_sch == null || oc_name_sch == '선택') {
+        } else {
+            query += "&oc_name_sch=" + oc_name_sch;
+        }
+
+        api_gp('/basic_information/order_companies_read/' + query, 'GET', {}, (done) => {
+            order_company_load_table(done);
+        });
+    }
+
+    function order_company_load_table(done) {
+
+        let data = done.results;
+        let num = (((nation1.page * 1) - 1) * nation_data1["page_size"]) + 1;
+
+        let rows = "";
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";
+            row += "<td data-item='name'>" + item.name + "</td>";
+            row += "<td data-item='explain'>" + item.explain + "</td>";
+            row += "<td data-item='created_by'>" + item.created_by + "</td>";
+            row +=
+                "<td data-item='created_at'>" +
+                item.created_at.substring(0, 4) +
+                "-" +
+                item.created_at.substring(5, 7) +
+                "-" +
+                item.created_at.substring(8, 10) +
+                "</td>";
+            row +=
+                "<td data-item='updated_at'>" +
+                item.created_at.substring(0, 4) +
+                "-" +
+                item.created_at.substring(5, 7) +
+                "-" +
+                item.created_at.substring(8, 10) +
+                "</td>";
+
+            row += "</tr>";
+
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+
+        $("#order_company_main-tbody").html(rows);
+
+        $("#order_company_main-tbody > tr").on("click", function () {
+
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+
+            order_comapany_columns.forEach((item) => {
+                $("#order_company_content [name='" + item + "']").val(
+                    $(this)
+                        .find("[data-item='" + item + "']")
+                        .text()
+                )
+            });
+            order_company_idx = $(this).attr("id");
+            order_company_name = $(this).find("[data-item='name']").text();
+        });
+
+        if (order_company_idx != null) {
+            $("#" + order_company_idx).addClass('clicked');
+        }
+    }
+
+    function search_click() {
+        nation1.page = 1;
+
+        oc_name_sch = $("#id_oc_name_sch").val();
+
+        request_table()
+    }
+
+
+    $("#order_company_search").submit(function (e) {
+        e.preventDefault();
+
+        let name = $("#order_company_search [name='search_name']").val();
+        let param = [];
+        param[0] = name;
+
+        api_get_order_company_list(param, (data) => {
+            order_company_load_table(data);
+        });
+        e.preventDefault();
+    });
+
+
+    function order_company_add() {
+        let valid = true;
+        // 필수 입력 검사
+
+        if ($("#order_company_detail_content [name='search_name']").val() == "") {
+            $("#order_company_detail_content [name='search_name']").css(
+                "border",
+                "1px solid red"
+            );
+            valid = false;
+        }
+
+
+        if (valid) {
+            let name = $('#order_company_content [name="name"]').val();
+            let explain = $('#order_company_content [name="explain"]').val();
+
+
+            let order_company_data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+
+                name: name,
+                explain: explain,
+            };
+
+            api_gp("/basic_information/order_companies_create/", "POST", order_company_data, (done) => {
+                //nation1.page = 1;
+
+                order_company_idx = done.id;
+                order_company_name = done.name;
+
+                alert("추가하였습니다.");
+                request_table();
+
+            });
+
+            return true;
+        } else return false;
+    }
+
+    // 필수항목을 모두 작성한 경우
+    $("#order_company_detail_content [name='name']").on("change", function () {
+        $(this).css("border", "");
+    });
+
+
+    $(function () {
+        refresh();
+    });
+
+    // Table export
+    $(parent.document).find("#excel-export").click(() =>
+        init_excel_export($("#order_company-table"), "납품기업")
+    );
+
+
+    function order_company_edit() {
+        if (order_company_idx == null) {
+            alert("데이터를 먼저 선택하십시오.");
+        } else {
+            let name = $('#order_company_content [name="name"]').val();
+            let explain = $('#order_company_content [name="explain"]').val();
+
+            let order_company_data = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                pk: order_company_idx,
+
+                name: name,
+                explain: explain,
+            };
+
+            api_gp("/basic_information/order_companies_update/", "POST", order_company_data, (done) => {
+                alert("수정 완료.");
+                request_table();
+            });
+        }
+    }
+
+    function delete_order_company() {
+        if (order_company_idx == null) {
+            alert("데이터를 먼저 선택하십시오.");
+        } else {
+            var del = confirm(
+                "기업명 : " + order_company_name + " 을(를) 삭제하시겠습니까?"
+            );
+
+            let allData = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                pk: order_company_idx,
+            }
+
+            if (del) {
+                api_gp('/basic_information/order_companies_delete/', 'post', allData, (done_callback) => {
+                    alert("삭제하였습니다.");
+                    //nation1.page = 1;
+
+                    request_table();
+                });
+            }
+        }
+    }
+
+    var order_comapany_columns = [
+        "name",
+        "explain",
+        "created_by",
+        "created_at",
+        "updated_at",
+    ];
+
+
+</script>
+
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

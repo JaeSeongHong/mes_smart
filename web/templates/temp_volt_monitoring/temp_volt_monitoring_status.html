@@ -1,0 +1,542 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <header>{% include "header.html" %}</header>
+
+  <body>
+    <div
+      class="row no-gutters justify-content-center d-lg-none d-md-flex d-sm-flex"
+    >
+      <h2 class="font-weight-bold my-2">온도전압 현황조회</h2>
+    </div>
+
+    <!-- 검색 -->
+    <form class="card m-2" id="temp_volt_monitoring_search-form">
+      <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+          class="content-search row no-gutters align-items-center content-input-group"
+        >
+          <div
+            class="content-title col-lg-1 align-self-stretch d-lg-flex d-md-none d-sm-none"
+          >
+            조회
+          </div>
+          <div class="col-lg-11 col-md-12">
+            <div class="row no-gutters">
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>기업명<strong>*</strong></label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control"
+                    name="company__id"
+                    id="company_select"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>공장명<strong>*</strong></label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control"
+                    name="factory__id"
+                    id="factory_select"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-2 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>일자</label>
+                </div>
+                <div class="content-input-group-input">
+                  <input
+                    class="form-control datepicker"
+                    type="text"
+                    name="created_at"
+                    autocomplete="off"
+                  />
+                </div>
+              </div>
+              <div class="col-lg-1 col-md-12 ml-auto px-0">
+                <button
+                  class="btn button-search rounded-0 w-100 h-100"
+                  type="button"
+                  onclick="temp_volt_monitoring_load_table()"
+                >
+                  검색
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- 차트 제목 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-content w-100">
+          <label class="mb-0">기업명 : </label
+          ><strong id="company_label"></strong>
+          <label class="mb-0">공장명 : </label
+          ><strong id="factory_label"></strong>
+          <label class="mb-0">일자 : </label
+          ><strong id="created_at_label"></strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- 차트 들어갈 자리 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-content w-100" style="height: 300px">
+          <canvas id="myChart" width="100" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="height: 220px">
+          <table
+            id="temp_volt_monitoring_data-table"
+            class="table table-sm text-center"
+            style="min-width: 1300px"
+          >
+            <thead id="temp_volt_monitoring_main-thead"></thead>
+            <tbody id="temp_volt_monitoring_main-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+{#    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>#}
+{#    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>#}
+    <!-- swal cdn library -->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+      var temp_volt_monitoring_filters = ["company__id", "factory__id"]; // TODO Type PC로 변경
+      var temp_volt_monitoring_lookup_filters = [
+        "master__company__id",
+        "master__factory__id",
+        "created_at",
+      ];
+      var sensor = null;
+
+      // 함수 alert
+      function popup_alert(message) {
+        if(message !== null && message !== ""){
+          swal.fire({
+            imageUrl: '../../../static/img/warning_icon.png',
+            imageWidth: 400,
+            imageHeight: 300,
+            imageAlt: 'Warning Img',
+            html: message,
+            showConfirmButton: false,
+          })
+        }
+      }
+
+      function show_alert(data) {
+        let alert_message = "";
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].alert === false) continue;
+          if (data[i].voltage === null && data[i].temp === null) {
+            alert_message += data[i].name + ": 전원 꺼짐!<br>";
+          }
+          else {
+              if (data[i].temp_thres[0] > data[i].temp || data[i].temp_thres[1] < data[i].temp) {
+                  alert_message += data[i].name + ": 온도 이상 발생!<br>";
+              }
+              if (data[i].voltage_thres[2] > data[i].voltage3 || data[i].voltage_thres[3] < data[i].voltage3) {
+                  alert_message += data[i].name + ": 3.3V 이상 발생!<br>";
+              }
+              if (data[i].voltage_thres[4] > data[i].voltage5 || data[i].voltage_thres[5] < data[i].voltage5) {
+                  alert_message += data[i].name + ": 5V 이상 발생!<br>";
+              }
+              if (data[i].voltage_thres[6] > data[i].voltage12 || data[i].voltage_thres[7] < data[i].voltage12) {
+                  alert_message += data[i].name + ": 12V 이상 발생!<br>";
+              }
+          }
+        }
+        popup_alert(alert_message);
+      }
+
+      // 함수 4 검색버튼 SUBMIT
+      function temp_volt_monitoring_load_table() {
+        //내부함수
+        function render_table_static(data) {
+          // table rendering
+          let cols = "<th>구분</th>";
+          let temp_rows = "<td>온도</td>";
+          let heu_rows = "<td>전압</td>";
+          let heu_rows_3v = "<td>3.3V</td>";
+          let heu_rows_5v = "<td>5V</td>";
+          let heu_rows_12v = "<td>12V</td>";
+
+          for (let i = 0; i < data.length; i++) {
+            cols += "<th>" + data[i].name + "</th>";
+            if (data[i].temp !== null) {
+              //  하나만 들어올 리는 없으므로, temp 만 체크하여도 됨.
+              temp_rows += "<td>" + data[i].temp + "</td>";
+              heu_rows += "<td>" + data[i].voltage + "</td>";
+              heu_rows_3v += "<td>" + data[i].voltage3 + "</td>";
+              heu_rows_5v += "<td>" + data[i].voltage5 + "</td>";
+              heu_rows_12v += "<td>" + data[i].voltage12 + "</td>";
+            } else {
+              temp_rows += "<td style='color: red'>꺼짐</tdsty>";
+              heu_rows += "<td style='color: red'>꺼짐</td>";
+              heu_rows_3v += "<td style='color: red'>꺼짐</td>";
+              heu_rows_5v += "<td style='color: red'>꺼짐</td>";
+              heu_rows_12v += "<td style='color: red'>꺼짐</td>";
+            }
+          }
+
+          $("#temp_volt_monitoring_main-thead").html("<tr>" + cols + "</tr>");
+          $("#temp_volt_monitoring_main-tbody").html(
+            "<tr>" + temp_rows + "</tr><tr>" + heu_rows + "</tr><tr>" + heu_rows_3v + "</tr>" +
+              "<tr>" + heu_rows_5v + "</tr><tr>" + heu_rows_12v + "</tr>"
+          );
+        }
+
+        function render_plot(data) {
+          // NOTE 그래프데이터
+          let chart_data = {
+            labels: data.map((x) => x.name),
+            datasets: [
+              {
+                label: "온도",
+                backgroundColor: data.map((x) =>
+                  x.temp
+                    ? x.temp > x.temp_thres[1] || x.temp < x.temp_thres[0]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                borderColor: data.map((x) =>
+                  x.temp
+                    ? x.temp > x.temp_thres[1] || x.temp < x.temp_thres[0]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                data: data.map((x) => (x.temp ? x.temp : 0)),
+                fill: false,
+                stack: "Stack 0",
+              },
+              {
+                label: "전압",
+                backgroundColor: data.map((x) =>
+                  x.voltage
+                    ? x.voltage > x.voltage_thres[1] ||
+                      x.voltage < x.voltage_thres[0]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                borderColor: data.map((x) =>
+                  x.voltage
+                    ? x.voltage > x.voltage_thres[1] ||
+                      x.voltage < x.voltage_thres[0]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                data: data.map((x) => (x.voltage ? x.voltage : 0)),
+                fill: false,
+                stack: "Stack 1",
+              },
+
+              {
+                label: "3.3V",
+                backgroundColor: data.map((x) =>
+                  x.voltage3
+                    ? x.voltage3 > x.voltage_thres[3] ||
+                      x.voltage3 < x.voltage_thres[2]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                borderColor: data.map((x) =>
+                  x.voltage3
+                    ? x.voltage3 > x.voltage_thres[3] ||
+                      x.voltage3 < x.voltage_thres[2]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                data: data.map((x) => (x.voltage3 ? x.voltage3 : 0)),
+                fill: false,
+                stack: "Stack 2",
+              },
+              {
+                label: "5V",
+                backgroundColor: data.map((x) =>
+                  x.voltage5
+                    ? x.voltage5 > x.voltage_thres[5] ||
+                      x.voltage5 < x.voltage_thres[4]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                borderColor: data.map((x) =>
+                  x.voltage
+                    ? x.voltage5 > x.voltage_thres[5] ||
+                      x.voltage5 < x.voltage_thres[4]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                data: data.map((x) => (x.voltage5 ? x.voltage5 : 0)),
+                fill: false,
+                stack: "Stack 3",
+              },
+              {
+                label: "12V",
+                backgroundColor: data.map((x) =>
+                  x.voltage12
+                    ? x.voltage12 > x.voltage_thres[7] ||
+                      x.voltage12 < x.voltage_thres[6]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                borderColor: data.map((x) =>
+                  x.voltage12
+                    ? x.voltage12 > x.voltage_thres[7] ||
+                      x.voltage12 < x.voltage_thres[6]
+                      ? "red"
+                      : "blue"
+                    : "blue"
+                ),
+                data: data.map((x) => (x.voltage12 ? x.voltage12 : 0)),
+                fill: false,
+                stack: "Stack 4",
+              }
+
+            ]
+          };
+          console.log(chart_data);
+
+          var ctx = document.getElementById("myChart");
+          ctx.height = 300;
+          var myBarChart = new Chart(ctx, {
+            type: "bar",
+            data: chart_data,
+            options: {
+              legend: {
+                display: false,
+              },
+              maintainAspectRatio: false,
+              responsive: true,
+              scales: {
+                x: { stacked: true },
+                y: { stacked: true },
+                yAxes: [
+                  {
+                    ticks: {
+                      suggestedMin: 0,
+                      suggestedMax: 100,
+                    },
+                  },
+                ],
+              },
+            },
+          });
+        }
+
+        function process(data, values) {
+          // 데이터 전처리
+          let res = [];
+          for (let i = 0; i < data.length; i++) {
+            let obj = {
+              name: data[i].name,
+              temp_thres: [
+                data[i].temp_threshold_low,
+                data[i].temp_threshold_high,
+              ],
+              voltage_thres: [
+                data[i].voltage_threshold_low,
+                data[i].voltage_threshold_high,
+                data[i].voltage_3v_threshold_low,
+                data[i].voltage_3v_threshold_high,
+                data[i].voltage_5v_threshold_low,
+                data[i].voltage_5v_threshold_high,
+                data[i].voltage_12v_threshold_low,
+                data[i].voltage_12v_threshold_high,
+              ],
+              temp: null,
+              voltage: null,
+              voltage3: null,
+              voltage5: null,
+              voltage12: null,
+
+              alert: data[i].alert === "true",
+            };
+
+            for (let j = 0; j < values.length; j++) {
+              if (data[i].id === values[j].master) {
+                obj.temp = values[j].temp;
+                obj.voltage = values[j].voltage;
+                obj.voltage3 = values[j].voltage3;
+                obj.voltage5 = values[j].voltage5;
+                obj.voltage12 = values[j].voltage12;
+              }
+            }
+            res.push(obj);
+          }
+          return res;
+        }
+        
+        //내부함수 7 그래프그리기
+        function mock(data1, data2) {
+          let chart_raw_data = process(data1, data2);
+          render_table_static(chart_raw_data);
+          render_plot(chart_raw_data);
+          show_alert(chart_raw_data);
+        }
+
+        // filter
+        let query_params = "?";
+        let query_params2 = "?";
+        let success = true;
+        let realtime = true;
+
+        // 내부함수 5 쿼리문 생성
+        temp_volt_monitoring_filters.forEach((item) => {
+          let val = $(
+            "#temp_volt_monitoring_search-form [name='" + item + "']"
+          ).val();
+          
+          if (val !== "") {
+            query_params += "&" + item + "=" + val; 
+            query_params2 += "&master__" + item + "=" + val;
+          }
+        });
+
+        let val = $(
+          "#temp_volt_monitoring_search-form [name='created_at']"
+        ).val();
+        if (val !== "") {
+          query_params2 += "&created_at=" + val;
+        } else success = false;
+
+        if (success === true) {
+          // 내부함수 6 그래프 데이터 불러오기
+          api_gp("/sensor_pc/" + query_params, "GET", {}, (data1) => {
+            api_gp("/sensor_pc/values/" + query_params2, "GET", {}, (data2) => {
+              mock(data1, data2);
+            });
+          });
+          $("#factory_label").text($("#factory_select option:selected").text());
+          $("#company_label").text($("#company_select option:selected").text());
+          $("#created_at_label").text(
+            $("#temp_volt_monitoring_search-form [name='created_at']").val()
+          );
+        } else alert("공정명, 설비명, 일자 선택하시기 바랍니다.");
+      }
+
+      //함수  ...
+      function formatDate(date) {
+        var d = new Date(date),
+          month = "" + (d.getMonth() + 1),
+          day = "" + d.getDate(),
+          year = d.getFullYear();
+
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("-");
+      }
+      // 함수 3 화면 전체폼 그리기
+      function temp_volt_monitoring_init() {
+        function make_dropdown(data, selectors) {
+          let list = "<option value=''>선택</option>";
+          for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            if (selectors === "#factory_select") {
+              list +=
+                "<option value='" + item.id + "'>" + item.name + "</option>";
+            } else if (selectors === "#company_select") {
+              list +=
+                "<option value='" +
+                item.id +
+                "'>" +
+                item.name +
+                "</option>";
+            }
+          }
+          $(selectors).html(list);
+        }
+
+        //API호출 [/codes/?group=104] factory dropdown
+        api_gp("/codes_select/?group=104&enable=true", "GET", {}, (data) => {
+          make_dropdown(data, "#factory_select");
+        });
+
+        //API호출 [/order/company/] 발주기업
+        api_gp("/order/company/", "GET", {}, (data) => {
+          make_dropdown(data, "#company_select");
+          
+        });
+
+        //API호출 [/facilities/] facilities dropdown
+        api_gp("/facilities/", "GET", {}, (data) => {
+          make_dropdown(data, "#facilities_select");
+        });
+        //API호출 [/codes/?group=123] type dropdown
+        api_gp("/codes_select/?group=123&enable=true", "GET", {}, (data) => {
+          make_dropdown(data, "#type_select");
+        });
+      }
+
+      //함수  1
+      $(() => {
+        refresh();
+
+        // Table export
+        $(parent.document).find("#excel-export").click(() =>
+          init_excel_export(
+            $("#temp_volt_monitoring_data-table"),
+            "온습도현황조회"
+          )
+        );
+      });
+      $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+      });
+      $(".datepicker").datepicker("setDate", "today");
+
+      //함수  2
+      function refresh() {
+        temp_volt_monitoring_init();
+      }
+    </script>
+    <!-- {#{% endblock %}#} -->
+  </body>
+</html>
+
+<style>
+  div {
+    color: #4e692b;
+  }
+</style>

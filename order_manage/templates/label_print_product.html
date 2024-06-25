@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div class="content-search row no-gutters align-items-center content-input-group">
+            {{ searchForm.media }}
+            <div class="content-title col-1 align-self-stretch">검색</div>
+            <form id="customer_search_form" class="col-11" method="get">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>제품명</label>
+                        </div>
+                        <div class="input-group" id="customer_type_search">
+                            {{ searchForm.search_name }}
+                        </div>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-search rounded-0 w-100 h-100" type="submit">
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form method="post" enctype="multipart/form-data" id="detail_customer" class="content-content w-100">
+            <!-- TODO: submit 시 validation 구현 -->
+            {% csrf_token %}
+            {{ form.media }}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">내용</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제품명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-12">
+                            <div class="content-input-group-header">
+                                <label>성분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.ingredient }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제조일자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.date_manufacture }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>유통기한</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.date_expiration }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>유통기한 방식</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.expiration_type }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>유통기한 일 수</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="date_expiration_days" id="id_date_expiration_days" readonly/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>유통기한 표기</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="sample" id="id_sample" readonly/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.remarks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters w-100 mt-3 justify-content-end">
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100" type="button" onclick="refresh();">
+                            초기화
+                        </button>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100 add" type="submit">
+                            {{ method }}
+                        </button>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-custom2 w-100" type="button" onclick="remove();">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:640px;">
+            <table id="customer_data-table" class="table table-sm text-center">
+                <thead>
+                <tr>
+                    <th style="width: 5%">순번</th>
+                    <th style="width: 10%">품명</th>
+                    <th>성분</th>
+                    <th style="width: 6%">제조일자</th>
+                    <th style="width: 6%">유통기한</th>
+                    <th style="width: 10%">유통기한 방식</th>
+                    <th style="width: 10%">유통기한 표기</th>
+                    <th style="width: 10%">비고</th>
+                </tr>
+                </thead>
+                <tbody id="customer_tbody"></tbody>
+                {% load mathfilters %}
+                {% for row in queryset %}
+                <tr onclick=" location.href='/ordering/label_print_product/{{ row.id }}'" style="cursor: pointer;">
+                    <td>{{ page | sub:1 | mul:20 | add:forloop.counter }}</td>
+                    <td>{{ row.name }}</td>
+                    <td class="text-left">{{ row.ingredient }}</td>
+                    <td>{{ row.date_manufacture | date:'Y-m-d' }}</td>
+                    <td>{{ row.date_expiration | date:'Y-m-d' }}</td>
+                    <td>{{ row.expiration_type }}</td>
+                    {% if row.expiration_type == '특정일' %}
+                        <td>{{ row.date_expiration | date:'Y-m-d' }}까지</td>
+                    {% else %}
+                        {% if row.date_expiration_days <= 60 %}
+                            <td>제조일로부터 {{ row.date_expiration_days }}일까지</td>
+                        {% else %}
+                            <td>제조일로부터 {{ row.date_expiration_days | div:30 | floatformat:0 }}개월까지</td>
+                        {% endif %}
+                    {% endif %}
+                    <td class="text-left">{{ row.remarks | default:'' }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <script src="/static/js/sb-admin-2.js"></script>
+    <div class="row no-gutters d-flex justify-content-center">
+        <ul class="pagination">
+            {% if queryset.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page=1&search_name={{ search_name }}">&laquo;
+                        처음</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.previous_page_number }}&search_name={{ search_name }}">이전</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">&laquo; 처음</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">이전</a>
+                </li>
+            {% endif %}
+
+            {% for page in page_range %}
+                <li class="page-item {% if queryset.number == page %}active{% endif %}">
+                    <a class="page-link"
+                       href="?page={{ page }}&search_name={{ search_name }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+
+            {% if queryset.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.next_page_number }}&search_name={{ search_name }}">다음</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.paginator.num_pages }}&search_name={{ search_name }}">마지막
+                        &raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">다음</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">마지막 &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <label class="mb-0"
+        >(<strong id="customer_table_row">{{ count }}</strong>) 건 로딩</label
+        >
+    </div>
+</div>
+<script
+        src="{% static 'js/api_customer.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_codemaster.js' %}"
+        type="text/javascript"
+></script>
+<script>
+
+    $(document).ready(function () {
+        //This block is called when user will check on 'from' fields in past Employment blocks
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            // common configurations
+            autoclose: true,
+            language: 'ko',
+        });
+
+        // 제조일자
+        $("#id_date_manufacture").change(function () {
+            // 일자 계산
+            CalDays();
+        });
+        // 유통기한
+        $("#id_date_expiration").change(function () {
+            // 일자 계산
+            CalDays();
+        });
+        // 유통기한 표기 타입
+        $("#id_expiration_type").change(function () {
+            // 일자 계산
+            CalDays();
+        });
+    });
+    // 일자 계산
+    function CalDays () {
+        let manufacture = $("#id_date_manufacture").val();
+        let expiration = $("#id_date_expiration").val();
+
+        if (manufacture && expiration){
+            console.log(manufacture, expiration);
+
+            let fromDate = $('#id_date_manufacture').datepicker('getDate');
+            let toDate = $('#id_date_expiration').datepicker('getDate');
+
+            const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+            {#const firstDate = new Date(2008, 1, 12);#}
+            {#const secondDate = new Date(2008, 1, 22);#}
+
+            const diffDays = Math.round(Math.abs((fromDate - toDate) / oneDay));
+
+            $("#id_date_expiration_days").val(diffDays.toString() + ' 일');
+
+            let type = $("#id_expiration_type").val();
+            if (type == '제조일로부터'){
+                if (diffDays < 60)
+                    $("#id_sample").val('제조일로부터 ' + diffDays.toString() + ' 일까지');
+                else {
+                    let month = Math.round(diffDays / 30);
+                    $("#id_sample").val('제조일로부터 ' + month.toString() + ' 개월까지');
+                }
+            }
+            else{
+                const year = toDate.getFullYear();
+                const month = toDate.getMonth() + 1;
+                const date = toDate.getDate();
+                $("#id_sample").val(year.toString() + '년' + month.toString() + '월' + date.toString() + '일 까지');
+            }
+        }
+    }
+
+    function refresh() {
+        location.href='/ordering/label_print_product/';
+    }
+    function remove() {
+        {% if itemId %}
+            location.href ='/ordering/label_print_product_delete/{{ itemId }}'
+        {% endif %}
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

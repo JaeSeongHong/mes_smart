@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+
+<!-- {#{% block title %}#}
+{#    <title>공정진행현황 조회</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<div
+        class="row no-gutters justify-content-center d-lg-none d-md-flex d-sm-flex"
+>
+    <h2 class="font-weight-bold my-2">공정진행현황 조회</h2>
+</div>
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <form
+                class="content-search row no-gutters align-items-center content-input-group"
+                id="progress_lookup_main-form"
+                onsubmit="return progress_lookup_search_submit(event)"
+        >
+            <div
+                    class="content-title col-lg-1 align-self-stretch d-lg-flex d-md-none d-sm-none"
+            >
+                공정명 조회
+            </div>
+            <div class="col-lg-11 col-md-12">
+                <div class="row no-gutters">
+                    <div
+                            class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                    >
+                        <div class="content-input-group-header">
+                            <label>생산제품명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control bom-dropdown-product"
+                                    id="product_name"
+                            ></select>
+                        </div>
+                    </div>
+                    <div
+                            class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                    >
+                        <div class="content-input-group-header">
+                            <label>진행현황</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select class="form-control" name="status">
+                                <option value="">전체</option>
+                                <option value="대기">대기</option>
+                                <option value="진행">진행</option>
+                                <option value="완료">완료</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div
+                            class="content-input-group col-lg-4 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                    >
+                        <div class="content-input-group-header">
+                            <label>생산일정</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <div class="input-group input-daterange">
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="created_at_after"
+                                        name="created_at_after"
+                                        autocomplete="off"
+                                />
+                                <div class="input-group-addon px-3">~</div>
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="created_at_before"
+                                        name="created_at_before"
+                                        autocomplete="off"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-1 col-md-12 px-0 ml-auto">
+                        <button class="btn button-search rounded-0 w-100 h-100">
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x:auto; height: 1300px;">
+            <table
+                    id="progress_lookup_data-table"
+                    class="table table-sm text-center"
+            >
+                <colgroup>
+                    <col style="width: 5%"/>
+                    <col style="width: 5%"/>
+                    <col style="width: 5%"/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th rowspan="2">순번</th>
+                    <th rowspan="2">생산제품명</th>
+                    <th rowspan="2">제품생산수량</th>
+                    <th rowspan="2">세부공정</th>
+                    <th id="progress_lookup_colspan" colspan="7">
+                        진행현황
+                    </th>
+                </tr>
+                <tr id="progress_lookup_main-thead">
+                    <th>수입검사(I / O 수량)</th>
+                    <th>자재입고(I / O 수량)</th>
+                    <th>자재출고(I / O 수량)</th>
+                    <th>생산(I / O 수량)</th>
+                    <th>조립(I / O 수량)</th>
+                    <th>최종검사(I / O 수량)</th>
+                    <th>출하(I / O 수량)</th>
+                </tr>
+                </thead>
+                <tbody id="progress_lookup_main-tbody">
+                <tr>
+                    <td rowspan="4">1</td>
+                    <td rowspan="4">생산공정명(고객사+생산제품명+모델명+버전</td>
+                    <td rowspan="4">1000</td>
+                    <td>지시수량</td>
+                    <td>지시수량</td>
+                    <td>지시수량</td>
+                    <td>지시수량</td>
+                    <td>지시수량</td>
+                    <td>지시수량</td>
+                    <td>지시수량</td>
+                </tr>
+                <tr>
+                    <td>생산수량</td>
+                    <td>생산수량</td>
+                    <td>생산수량</td>
+                    <td>생산수량</td>
+                    <td>생산수량</td>
+                    <td>생산수량</td>
+                    <td>생산수량</td>
+                </tr>
+                <tr>
+                    <td>불량수량</td>
+                    <td>불량수량</td>
+                    <td>불량수량</td>
+                    <td>불량수량</td>
+                    <td>불량수량</td>
+                    <td>불량수량</td>
+                    <td>불량수량</td>
+                </tr>
+                <tr>
+                    <td>진행상태</td>
+                    <td>진행상태</td>
+                    <td>진행상태</td>
+                    <td>진행상태</td>
+                    <td>진행상태</td>
+                    <td>진행상태</td>
+                    <td>진행상태</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script
+        src="{% static 'js/api_process.js' %}"
+        type="text/javascript"
+></script>
+<script>
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+    // $(".datepicker").datepicker("setDate", "today");  // 초기값 빈 칸
+
+    $(".input-daterange input").each(function () {
+        $(this).datepicker({
+            format: "yyyy-mm-dd",
+            language: "ko",
+        });
+    });
+    $(".select2").select2({width: "100%"});
+
+    let fr_date = '';
+    let to_date = '';
+    let select_status = '';
+
+    function progress_lookup_search_submit(e) {
+        e.preventDefault();
+        $("#spinner").show();
+
+        select_status = $("[name='status']").val(),
+            progress_lookup_load_table();
+        return false;
+    }
+
+    function mock(data) {
+        let rows = "";
+        let cs = "";
+        let list_num = 1;
+        let tot_max = 0;
+
+        for (let i = 0; i < data.length; i++) {
+            let order_max = 0;
+            for (let j = 0; j < data[i].status.types.length; j++) {
+                if (data[i].status.order_amounts[j]) {
+                    order_max += 1;
+                }
+            }
+            if (tot_max < order_max){
+                tot_max = order_max;
+            }
+        }
+        console.log('tot max = ' + tot_max);
+
+        for (let i = 0; i < data.length; i++) {
+
+            let item = data[i];
+
+            if (item.status) {
+
+                let types = item.status.types;
+                let order_amounts = item.status.order_amounts;
+                let produce_amounts = item.status.produce_amounts;
+                let faulty_amounts = item.status.faulty_amounts;
+                let progresses = item.status.progresses;
+
+                // append it
+                let row = "<tr>";
+                row +=
+                    "<td class='align-middle' rowspan='" + 5 + "'>" + list_num++ + "</td>";
+                row +=
+                    "<td class='align-middle' rowspan='" + 5 + "'>" +
+                    item.name +
+                    " (" +
+                    "버전" +
+                    ")" + "<br/>" +
+                    (item.fr_date ? item.fr_date : "") +
+                    " ~ " +
+                    (item.to_date ? item.to_date : "")
+                    {% comment %}+
+                    "<br/><a style='color: red'>" +
+                    (item.actual_fr_date ? item.actual_fr_date : "") +
+                    " ~ " +
+                    (item.actual_to_date ? item.actual_to_date : "") +
+                    "</a>" +{% endcomment %}
+                    "</td>";
+                row +=
+                    "<td class='align-middle' rowspan='" + 5 + "'>" + (item.amount ? item.amount.toLocaleString() : 0) + "</td>";
+
+                let t_tr = "";
+                let a_tr = "<td style='width:100px; position:static'>공정명</td>";
+                let o_tr = "<td style='width:100px; position:static'>지시수량</td>";
+                let p_tr =
+                    "<tr><td style='width:100px; position:static'>생산수량</td>";
+                let f_tr = "<tr><td style='width:100px; position:static'>불량수량</td>";
+                let pp_tr = "<tr><td style='width:100px; position:static'>진행상태</td>";
+
+
+                let order_max = 0;
+                for (let j = 0; j < types.length; j++) {
+                    if (order_amounts[j]) {
+                        order_max += 1;
+                    }
+                }
+
+                for (let j = 0; j < types.length; j++) {
+                    let disabled =
+                        !order_amounts[j] &&
+                        !produce_amounts[j] &&
+                        !faulty_amounts[j] &&
+                        !progresses[j];
+                    {#t_tr += "<th>" + types[j].name + "(I/O 수량)</th>";#}
+
+                    if (order_amounts[j]) {
+                        {#if(1) {#}
+
+                        let k = 1;
+
+                        // 4 는... total order_max
+                        // k = Math.floor(4 / order_max);
+
+                        a_tr +=
+                            "<td colspan='" + k + "' style='background:#9acfea;opacity: " +
+                            (disabled ? "50" : "100") +
+                            "%'>" +
+                            types[j].name + "(I/O 수량)" +
+                            "</td>";
+                        o_tr +=
+                            "<td colspan='" + k + "' style='width=100px;opacity: " +
+                            (disabled ? "50" : "100") +
+                            "%'>" +
+                            (order_amounts[j] ? order_amounts[j].toLocaleString() : "-") +
+                            "</td>";
+                        p_tr +=
+                            "<td colspan='" + k + "' style='width=100px;opacity: " +
+                            (disabled ? "50" : "100") +
+                            "%'>" +
+                            (produce_amounts[j] ? produce_amounts[j].toLocaleString() : "-") +
+                            "</td>";
+                        f_tr +=
+                            "<td colspan='" + k + "' style='width=100px;opacity: " +
+                            (disabled ? "50" : "100") +
+                            "%'>" +
+                            (faulty_amounts[j] ? faulty_amounts[j].toLocaleString() : "-") +
+                            "</td>";
+                        pp_tr +=
+                            "<td colspan='" + k + "' style='width=100px;opacity: " +
+                            (disabled ? "50" : "100") +
+                            "%'>" +
+                            (progresses[j] ? progresses[j] : "-") +
+                            "</td>";
+                    }
+                }
+
+                // todo hjlim :요구사항 또 변경될지 모르니 지우지 말 것.
+                // 내용 없는 곳 빈칸으로 나오도록 하는 부분
+                {% comment %}
+                let remain = tot_max - order_max;
+                for (let j = 0; j < remain; j++) {
+                    let k = 1;
+                    a_tr +=
+                        "<td style='background: white;width=100px;' colspan='" + k + "' style='opacity: " +
+                        (1 ? "50" : "100") +
+                        "%'>" +
+                        "" +
+                        "</td>";
+                    o_tr +=
+                        "<td style='background: white;width=100px;' colspan='" + k + "' style='opacity: " +
+                        (1 ? "50" : "100") +
+                        "%'>" +
+                        ("") +
+                        "</td>";
+                    p_tr +=
+                        "<td style='background: white;width=100px;' colspan='" + k + "' style='opacity: " +
+                        (1 ? "50" : "100") +
+                        "%'>" +
+                        ("") +
+                        "</td>";
+                    f_tr +=
+                        "<td style='background: white;width=100px;' colspan='" + k + "' style='opacity: " +
+                        (1 ? "50" : "100") +
+                        "%'>" +
+                        ("") +
+                        "</td>";
+                    pp_tr +=
+                        "<td style='background: white;width=100px;' colspan='" + k + "' style='opacity: " +
+                        (1 ? "50" : "100") +
+                        "%'>" +
+                        ("") +
+                        "</td>";
+                }
+                {% endcomment %}
+
+
+                $("#progress_lookup_colspan").attr("colspan", types.length); // TODO:
+
+                a_tr += "</tr>";
+                o_tr += "</tr>";
+                p_tr += "</tr>";
+                f_tr += "</tr>";
+                pp_tr += "</tr>";
+
+                {#if (i === 0) cs += t_tr;#}
+                cs = t_tr;
+                row += a_tr + o_tr + p_tr + f_tr + pp_tr;
+                rows += row;
+            }
+        }
+
+        $("#progress_lookup_main-thead").html(cs);
+        $("#progress_lookup_main-tbody").html(rows);
+        // console.log(rows);
+        spinner();
+    }
+
+    function progress_lookup_load_table() {
+
+        let product_name = $('#product_name :selected').text();
+        if (product_name === "선택") product_name = null;
+
+        fr_date = $("#created_at_after").val();
+        to_date = $("#created_at_before").val();
+
+        let query = "?";
+        if (product_name !== null) query += "bom_master__product_name=" + product_name + "&";
+
+
+        if (fr_date !== null || fr_date !== '') query += "fr_date=" + fr_date + "&";
+        if (to_date !== null || to_date !== '') query += "to_date=" + to_date + "&";
+
+        if (select_status !==null || select_status !=='') query +="status=" + select_status + "&";
+
+        console.log(query);
+
+        // test
+        api_gp("/process/status/" + query + "/", "GET", {}, (done) => {
+            mock(done);
+        });
+
+
+        {% comment %}
+        api_gp("/process/status/" + query + "/", "GET", {}, (done) => {
+            mock(done);
+        });
+        {% endcomment %}
+
+        {% comment %}
+        //Table pagination
+        $('.pagination-container').remove();
+        $('.table tbody').paginathing();
+        {% endcomment %}
+    }
+
+    function progress_lookup_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === '.bom-dropdown') {
+                    list += "<option value='" +
+                        item.id + "'>" +
+                        item.bom_name +
+                        "</option>";
+                } else if (selectors.includes(".bom-dropdown-product")) {
+                    list +=
+                        "<option value='" +
+                        item.product_name +
+                        "'>" +
+                        item.product_name +
+                        "</option>";
+                } else {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({
+                // select2 width 늘리기
+                width: "100%",
+            });
+        }
+
+        api_gp("/bom/master_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".bom-dropdown");
+            make_dropdown(data, ".bom-dropdown-product");
+        });
+
+        // main table
+        progress_lookup_load_table();
+    }
+
+    $(() => {
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export(
+                $("#progress_lookup_data-table"),
+                "공정진행현황조회"
+            )
+        );
+    });
+
+    function refresh() {
+        let now = new Date();
+        let first_date = new Date(now.getFullYear(), now.getMonth(), 1);
+        $("#created_at_after").datepicker("setDate", first_date);
+
+        progress_lookup_init();
+    }
+
+    function spinner() {
+        $("#spinner").hide();
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

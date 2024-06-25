@@ -1,0 +1,19 @@
+.select2-container {
+    width: 100%;
+    height: 100%;
+}
+
+ul li.select2-selection__choice,
+ul li.select2-search {
+    /* Cancel out django's style */
+    list-style-type: none;
+    width: 100%;
+    height: 100%;
+}
+
+.errors .select2-selection {
+    /* Highlight select box with error */
+    border-color: #ba2121;
+    width: 100%;
+    height: 100%;
+}

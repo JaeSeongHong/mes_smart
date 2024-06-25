@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+  <header>{% include "header.html" %}</header>
+  <body>
+    <!-- {#{% extends 'index.html' %}#} -->
+    {% load static %}
+
+    <!-- {#{% block title %}#}
+{#    <title>자재현황 조회</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+<div class="spinner" id="spinner">
+  <img src="../../../static/img/spinner.gif" width="150px" height="150px" />
+</div>
+
+    <div
+      class="row no-gutters justify-content-center d-lg-none d-md-flex d-sm-flex"
+    >
+      <h2 class="font-weight-bold my-2">자재재고현황 조회</h2>
+    </div>
+
+    <!-- 검색 -->
+    <div class="card m-2">
+      <div class="card-body p-2">
+        <!-- 본문 -->
+        <form
+          class="content-search row no-gutters align-items-center content-input-group"
+          id="material_status_main-form"
+          onsubmit="return material_status_search_submit(event)"
+        >
+          <div
+            class="content-title col-lg-1 align-self-stretch d-lg-flex d-md-none d-sm-none"
+          >
+            현황조회
+          </div>
+          <div class="col-lg-11 col-md-12">
+            <div class="row no-gutters">
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>조회일자</label>
+                </div>
+                <div class="content-input-group-input">
+                  <div class="input-group input-daterange">
+                    <input type="text" class="form-control" name="log_from"  autocomplete="off"  />
+                    <div class="input-group-addon px-3">~</div>
+                    <input type="text" class="form-control" name="log_to"  autocomplete="off" />
+                  </div>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>구매처</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control customer-dropdown"
+                    name="item-customer"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>자재구분</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control item-division-dropdown"
+                    name="item-division"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>품번</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control item-code-dropdown"
+                    name="item-code"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>품명</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control item-name-dropdown"
+                    name="item-name"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>품목</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control item-type-dropdown"
+                    name="item-type"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>모델</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control model-dropdown"
+                    name="item-model"
+                  ></select>
+                </div>
+              </div>
+
+              <div
+                class="content-input-group col-lg-2 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>재고저장위치</label>
+                </div>
+                <div class="content-input-group-input">
+                  <input
+                    class="form-control warehouse-keep-location"
+                    name="warehouse-keep-location"
+                  />
+                </div>
+              </div>
+
+              <div class="col-lg-1 col-md-12 px-0">
+                <button class="btn button-search rounded-0 w-100 h-100">
+                  검색
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12">
+          <table
+            id="material_status_data-table"
+            class="table table-sm text-center"
+            style="min-width: 1300px"
+          >
+            <thead>
+              <tr>
+                <th>순번</th>
+                <th>구매처</th>
+                <th>모델</th>
+                <th>품번</th>
+                <th>품명</th>
+                <th>품목</th>
+                <th>자재구분</th>
+                <th>단위</th>
+                <th>입고수량</th>
+                <th>출고수량</th>
+                <th>반입수량</th>
+                <th>현재고</th>
+                <th>재고저장위치</th>
+              </tr>
+            </thead>
+            <tbody id="material-status-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- 테이블 건수 조회 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <label class="mb-0"
+          >(<strong id="material_status_table_row">0</strong>) 건 로딩</label
+        >
+      </div>
+    </div>
+    <script
+      src="{% static 'js/api_warehouse.js' %}"
+      type="text/javascript"
+    ></script>
+    <script
+      src="{% static 'js/api_codemaster.js' %}"
+      type="text/javascript"
+    ></script>
+    <script>
+      $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+      });
+      $(".datepicker").datepicker("setDate", "today");
+
+      $(".input-daterange input").each(function () {
+        $(this).datepicker({
+          format: "yyyy-mm-dd",
+          language: "ko",
+        });
+      });
+
+      let warehouse_code;
+      $(function () {
+        // warehouse code
+        const urlParams = new URLSearchParams(window.location.search);
+        warehouse_code = urlParams.get("code");
+
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() =>
+          init_excel_export($("#material_status_data-table"), "자재현황")
+        );
+      });
+
+      function refresh() {
+        warehouse_calculate_list(warehouse_code, (data) => {
+          
+          material_status_draw_out_table(data);
+        });
+
+        material_status_init();
+      }
+
+      function material_status_search_submit(e) {
+        e.preventDefault();
+        var myform = document.forms["material_status_main-form"];
+        var my_arr = [];
+        my_arr.push(myform["item-customer"].value);
+        my_arr.push(myform["item-division"].value);
+        my_arr.push(myform["item-code"].value);
+        my_arr.push(myform["item-name"].value);
+        my_arr.push(myform["item-type"].value);
+        my_arr.push(myform["item-model"].value);
+        my_arr.push(myform["warehouse-keep-location"].value);
+        my_arr.push(myform["log_from"].value);
+        my_arr.push(myform["log_to"].value);
+
+        console.log("param", my_arr);
+
+        warehouse_calculate_search(my_arr, warehouse_code, (data) => {
+          material_status_draw_out_table(data);
+        });
+
+        return false;
+      }
+
+      function material_status_draw_out_table(data) {
+        
+        $("#material_status_table_row").text(data.length); // 로딩된 데이터 갯수 세기
+        let rows = "";
+        let list_num = 1;
+        for (let i = 0; i < data.length; i++) {
+          let material = data[i];
+          
+          let created_date = material.created_at;
+          let updated_date = material.updated_at;
+
+          let row = "<tr id='" + material.id + "' style='cursor:pointer;'>";
+          row += "<td>" + list_num++ + "</td>";
+          row +=
+            "<td data-item='customer'>" +
+            (material.purchase_from ? material.purchase_from.name : "") +
+            "</td>"; // 구매처
+          row +=
+            "<td data-item='item-model'>" +
+            (material.model ? material.model.name : "") +
+            "</td>"; // 모델
+          row += "<td data-item='item-code'>" + material.code + "</td>"; // 품번
+          row += "<td data-item='item-name'>" + material.name + "</td>"; // 품명
+          row +=
+            "<td data-item='item-type'>" +
+            (material.type ? material.type.name : "") +
+            "</td>"; // 품목
+          row +=
+            "<td data-item='item-model'>" +
+            (material.item_division ? material.item_division.name : "") +
+            "</td>"; // 자재구분
+          row +=
+            "<td data-item='item-item-division'>" +
+            (material.unit ? material.unit.name : "") +
+            "</td>"; // 단위
+          row +=
+            "<td data-item='in-amount'>" +
+            (material.in_receive_amount - material.in_faulty_amount) +
+            "</td>"; // 입고수량
+          row +=
+            "<td data-item='out-amount'>" +
+            (material.out_amount ? material.out_amount : 0) +
+            "</td>"; // 출고수량
+          row +=
+            "<td data-item='rein-amount'>" +
+            (material.rein_amount ? material.rein_amount : 0) +
+            "</td>"; // 반입수량
+          row += "<td data-item='actual-amount'>" + material.stock + "</td>"; // 현재고
+          row +=
+            "<td data-item='location'>" +
+            (material.warehouse_keep_location
+              ? material.warehouse_keep_location.name
+              : "") +
+            "</td>"; // 재고저장위치
+          row += "</tr>";
+
+          rows += row;
+        }
+        spinner();
+        $("#material-status-tbody").html(rows);
+        // {#$('#material-status-tbody > tr').on('click', function () {#}
+        // {#    columns.forEach((item) => {#}
+        // {#        $("#material_status_main-form [name='" + item + "']").val($(this).find("[data-item='" + item + "']").text());#}
+        // {#    });#}
+        // {#    id_idx = $(this).attr('id');#}
+        // {# });#}
+
+        // table click highlight
+        $("#material-status-tbody tr").on("click", function () {
+          $(this).parent().find("tr").removeClass("clicked");
+          $(this).addClass("clicked");
+        });
+
+        //Table pagination
+        $('.pagination-container').remove();
+        $('.table tbody').paginathing();
+      }
+
+      function material_status_init() {
+        function make_dropdown(data, selectors) {
+          let list = "<option value=''>선택</option>";
+          for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            if (selectors === ".bom-dropdown") {
+              list +=
+                "<option value='" +
+                item.id +
+                "'>" +
+                item.bom_name +
+                "</option>";
+            } else if (selectors === ".item-code-dropdown") {
+              list +=
+                "<option value='" + item.code + "'>" + item.code + "</option>";
+            } else if (selectors === ".item-name-dropdown") {
+              list +=
+                "<option value='" + item.name + "'>" + item.name + "</option>";
+            } else {
+              list +=
+                "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+          }
+          $(selectors).html(list);
+          $(selectors).select2({ width: "100%" });
+        }
+
+        api_gp("/bom/master/", "GET", {}, (data) => {
+          make_dropdown(data, ".bom-dropdown");
+        });
+
+        api_gp("/customers/", "GET", {}, (data) => {
+          make_dropdown(data, ".customer-dropdown");
+        });
+
+        api_gp("/items/", "GET", {}, (data) => {
+          make_dropdown(data, ".item-code-dropdown");
+          make_dropdown(data, ".item-name-dropdown");
+        });
+
+        api_gp("/codes/?group=115&enable=true", "GET", {}, (data) => {
+          make_dropdown(data, ".item-type-dropdown");
+        });
+
+        api_gp("/codes/?group=116&enable=true", "GET", {}, (data) => {
+          make_dropdown(data, ".model-dropdown");
+        });
+
+        api_gp("/codes/?group=118&enable=true", "GET", {}, (data) => {
+          make_dropdown(data, ".item-division-dropdown");
+        });
+      }
+
+      function material_status_get_form_data() {
+        let data = {};
+        columns.forEach((item) => {
+          if (item === "enable")
+            data[item] =
+              $('#material_status_main-form [name="' + item + '"]').val() ===
+              "사용";
+          else
+            data[item.replace(/-/gi, "_")] = $(
+              '#material_status_main-form [name="' + item + '"]'
+            ).val();
+        });
+
+        // TODO:
+        data.item = data["item_code"];
+
+        return data;
+      }
+
+    function spinner(){
+      $("#spinner").remove();
+    }
+
+    </script>
+    <!-- {#{% endblock %}#} -->
+  </body>
+</html>

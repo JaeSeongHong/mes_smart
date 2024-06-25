@@ -1,0 +1,582 @@
+<!DOCTYPE HTML>
+<html>
+<header>
+    {% include "header.html" %}
+</header>
+<body>
+
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+
+<!-- {#{% block title %}#}
+{#    <title>세부공정관리</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px" />
+</div>
+
+    <!-- 검색 -->
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <form class="content-search row no-gutters align-items-center content-input-group" id="process_detail_main-form" onsubmit="return process_detail_search_submit(event)">
+                <div class="content-title col-1 align-self-stretch">
+                    생산공정 검색
+                </div>
+                <div class="col-11" id="process_detail">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-4 px-0">
+                            <div class="content-input-group-header">
+                                <label>생산공정등록일자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="input-group input-daterange">
+                                    <input type="text" class="form-control" id="created-at-after" name="created-at-after">
+                                    <div class="input-group-addon px-3">~</div>
+                                    <input type="text" class="form-control" id="created-at-before" name="created-at-before">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4 px-0">
+                            <div class="content-input-group-header">
+                                <label>고객사</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select name="customer_name" class="form-control" id="process_detail_select_customer">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4 px-0">
+                            <div class="content-input-group-header">
+                                <label>생산제품명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select name="product_name" class="form-control" id="process_detail_select_product">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3 px-0 d-none">
+                            <div class="content-input-group-header" style="background-color: darkgrey;">
+                                <label>모델명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select name="model_name" class="form-control" id="process_detail_select_model">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3 px-0 d-none">
+                            <div class="content-input-group-header"  style="background-color: darkgrey;">
+                                <label>버전</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select name="version" class="form-control" id="process_detail_select_version">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4 px-0">
+                            <div class="content-input-group-header">
+                                <label>공장구분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select name="factory_classification" class="form-control" id="process_detail_factory_classification">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4 px-0">
+                            <div class="content-input-group-header">
+                                <label>생산공정명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input name="name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-1 px-0 ml-auto">
+                            <button class="btn button-search rounded-0 w-100 h-100">검색</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-table col-12" style="height: 200px;">
+                <table id="process_detail_data-table-up" class="table table-sm text-center" style="min-width: 1300px;">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>공장등록코드</th>
+                        <th>생산공정명</th>
+                        <th>고객사</th>
+                        <th>생산제품명</th>
+                        <th>모델명</th>
+                        <th>버전</th>
+                        <th>공장구분</th>
+                        <th>등록자</th>
+                        <th>등록일</th>
+                    </tr>
+                    </thead>
+                    <tbody id="process_detail_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <label class="mb-0">(<strong id="process_detail_table_row">0</strong>) 건 로딩</label>
+        </div>
+    </div>
+
+    <!-- 내용 -->
+
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <form class="content-content w-100" id="process_detail_manage_detail">
+                <div class="row no-gutters w-100 mb-2">
+                    <div class="col-1 content-title" id="process_detail_manage_detail_bottom_table_label">
+                        세부공정관리
+                    </div>
+                    <div class="col-11" id="detail_process_detail">
+                        <div class="row no-gutters">
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>세부공정(창고)</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select name='type' class="form-control type-dropdown">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>작업장</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select name='workshop' class="form-control workshop-dropdown">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>공정담당자</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select name='charge' class="form-control user-dropdown">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>단위</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select name='unit' class="form-control unit-dropdown">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row no-gutters">
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>생산지시수량</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input name="amount" class="form-control" onkeyup="_chkNumber(this, 3)">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-3">
+                                <div class="content-input-group-header">
+                                    <label>작업완료일자</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input name='by' class="form-control datepicker" autocomplete="off"  type="text">
+                                </div>
+                            </div>
+                            <div class="content-input-group col-6">
+                                <div class="content-input-group-header">
+                                    <label>기타</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input name='etc' class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters w-100 justify-content-end">
+                    <div class="col-1 px-0 mr-2">
+                        <a class="btn button-custom2 w-100" role="button" onclick="process_detail_add()">세부공정추가</a>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <a class="btn button-custom2 w-100" role="button" onclick="process_detail_edit()">세부공정변경</a>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <a class="btn button-custom2 w-100" role="button" onclick="process_detail_remove()">세부공정삭제</a>
+                    </div>
+<!-- {#                    <div class="col-1 px-0">#}
+{#                        <a class="btn button-custom2 w-100" role="button">저장</a>#}
+{#                    </div>#} -->
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+<!-- {#            <div class="col-12">#}
+{#                <p class="mb-2"><strong>생산공정명 : </strong>고객사 + 생산제품명 + 모델명 + 버전&emsp;<strong>공장구분 : </strong>본사&emsp;<strong>생산수량 : </strong>1000개</p>#}
+{##}
+{#            </div>#} -->
+            <div class="content-table col-12">
+                <table id="process_detail_data-table-down" class="table table-sm text-center" style="min-width: 1300px;">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>공정 등록일</th>
+                        <th>세부공정명</th>
+                        <th>작업장</th>
+                        <th>공정 담당자</th>
+                        <th>생산지시수량(I/O 수량)</th>
+                        <th>단위</th>
+                        <th>작업완료일자</th>
+                        <th>공정 등록자</th>
+                        <th>기타</th>
+                    </tr>
+                    </thead>
+                    <tbody id="detail_process_detail_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <label class="mb-0">(<strong id="detail_process_detail_table_row">0</strong>) 건 로딩</label>
+        </div>
+    </div>
+    <script src="{% static 'js/api_process.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/api_customer.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+    <script>
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            minViewMode: 0,
+            maxViewMode: 2,
+            autoclose: true,
+            language: 'ko',
+        });
+        $(".datepicker").datepicker("setDate", "today");
+        $('.input-daterange input').each(function () {
+            $(this).datepicker({
+                format: 'yyyy-mm-dd',
+                language: 'ko',
+            });
+        });
+        $('.select2').select2({width: '100%'});
+        var detail_process_id, detail_subprocess_id;
+
+        function process_detail_search_submit(e) {
+            e.preventDefault();
+            let main_form = document.forms['process_detail_main-form'];
+            let filter_arr = [];
+            filter_arr.push(main_form['created-at-after'].value);
+            filter_arr.push(main_form['created-at-before'].value);
+            filter_arr.push(main_form['customer_name'].value);
+            filter_arr.push(main_form['product_name'].value);
+            filter_arr.push(main_form['model_name'].value);
+            filter_arr.push(main_form['version'].value);
+            filter_arr.push(main_form['factory_classification'].value);
+            filter_arr.push(main_form['name'].value);
+
+            process_search(filter_arr, (data) => {
+                process_detail_draw_table(data);
+            });
+
+            return false;
+        }
+
+        function process_detail_draw_table(data) {
+            $('#process_detail_table_row').text(data.length); // 로딩된 데이터 갯수 세기
+            let rows = "";
+            let list_num = 1;
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                let created_date = item.created_at;
+
+                // append it
+                let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                row += "<td>" + (list_num++) + "</td>";
+                row += "<td name='code'>" + item.code + "</td>";
+                row += "<td name='name'>" + item.name + "</td>";
+                row += "<td name='customer_name' property='" + (item.customer ? item.customer.id : "") + "'>" + (item.customer ? item.customer.name : "") + "</td>";
+                row += "<td name='product_name'>" + (item.bom_master ? item.bom_master.product_name : "") + "</td>";
+                row += "<td name='model_name'>" + (item.bom_master ? item.bom_master.model_name : "") + "</td>";
+                row += "<td name='version'>" + (item.bom_master ? item.bom_master.version : "") + "</td>";
+                row += "<td name='factory_classification' property='" + (item.factory_classification ? item.factory_classification.id : 0) + "'>" + (item.factory_classification ?  item.factory_classification.name  : "") + "</td>";
+                row += "<td name='created_by'>" + item.created_by + "</td>";
+                row += "<td name='created_at'>" + created_date.substring(0, 4) + "-" + created_date.substring(5, 7) + "-" + created_date.substring(8, 10) + "</td>";
+                row += "</tr>";
+
+                rows += row;
+            }
+            spinner();
+            $('#process_detail_tbody').html(rows);
+            $('#process_detail_tbody > tr').on('click', function () {
+                $("#process_detail_select_customer").val($(this).find("[name='customer_name']").text());
+                $("#process_detail [name='code']").val($(this).find("[name='code']").text());
+                $("#process_detail [name='customer_name']").val($(this).find("[name='customer_name']").attr('property'));
+                $("#process_detail [name='customer_name']").trigger('change');
+                $("#process_detail [name='product_name']").val($(this).find("[name='product_name']").text());
+                $("#process_detail [name='product_name']").trigger('change');
+                $("#process_detail [name='model_name']").val($(this).find("[name='model_name']").text());
+                $("#process_detail [name='model_name']").trigger('change');
+                $("#process_detail [name='version']").val($(this).find("[name='version']").text());
+                $("#process_detail [name='version']").trigger('change');
+                $("#process_detail [name='factory_classification']").val($(this).find("[name='factory_classification']").attr('property'));
+                $("#process_detail [name='factory_classification']").trigger('change');
+                $("#process_detail [name='name']").val($(this).find("[name='name']").text());
+                detail_process_id = $(this).attr('id');
+
+                table_highlight('#process_detail_tbody', detail_process_id);
+
+                $('#detail_process_detail input').val('');
+                $('#detail_process_detail select').val('');
+                $("#detail_process_detail select").trigger('change');
+
+                process_detail_load_subtable();
+            });
+
+            $('#process_detail_data-table-up + .pagination-container').remove();
+            $(function () {
+                //Table pagination
+                $('#process_detail_tbody').paginathing({
+                insertAfter: '#process_detail_data-table-up'
+                });
+            });
+        }
+
+        function detail_process_detail_draw_table(data) {
+            let detail_rows = "";
+            let detail_list_num = 1;
+            let detail_count = 0;
+            for (let i = 0; i < data.length; i++) {
+                let detail_item = data[i];
+                let detail_created_date = detail_item.created_at;
+                if (detail_item.process == detail_process_id){
+                    // append it
+                    detail_count++;
+                    let detail_row = "<tr id='" + detail_item.id + "' style='cursor:pointer;'>";
+                    detail_row += "<td>" + (detail_list_num++) + "</td>"; //순번
+                    detail_row += "<td name='created_at'>" + detail_created_date.substring(0, 4) + "-" + detail_created_date.substring(5, 7) + "-" + detail_created_date.substring(8, 10) + "</td>"; // 공정 등록일
+                    detail_row += "<td name='type' property='" + detail_item.type.id + "'>" + detail_item.type.name + "</td>"; //세부공정명
+                    // {#detail_row += "<td class='d-none' name='type_id'>" + detail_item.type.id + "</td>";#}
+                    detail_row += "<td name='workshop' property='" + detail_item.workshop.id + "'>" + detail_item.workshop.name + "</td>"; //작업장
+                    // {#detail_row += "<td class='d-none' name='workshop_id'>" + detail_item.workshop.id + "</td>";#}
+                    detail_row += "<td name='charge' property='" + detail_item.charge.id + "'>" + detail_item.charge.username + "</td>"; // 공정 담당자
+                    // {#detail_row += "<td class='d-none' name='charge_id'>" + detail_item.charge.id + "</td>";#}
+                    detail_row += "<td name='amount'>" + (detail_item.amount ? detail_item.amount.toLocaleString() : 0) + "</td>"; // 생산수량
+                    detail_row += "<td name='unit' property='" + detail_item.unit.id + "'>" + detail_item.unit.name + "</td>"; // 단위
+                    // {#detail_row += "<td class='d-none' name='unit_id'>" + detail_item.unit.id + "</td>";#}
+                    detail_row += "<td name='by'>" + detail_item.by + "</td>"; // 작업일자
+                    detail_row += "<td name='created_by' property='" + detail_item.created_by + "'>" + detail_item.created_by + "</td>";
+                    // {#detail_row += "<td class='d-none' name='created_by_id'>" + detail_item.created_by + "</td>";#}
+                    detail_row += "<td name='etc'>" + detail_item.etc + "</td>"; // 기타
+                    detail_row += "</tr>";
+
+                    detail_rows += detail_row;
+                }
+            }
+            $('#detail_process_detail_table_row').text(detail_count); // 로딩된 데이터 갯수 세기
+            $('#detail_process_detail_tbody').html(detail_rows);
+            $('#detail_process_detail_tbody > tr').on('click', function () {
+                $("#detail_process_detail [name='type']").val($(this).find("[name='type']").attr('property')); // 세부공정명
+                $("#detail_process_detail [name='type']").trigger('change');
+                $("#detail_process_detail [name='workshop']").val($(this).find("[name='workshop']").attr('property')); // 작업장
+                $("#detail_process_detail [name='workshop']").trigger('change');
+                $("#detail_process_detail [name='charge']").val($(this).find("[name='charge']").attr('property')); // 공정담당자
+                $("#detail_process_detail [name='charge']").trigger('change');
+                $("#detail_process_detail [name='unit']").val($(this).find("[name='unit']").attr('property')); // 단위
+                $("#detail_process_detail [name='unit']").trigger('change');
+                $("#detail_process_detail [name='amount']").val($(this).find("[name='amount']").text()); // 생산수량
+                $("#detail_process_detail [name='by']").val($(this).find("[name='by']").text()); // 작업일자
+                $("#detail_process_detail [name='etc']").val($(this).find("[name='etc']").text()); // 기타
+
+                detail_subprocess_id = $(this).attr('id');
+
+                table_highlight('#detail_process_detail_tbody', detail_subprocess_id);
+            });
+
+            $('#process_detail_data-table-down + .pagination-container').remove();
+                $(function () {
+                //Table pagination
+                $('#detail_process_detail_tbody').paginathing({
+                    insertAfter: '#process_detail_data-table-down'
+                });
+            });
+        }
+
+        $(function () {
+            refresh();
+
+            // Table Export
+            $(parent.document).find("#excel-export").click(() => {
+                init_excel_export($('#process_detail_data-table-up'), '생산공정');
+                init_excel_export($('#process_detail_data-table-down'), '공정진행현황조회');
+            });
+        });
+
+        function refresh() {
+            // 데이터 보여주기
+            process_detail_init();
+            process_detail_load_table();
+        }
+
+        function process_detail_load_table() {
+            // 테이블
+            let filter_arr = null;
+            process_list(filter_arr, (data) => {
+                process_detail_draw_table(data);
+            });
+        }
+
+        function process_detail_load_subtable() {
+            process_sub_list((data) => {
+                detail_process_detail_draw_table(data);
+                table_highlight('#detail_process_detail_tbody', detail_subprocess_id);
+            });
+        }
+
+        function process_detail_init() {
+            function make_dropdown(data, selectors) {
+                let list = "<option value=''>선택</option>";
+                for (let i = 0; i < data.length; i++) {
+                    let item = data[i];
+                    if (selectors.includes('.user-dropdown')) {
+                        list += "<option value='" + item.id + "'>" + item.username + "</option>";
+                    } else if (selectors.includes('#process_detail_select_product')) {
+                        list += "<option value='" + item.product_name + "'>" + item.product_name + "</option>";
+                    } else if (selectors.includes('#process_detail_select_model')) {
+                        list += "<option value='" + item.model_name + "'>" + item.model_name + "</option>";
+                    } else if (selectors.includes('#process_detail_select_version')) {
+                        list += "<option value='" + item.version + "'>" + item.version + "</option>";
+                    } else {
+                        list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                    }
+                }
+                $(selectors).html(list);
+                $(selectors).select2({width: '100%'});
+            }
+
+            api_gp('/customers/', 'GET', {}, (data) => {
+                make_dropdown(data, '#process_detail_select_customer');
+            });
+
+            api_gp('/bom/master/', 'GET', {}, (data) => {
+                make_dropdown(data, '#process_detail_select_product');
+                make_dropdown(data, '#process_detail_select_model');
+                make_dropdown(data, '#process_detail_select_version');
+            });
+
+            api_gp('/codes/?group=109&enable=true', 'GET', {}, (data) => {
+                make_dropdown(data, '#process_detail_manage_detail .type-dropdown');
+            });
+
+            api_gp('/codes/?group=110&enable=true', 'GET', {}, (data) => {
+                make_dropdown(data, '#process_detail_manage_detail .workshop-dropdown');
+            });
+
+            api_gp('/codes/?group=105&enable=true', 'GET', {}, (data) => {
+                make_dropdown(data, '#process_detail_manage_detail .unit-dropdown');
+            });
+
+            api_gp('/codes/?group=104&enable=true', 'GET', {}, (data) => {
+                make_dropdown(data, '#process_detail_factory_classification');
+            });
+
+            api_gp('/users/', 'GET', {}, (data) => {
+                make_dropdown(data, '#process_detail_manage_detail .user-dropdown');
+            });
+
+
+        }
+
+       function process_detail_get_form_data() {
+            return {
+                process: parseInt(detail_process_id),
+                type: parseInt($("#detail_process_detail [name='type']").val()), // 세부공정명
+                workshop: parseInt($("#detail_process_detail [name='workshop']").val()), // 작업장
+                charge: $("#detail_process_detail [name='charge']").val(), // 공정담당자
+                unit: parseInt($("#detail_process_detail [name='unit']").val()), // 단위
+                amount: parseInt($("#detail_process_detail [name='amount']").val().replace(/,/g , '')), // 생산수량
+                by: $("#detail_process_detail [name='by']").val(), // 작업일자
+                etc: $("#detail_process_detail [name='etc']").val() // 기타
+            };
+        }
+
+        function process_detail_add() {
+            let data = process_detail_get_form_data();
+            api_gp('/process/sub/', 'POST', data, (data) => {
+                alert("성공적으로 등록하였습니다.");
+                process_detail_load_subtable();
+            });
+        }
+
+        function process_detail_edit() {
+            let data = process_detail_get_form_data();
+            api_gp('/process/sub/' + detail_subprocess_id + '/', 'PATCH', data, (data) => {
+                alert("성공적으로 수정하였습니다.");
+                process_detail_load_subtable();
+            });
+        }
+
+        function process_detail_remove() {
+            let data = process_detail_get_form_data();
+            api_gp('/process/sub/' + detail_subprocess_id + '/', 'DELETE', data, (data) => {
+                alert("성공적으로 삭제하였습니다.");
+                process_detail_load_subtable();
+            });
+        }
+
+        function table_highlight(table, id) {
+            // {#console.log(id);#}
+            // {#console.log($(table).find('tr#' + id));#}
+            // table click highlight
+            $(table).find('tr').removeClass('clicked');
+            $(table).find('tr#' + id).addClass('clicked');
+        }
+
+
+        function spinner(){
+         $("#spinner").remove();
+        }   
+
+    </script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

@@ -1,0 +1,164 @@
+{% include 'header.html' %}
+{% load static %}
+<div class="card m-2">
+    <div class="card-body p-2">
+        <div class="row no-gutters mb-2">
+            <h4>그룹코드관리</h4>
+            <div style="position:relative; top:3px;left:15px;"> <strong>*</strong> 반드시 '서울소프트'와 상의 후 수정하세요.</div>
+        </div>
+        <form class="row no-gutters" id="code_master">
+            {% csrf_token %}
+            <div class="col-12 d-flex mb-2">
+                <div class="content-input-group col-3 px-0">
+                    <div class="content-input-group-header" style="flex: 0 0 66.666666%; max-width: 66.666666%;">
+                        <label>그룹코드<strong>*</strong></label>
+                    </div>
+                    <div class="content-input-group-input" style="flex: 0 0 33.333334%; max-width: 33.333334%;">
+                        <input class="form-control" name="code_group" placeholder="3자리" maxlength="3" minlength="3" autocomplete="off">
+                    </div>
+                </div>
+                <div class="content-input-group col-5 px-0">
+                    <div class="content-input-group-header" style="flex: 0 0 40%; max-width: 40%;">
+                        <label>그룹코드 명<strong>*</strong></label>
+                    </div>
+                    <div class="content-input-group-input" style="flex: 0 0 60%; max-width: 60%;">
+                        <input class="form-control" name="code_group_name" autocomplete="off">
+                    </div>
+                </div>
+                <div class="content-input-group col-4 px-0">
+                    <div class="col-2 pl-0 pr-1"></div>
+                    <div class="col-5 pl-0 pr-1">
+                        <button id="btn_init" class="btn button-custom w-100 add" type="submit" style="background-color: #00A250; display: none;" onclick="formsubmit()">생성</button>
+                    </div>
+                    <div class="col-5 pl-1 pr-0">
+                        <button class="btn button-custom w-100 edit" type="button" onclick="edit()">수정</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row no-gutters">
+            <div class="content-table col-12" style="height: 690px;">
+                <table class="table table-sm text-center" style="min-width: 800px;">
+                    <thead>
+                    <tr>
+                        <th>순번</th>
+                        <th>그룹코드</th>
+                        <th>코드그룹명</th>
+                        <th>최초등록자</th>
+                        <th>최초등록일</th>
+                        <th>최종변경자</th>
+                        <th>최종변경일</th>
+                    </tr>
+                    </thead>
+                    <tbody id="codegroup_tbody">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/api_codemaster_manage.js' %}" type="text/javascript"></script>
+<script>
+    var group_code_num;
+
+    $("#code_master [name='code_group']").on('change',function(){
+        if($(this).val().length == 3 && $.isNumeric($(this).val()))
+                $(this).css('border', '1px solid green');
+            else
+                $(this).css('border', '1px solid red');
+    });
+    $("#code_master [name='code_group_name']").on('change',function(){
+        if($(this).val() != "")
+            $(this).css('border', '1px solid green');
+        else
+            $(this).css('border', '1px solid red');
+    });
+
+    $(function(){
+        groupcode_table_load();
+    });
+
+    function groupcode_table_load() {
+        api_get_groupcodemaster((data) => {
+
+            let rows = "";
+            let list_num = 1;
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                let created_date = item.created_at;
+                let updated_date = item.updated_at;
+
+                // append it
+                let row = "<tr onclick=\"show_code("+item.id + ", "+item.code+",\'"+$.trim(item.name)+"\')\" style='cursor:pointer;'>";
+                row += "<td>" + (list_num++) + "</td>";
+                row += "<td>" + pad(item.code, 3) + "</td>";
+                row += "<td>" + item.name + "</td>";
+                row += "<td>" + item.created_by + "</td>";
+                row += "<td>" + created_date.substring(0, 4) + "-" + created_date.substring(5, 7) + "-" + created_date.substring(8, 10) + "</td>";
+                row += "<td>" + item.updated_by + "</td>";
+                row += "<td>" + updated_date.substring(0, 4) + "-" + updated_date.substring(5, 7) + "-" + updated_date.substring(8, 10) + "</td>";
+                row += "</tr>";
+
+                rows += row;
+            }
+            // 여기서 코드마스터 초기화 버튼을 뛰울 것인가를 처리
+            if (data.length === 20)
+                $('#btn_init').css('display', 'none');
+            else
+                $('#btn_init').css('display', '');
+
+            $('#codegroup_tbody').html(rows);
+
+            // table click highlight
+            $('.content-table tbody tr').on('click', function () {
+                $(this).parent().find('tr').removeClass('clicked');
+                $(this).addClass('clicked');
+            });
+
+            //Table pagination
+            $('.pagination-container').remove();
+            $('.table tbody').paginathing();
+
+        });
+    }
+
+    function formsubmit(e){
+        api_post_generate_codemaster((data) => {
+                alert("초기화 되었습니다.");
+                groupcode_table_load();
+            });
+    }
+
+    function edit(){
+        let code_group = $('#code_master [name="code_group"]').val();
+        let code_group_name = $('#code_master [name="code_group_name"]').val();
+
+        if ($.isNumeric(code_group) && code_group.length == 3 && code_group_name != "") {
+            api_patch_group_codemaster(group_code_num, code_group, code_group_name, () => {
+                alert("수정되었습니다.");
+                {#opener.parent.load_page_codemaster();#}
+                groupcode_table_load();
+            });
+        }
+        else
+            alert("잘못된 그룹코드입니다. 다시 입력해주십시오.");
+    }
+
+
+    function show_code(id, code_group, code_group_name){
+        group_code_num = id;
+        $('#code_master [name="code_group"]').val(code_group);
+        $('#code_master [name="code_group"]').css('border','1px solid green');
+        //$('#code_master [name="code_group"]').attr('readonly',true);
+        $('#code_master [name="code_group_name"]').val(code_group_name);
+        $('#code_master [name="code_group_name"]').css('border','1px solid green');
+
+    }
+
+          //상세코드가 3자리로 고정될 수 있게 함.
+    function pad(n, width) {
+      n = n + "";
+      return n.length >= 3 ? n : new Array(3 - n.length + 1).join("0") + n;
+    }
+</script>

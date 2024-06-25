@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    {% block title %}
+        <title>Seoul Soft MES</title>
+    {% endblock title %} {% include 'header.html' %}
+{% load static %}
+
+</head>
+<body>
+    <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <!-- preloader area start -->
+    {% comment %}<div id="preloader">
+        <div class="loader"></div>
+    </div>{% endcomment %}
+    <!-- preloader area end -->
+    <!-- page container area start -->
+    <div class="page-container">
+        {% include 'header-menu.html' %}
+        <!-- sidebar menu area start -->
+        {% include 'sub-menu.html' %}
+        <!-- sidebar menu area end -->
+        <div id="content" >
+            <div class="row no-gutters">
+                <div class="col-lg-11">
+                    <div class="card">
+                        <div class="card-body">
+                    <ul
+                            class="nav nav-tabs"
+                            id="tab_header-list"
+                            role="tablist"
+                    ></ul>
+                    </div>
+                    </div>
+                </div>
+                <div class="col-lg-1">
+                    <button
+                            type="button"
+                            class="btn btn-flat btn-outline-secondary mt-3"
+                            onclick="tab_delete_all();"
+                    >
+                        tab 전체삭제
+                    </button>
+                </div>
+                <!-- tab contents -->
+
+                    <div class="tab-content col-lg-12" id="tab_content-list" style="height:3000px;">
+                        <div class="page-title-area mb-3">
+                <div class="row align-items-center">
+                    <div class="col-sm-6">
+                        <div class="breadcrumbs-area clearfix">
+                            <h4 class="page-title pull-left" id="page_title">WelCome!</h4>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 clearfix">
+                        <!-- 오른쪽 공간 활용 -->
+                    </div>
+                </div>
+            </div>
+
+                    </div>
+                            {% comment %}</div>
+                    </div>{% endcomment %}
+            </div>
+        </div>
+        <!-- main content area start -->
+    </div>
+
+    <!-- offset area end -->
+
+    <!-- bootstrap 4 js -->
+<script src="{% static 'srtdash/assets/js/popper.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/bootstrap.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/owl.carousel.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/metisMenu.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/jquery.slimscroll.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/jquery.slicknav.min.js' %}" type="text/javascript"></script>
+
+
+    <!-- others plugins -->
+
+    <script src="{% static 'srtdash/assets/js/plugins.js' %}"></script>
+
+<script src="{% static 'srtdash/assets/js/scripts.js' %}"></script>
+
+</body>
+<script>
+
+    // hjlim : Session, Changed Event, Broadcast 가 제대로 동작 안하는 문제가 있어서 Interval 사용
+    var oldValue = $("#mes_toggle").val();
+    setInterval(function () {
+        var currentValue = $("#mes_toggle").val();
+        if (currentValue !== oldValue) {
+            {#$("#txt2").trigger("change");#}
+
+            let msg = currentValue.split(',');
+            console.log("msg_cmd : ", msg[1]);
+
+            if (msg[1] === 'fold') {
+                $("#sub-menu").removeClass("col-2");
+                $("#content").removeClass("col-lg-10");
+            } else if (msg[1] === 'spread') {
+                $("#sub-menu").addClass("col-2");
+                $("#content").addClass("col-lg-10");
+            }
+
+            oldValue = currentValue;
+            console.log("changed");
+        }
+    }, 100); // 0.1초
+
+
+    const TAB_CNT_MAX = 23;  // hjlim new-module : 수정 시 전체 검색, 상단이나 사이드의 메뉴 상단 버튼 최대 갯수
+    const AUTH_CNT_MAX = 73 + 1;  // idx 마지막 수 + 1 을 해줘야 함
+
+    if (get_token() === "") {
+        window.location.href = "/accounts/login/";
+    }
+
+    // table click highlight
+    $(".content-table tbody tr").on("click", function () {
+        $(this).parent().find("tr").removeClass("clicked");
+        $(this).addClass("clicked");
+    });
+
+    //
+    let dom_store = {};
+
+    function url_click(url, _title) {
+        let target = null;
+
+        let tabs = $("#tab_header-list .nav-item .nav-link");
+
+        let title_name = $("." + _title + ":first").text();
+            $('#page_title').text(title_name);
+
+        for (let i = 0; i < tabs.length; i++) {
+            // to get already-loaded one.
+
+            if (_title.substring(0, 2) == 'sm') {
+                let tab_title_num = tabs[i].id.replace("tab_header-", "");
+
+                let _title_num = _title.replace("sm-", "");
+
+                if (tab_title_num === _title_num) {
+                    target = tabs[i];
+                    break;
+                }
+            } else {
+                let tab_title = tabs[i].text.replace("×", "").trim();
+                if (tab_title === _title) {
+                    target = tabs[i];
+                    break;
+                }
+            }
+        }
+        if (target === null) {
+            // else tab_add() with new content
+            detach_all();
+            //$(tab_add(url ,title)).load(url);
+
+            $(tab_add(url, _title)).append(
+                // '<div id="spinner" style="position:relative;top:30%;left:45%;">'+
+                //         '<img src="../../../static/img/spinner.gif" />'+
+                // '</div>' +
+                '<iframe src="' +
+                url +
+                '" class="w-100 h-100" style="border:none;" ></iframe>'
+            );
+            // $('#tab_content-' + title2num(title)).bind("attach", function () { });
+        } else {
+            // if title 검사 => 있으면 그쪽으로 focus
+            $("#" + target.id).click();
+        }
+    }
+
+    // function spinner(){
+    //   console.log('iframe loaded');
+    //   setTimeout(() => {
+    //     $("#spinner").remove();
+    //   }, 3000);
+    // }
+
+    function detach_all() {
+        let tabs = $("#tab_header-list .nav-item .nav-link");
+
+        for (let i = 0; i < tabs.length; i++) {
+            let tab_title = tabs[i].text.replace("×", "").trim();
+            let idx = title2num(tab_title);
+            let dom = $("#container-" + idx);
+
+            dom.css("display", "none");
+            // if (dom.length > 0) dom_store[idx] = dom.detach();
+        }
+    }
+
+    function load_detached(url, title) {
+        detach_all();
+
+        let idx = title2num(title);
+        $("#container-" + idx).css("display", "block");
+        // $('#tab_content-' + idx).append(dom_store[idx]);
+        // delete dom_store[idx];
+
+        // call reload function of attached content. no way...
+        let target = $("#tab_content-" + idx + " iframe");
+        if (target.length === 1) target[0].contentWindow.location.reload(true);
+    }
+
+    <!-- 넘버링 규칙 : Tab 생성시 사용됨. 권한 쪽과 동일하도록 사용하는게 좋을 듯, 지금은 매칭 안되어있음-->
+    function title2num(title) {
+        let num;
+        let parts = title.split("-");
+        if (parts[0] === "sm"){
+            num = parts[1];
+        }else{
+            num = title;
+        }
+        return num;
+    }
+
+
+    function tab_add(url, title) {
+        let tab_now_add = title2num(title);
+
+        let title_name = '';
+
+        if (title.substring(0, 2) == 'sm') {
+
+            title_name = $("." + title + ":first").text();
+
+        } else {
+            title_name = title;
+        }
+
+        let tab_header =
+            '<li class="nav-item" id="tab_' +
+            tab_now_add +
+            '">\n' +
+            '    <a class="nav-link" id="tab_header-' +
+            tab_now_add +
+            '" data-toggle="tab" href="#tab_content-' +
+            tab_now_add +
+            '"\n' +
+            '         role="tab" aria-controls="tab_' +
+            tab_now_add +
+            '" aria-selected="false">' +
+            {% comment %}"         onclick=\"load_detached('" +
+            url +
+            "', '" +
+            title +
+            "');\">" +{% endcomment %}
+            title_name +
+            '<span class="tab_closer">&emsp;&times;</span>\n' +
+            "    </a>\n" +
+            "</li>";
+        let tab_content =
+            '<div class="tab-pane fade w-100 h-100" id="tab_content-' +
+            tab_now_add +
+            '" role="tabpanel" aria-labelledby="tab_content-' +
+            tab_now_add +
+            '">\n' +
+            '    <div id="container-' +
+            tab_now_add +
+            '" class="w-100 h-100"></div>' +
+            "</div>";
+        $("#tab_header-list").append(tab_header);
+        $("#tab_content-list").append(tab_content);
+        $("#tab_header-" + tab_now_add + " span.tab_closer").click(() => {
+            tab_delete(tab_now_add);
+        });
+        $("#tab_header-" + tab_now_add).click();
+        return "#container-" + tab_now_add;
+    }
+
+    function tab_delete(tab_num) {
+        $("#tab_" + tab_num).remove("#tab_header-list .nav-item");
+        $("#tab_content-" + tab_num).remove("#tab_content-list .tab-pane");
+
+        delete dom_store[tab_num];
+    }
+
+    function tab_delete_all() {
+        $("#tab_header-list").empty();
+        $("#tab_content-list").empty();
+        dom_store = {};
+        console.log("All tabs are deleted");
+    }
+
+    // let not_active_setting_time = 10 * 60;
+    // let time_checker = null;
+
+    // init_timer = function () {
+    //   if (window.event) {
+    //     not_active_setting_time = 10 * 60 * 600000;
+    //     // console.log("사용자 작업중")
+    //     clearTimeout(time_checker);
+    //   }
+    //   if (not_active_setting_time > 0) {
+    //     not_active_setting_time--;
+    //     time_checker = setTimeout("init_timer()", 1000);
+
+    //     // console.log("not_active_time :: ", not_active_setting_time);
+    //     // console.log("time_checker :: ",time_checker);
+    //   } else {
+    //     clearTimeout(time_checker);
+    //     flush_token();
+    //     alert("장시간 미사용으로 자동 로그아웃 처리되었습니다.");
+    //     top.location.replace("/");
+    //   }
+    // };
+
+    // onload = init_timer;
+    // document.onclick = init_timer;
+    // document.onkeypress = init_timer;
+    const dragArea = document.querySelector("#tab_header-list");
+    //new Sortable(dragArea, {
+    //    animation: 350
+    //});
+</script>
+</html>

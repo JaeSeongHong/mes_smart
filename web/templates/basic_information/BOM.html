@@ -1,0 +1,706 @@
+<!DOCTYPE HTML>
+<html>
+<header>
+    {% include "header.html" %}
+</header>
+<body style="overflow: hidden;">
+
+
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {#{% block title %}#}
+{#    <title>BOM 형식 생성</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<div class="show-error" style="display:none;"></div>
+<div>
+    <!-- 검색 -->
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center">
+                <form class="col-11" method="GET" id="BOM_main-form" onsubmit="return BOM_search_submit(event)">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>브랜드</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control brand-dropdown" id="search_brand">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제품군</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item_group-dropdown" id="search_item_group">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품번</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control bom_number-dropdown" id="search_item-code">
+                                </select>
+                            </div>
+                        </div>
+                              <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>나이스번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item_nice-dropdown" id="search_item-nice">
+                                </select>
+                            </div>
+
+                    </div>
+
+
+
+
+
+
+                        </div>
+                              <div class="row no-gutters">
+                        <div class="content-input-group col-4 mt-2">
+                            <div class="content-input-group-input input-group">
+                                <input class="form-control" id="multiSearch" placeholder="검색어를 입력해주세요
+                                "/>
+                              <div class="input-group-append">
+                         <button class="btn btn-outline-secondary" onclick="nation1.page =1; BOM_search();"> 🔍</button>
+
+                            </div>
+                            </div>
+                            </div>
+                        </div>
+                </form>
+                  <div class="col-1 px-0">
+                      <button class="btn button-search w-100" form="BOM_main-form">검색</button>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <div class="col-12 px-0">
+                <!-- 본문 -->
+                <div class="content-table col-12 px-0" style="overflow-x:auto; overflow-y:hidden; height: 402px;">
+                    <table id="BOM_data-table-up" class="table table-sm text-center">
+                        <thead>
+                        <tr>
+                            <th>순번</th>
+                            <th>브랜드</th>
+                            <th>제품군</th>
+                            <th>품명</th>
+                            <th>품번</th>
+                            <th>나이스번호</th>
+                            <th>품명상세</th>
+                            <th>형태</th>
+
+                            <th data-tableexport-display="none">설계도면</th>
+
+                            <th>최초 등록일</th>
+                            <th>최초 등록자</th>
+                                <th>최종 변경일</th>
+                            <th>최종 변경자</th>
+
+                        </tr>
+                        </thead>
+                        <tbody id="BOMmaster_tbody">
+                        </tbody>
+                    </table>
+
+                    <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                         style="margin-top: -20px;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center" id="BOM_identity">
+                <div class="content-title col-1 align-self-stretch" id="n_bom_generate">
+                    BOM 생성
+                </div>
+                <form class="col-11">
+                    {% csrf_token %}
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>브랜드</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control brand-dropdown" id="brand" name="brand" placeholder="" maxlength="15">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제품군</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item_group-dropdown" name="item_group">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control product_name" name="product_name" id="product_name">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품번<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="bom_number     form-control" id="bom_number" name="bom_number"/>
+                            </div>
+                        </div>
+                        </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>나이스번호<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input
+                                        class="form-control item-nice"
+                                        name="item-nice"
+                                        id="item-nice"
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품명상세</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="item-detail" id="item-detail">
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>형태</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="item-shape" id="item-shape"/>
+                            </div>
+                        </div>
+                       <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>자재분류</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control item-division-dropdown"
+                                        name="item_division"
+                                        id="item-division"
+                                ></select>
+                            </div>`
+                        </div>
+                        </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>안전재고수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input
+                                        class="form-control amount"
+                                        name="amount"
+                                        id="amount"
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>단가</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input
+                                        class="form-control item-price"
+                                        name="item-price"
+                                        id="item-price"
+                                />
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>거래처</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control customer-dropdown"
+                                        name="customer"
+                                        id="customer"
+                                ></select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>설계도면</label>
+                            </div>
+                            <div class="content-input-group-input" style="border: #bebebe solid 1px; ">
+                                <input type="file" id="file-selector" class="fs-selector" name="file" style="line-height: 24px;"
+                                       accept=".pdf" onchange='chk_file_type(this)'>
+
+                                <button type="button" class="btn button-custom2 fs-delete"
+                                        onClick="uploadFile = ''"
+                                        style="width: 48%; float:right;">파일 삭제
+                                </button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- 내용 -->
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2" id="detail_bom_div">
+            <!-- 본문 -->
+            <div class="content-table col-12 mb-2" style="overflow:auto; height:80px;">
+                <table id="BOM_data-table-down" class="table table-sm text-center">
+                    <thead>
+                    <tr class="BOM-list" width="100%">
+                        <th style="width:60px;">순번</th>
+                        <th>브랜드</th>
+                        <th>제품군</th>
+                        <th>품명</th>
+                        <th>품번</th>
+                        <th>나이스번호</th>
+                        <th>품명상세</th>
+                        <th>형태</th>
+                        <th>자재분류</th>
+                        <th>안전재고수량</th>
+                        <th>단가</th>
+                        <th>거래처</th>
+                        <th>설게 도면</th>
+                    </tr>
+                    </thead>
+                    <tbody id="BOM-data">
+                    </tbody>
+
+                </table>
+            </div>
+            <!-- {#                <div class="col-12 d-flex justify-content-end">#}
+                {#                    <div class="col-1 px-0">#}
+                {#                        <button class="btn button-custom2 w-100 save" type="button" onclick="confirm()">저장</button>#}
+                {#                    </div>#}
+                {#                </div>#} -->
+        </div>
+
+        <div class="row no-gutters justify-content-end m-2">
+            <div class="col-1 mr-2">
+                <button class="btn button-custom2 w-100" type="button" id='n_bom_save' onclick="BOM_formsubmit()">BOM 형식 저장</button>
+            </div>
+            <div class="col-1 mr-2">
+                <button class="btn button-custom2 w-100" type="button" id='n_bom_del' onclick="BOM_delete()">BOM 삭제</button>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+
+    </div>
+</div>
+
+<script src="{% static 'js/BOM_create_format.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_item.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+
+<script>
+    var bom_id =  null;
+    {#let pre_bom_number = "" // BOM 코드번호 저장#}
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 10,
+    };
+
+    let nation1 = new Pnations(nation_data1, BOM_search);  // 인스턴스 명
+    let uploadFile = ""
+    function BOM_load_page() {
+        BOM_init();
+        BOM_search();
+
+        // Table export
+        $(parent.document).find("#excel-export").click(() => {
+            init_excel_export($('#BOM_data-table-up'), 'BOM조회');
+            init_excel_export($('#BOM_data-table-down'), 'BOM항목');
+        });
+    }
+
+
+    function BOM_search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+        bom_id = null;
+        reset();
+
+        BOM_search();
+        return false;
+    }
+
+
+    function BOM_search() {
+          let query = "&page=" + nation1.page
+
+        let code =$("#search_item-code option:selected").text();
+        if(code !== "선택 및 검색" && code !== "") query += `&item_code=${code}`
+        let brand = $("#search_brand option:selected").text()
+        if(brand !== "선택 및 검색" && brand !== "") query += `&brand=${brand}`
+        let item_group = $("#search_item_group option:selected").text()
+        if(item_group !== "선택 및 검색" && item_group !== "") query += `&item_group=${item_group}`
+        let nice_number = $("#search_item-nice option:selected").text()
+        if(nice_number !== "선택 및 검색" && nice_number !== "") query += `&nice=${nice_number}`
+
+
+
+                let multiSearch = $("#multiSearch").val()
+
+
+
+
+
+        api_gp(`/bom/master10/?search=${multiSearch}` + query, 'GET', {}, (data) => {
+            BOM_load_data(data.results);
+            nation1.nation_display(data)
+            {#pre_bom_number = "";#}
+        });
+    }
+
+    // starting point
+    $(function () {
+        nation1.page = 1
+        BOM_init()
+        BOM_search()
+        spinner()
+    });
+
+
+    function BOM_load_data(data) {
+        let tbody = ""
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i]
+            let num = (((nation1.page * 1) - 1) * nation_data1["page_size"]) + 1;
+
+            let tr = `<tr>
+                      <td name="id" class="d-none">${nullapply(item.id)}</td>
+                      <td>${nullapply(num + i)}</td>
+                      <td name='brand' >${nullapply(item.brand?.name)}</td>
+                      <td class="d-none" name='brand_id'>${nullapply(item.brand?.id)}</td>
+                      <td name='item_group'>${nullapply(item.item_group?.name)}</td>
+                      <td class="d-none" name='item_group_id'>${nullapply(item.item_group?.id)}</td>
+                      <td name='product_name-tooltip' data-toggle=tooltip title='${item.product_name}'>${nullapply(item.product_name.length > 10 ? item.product_name.slice(0,10) + "..." :item.product_name )}</td>
+                      <td name='product_name' class='d-none' >${item.product_name}</td>
+                      <td name='bom_number-tooltip' data-toggle=tooltip title='${item.bom_number}'>${nullapply(item.bom_number.length > 10 ? item.bom_number.slice(0,10) + "..." :item.bom_number )}</td>
+                      <td name='bom_number' class='d-none' >${item.bom_number}</td>
+                      <td name='item-nice-tooltip' data-toggle=tooltip title='${item.nice_number}'>${nullapply(item.nice_number.length > 10 ? item.nice_number.slice(0,10) + "..." :item.nice_number )}</td>
+                      <td name='item-nice' class='d-none' >${item.nice_number}</td>
+                      <td name='item-detail-tooltip' data-toggle=tooltip title='${item.detail}'>${nullapply(item.detail ? item.detail.length > 10 ? item.detail.slice(0,10) + "..." : item.detail: "")}</td>
+                      <td name='item-detail' class='d-none' >${item.detail ? item.detail : ""}</td>
+                      <td name='item-shape'>${nullapply(item.shape)}</td>
+                      <td name='item-file'>${item.file !== null ? `<a href=${item.file} download=""><img src='../../../static/img/pdf_icon.png' width='20' height='20'/></a>`: ""}</td>
+                      <td name='created_at'>${nullapply(item.created_at)}</td>
+                      <td name='created_by'>${nullapply(item.created_by)}</td>
+                      <td name='updated_at'>${nullapply(item.updated_at)}</td>
+                      <td name='updated_by'>${nullapply(item.updated_by)}</td>
+                      <td class='d-none' name='item_division'>${nullapply(item.item_division?.name)}</td>
+                      <td class='d-none' name='item_division_id'>${nullapply(item.item_division?.id)}</td>
+                      <td class='d-none' name='amount'>${nullapply(item.amount)}</td>
+                      <td class='d-none' name='item-price'>${nullapply(item.price)}</td>
+                      <td class='d-none' name='customer_id'>${nullapply(item.master_customer?.id)}</td>
+                      <td class='d-none' name='customer'>${nullapply(item.master_customer?.name)}</td>
+                      <td class='d-none' name='file'>${nullapply(item.file)}</td>
+
+                      </tr>`
+            tbody += tr;
+        }
+
+        $("#BOMmaster_tbody").html(tbody);
+        document.querySelectorAll("#BOMmaster_tbody tr").forEach(element =>
+        element.addEventListener("click", (e) => {
+                document.querySelectorAll("#BOMmaster_tbody tr").forEach(subElement =>
+                subElement.classList.remove("clicked")
+            )
+                element.classList.add("clicked")
+            bom_id = element.querySelector("td[name='id']").textContent
+            let names = ['brand', 'item_group', 'product_name', 'bom_number', 'item-nice', 'item-detail', 'item-shape', 'item-file', 'created_at', 'created_by', 'updated_at', 'updated_by', 'item_division', 'amount', 'item-price', 'customer', 'file']
+            names.forEach(name =>{
+                if(name === "brand" || name === "item_group" || name=="customer" || name=="item_division"){
+                     $(`#BOM_identity [name=${name}]`).val($(element).find(`[name=${name}_id]`).text()).trigger("change")
+                }else{
+                $(`#BOM_identity [name=${name}]`).val($(element).find(`[name=${name}]`).text())
+            }
+            bom_detail_data(element)
+            })
+        })
+    )
+    }
+
+
+    async function bom_detail_data(element){
+        let names = ["brand", "item_group", "product_name", "bom_number", "item-nice", "item-detail", "item-shape", "item_division", "amount", "item-price", "customer", "file"]
+        let tr = "<tr> <td>1</td>"
+        for(let i=0; i<names.length; i++){
+            let name = names[i]
+
+            let data =element.querySelector(`td[name=${name}]`).textContent
+               if(name === "product_name" || name==="bom_number" || name==="item-nice" || name==="item-detail"){
+                    tr += `<td class='d-none' name=${name}>${data}</td>`
+                    tr += `<td title='${data}' data-toggle=tooltip >${data.length >10 ? data.slice(0,10)+ "...": data}</td>`
+            }else if(name === "file"){
+                   if(data !==""){
+                    const convertURLtoFile = async (url) => {
+                  const response = await fetch(url);
+                  const data =await response.blob();
+                  const ext = decodeURI(url).split(".").pop(); // url 구조에 맞게 수정할 것
+                  const filename = decodeURI(url).split("/").pop()// url 구조에 맞게 수정할 것
+                  const metadata = { type: `${ext}` };
+                  return new File([data], filename, metadata);
+                };
+                    let urlToFile = await convertURLtoFile(data)
+                    uploadFile = urlToFile
+
+                    }else{
+                    uploadFile=""
+                   }
+
+                    tr += `<td>${data !== "" ? `<a href=${data} download><img src='../../../static/img/pdf_icon.png' width="20" height="20"/></a>`: ""}</td>`
+
+               }else{
+            tr += `<td title='${data}' data-toggle=tooltip name=${name}>${data}</td>`
+            }
+}
+
+
+        tr += "</tr>"
+        $("#BOM-data").html(tr)
+
+
+    }
+
+
+    function BOM_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택 및 검색</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === '.customer-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                } else if (selectors === '.product-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.product_name + "</option>";
+                } else if (selectors === '.bom_number-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.bom_number + "</option>";
+                }else if (selectors === '.item_nice-dropdown') {
+                    list += "<option value='" + item.id + "'>" + item.nice_number + "</option>";
+                }
+                else{
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: '100%'});
+        }
+
+        // 생산제품명
+        api_gp('/bom/master_select/', 'GET', {}, (data) => {
+            make_dropdown(data, '.product-dropdown');
+            make_dropdown(data, '.bom_number-dropdown')
+            make_dropdown(data, ".item_nice-dropdown")
+
+        });
+
+        // 고객사
+        api_gp('/customers_select/', 'GET', {}, (data) => {
+            make_dropdown(data, '.customer-dropdown');
+        });
+
+        // 자재분류
+        api_gp("/codes_select/?group=118&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".division_dropdown");
+        });
+
+
+
+        // 칼라구분 > Sent
+        api_gp("/codes_select/?group=119&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".item_division_dropdown");
+        });
+
+        // 품종구분 > 브랜드
+        api_gp("/codes_select/?group=115&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".type_dropdown");
+        });
+
+        api_gp("/codes_select/?group=127&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".brand-dropdown");
+        });
+
+        api_gp("/codes_select/?group=128&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".item_group-dropdown");
+        });
+
+          api_gp("/codes_select/?group=118&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".item-division-dropdown");
+        });
+
+
+
+
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+    function chk_file_type(obj) {
+
+        var file_kind = obj.value.lastIndexOf('.');
+        var file_name = obj.value.substring(file_kind + 1, obj.length);
+        var file_type = file_name.toLowerCase();
+
+        var check_file_type = new Array();
+        check_file_type = ['pdf',];
+
+        if (check_file_type.indexOf(file_type) == -1) {
+            alert('PDF 파일만 선택할 수 있습니다.');
+
+            $("#file-selector").val("");
+
+            return false;
+        } else {
+            let ret = fileCheck(obj);
+            return ret;
+        }
+    }
+
+    function fileCheck(file) {
+        // 사이즈체크
+        var maxSize = 1 * 1024 * 1024 //1MB
+        var fileSize = 0;
+
+        fileSize = file.files[0].size;
+        if (fileSize > maxSize) {
+            alert("파일 사이즈는 1MB 이내로 등록 가능합니다.");
+            return false;
+        }
+        uploadFile = file.files[0]
+        return true;
+    }
+
+    function reset() {  // 선택 취소
+        $('#BOM_identity input').val('');
+        $('#BOM_identity select').val('').trigger('change');
+        $('#BOMmaster_tbody tr').removeClass('clicked');
+        bom_id = null;
+
+    }
+
+       function api_bom_post(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/bom/master/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function (json) {
+                done_callback(json);
+            })
+            .fail(handle_error);
+    }
+        function api_bom_patch(allData, done_callback) {
+        $.ajax({
+            type: "Patch",
+            url: `/bom/master/${bom_id}/`,
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function (json) {
+                done_callback(json);
+            })
+            .fail(handle_error);
+    }
+
+    function BOM_formsubmit(){
+        if(bom_id === null){
+        api_bom_post(get_data(), (done)=>{
+            alert("추가완료되었습니다.")
+            BOM_search()
+        } )
+        }
+        else{
+        api_bom_patch(get_data(), (done)=>{
+
+            alert("수정완료되었습니다")
+            BOM_search()
+        })
+        }
+
+    }
+
+    function BOM_delete(){
+        api_gp(`/bom/master/${bom_id}`, "delete", {}, (done)=>{
+            alert("삭제완료되었습니다.")
+            BOM_search()
+        })
+    }
+
+    function get_data(){
+            let form = new FormData();
+            form.append("bom_number", $("#BOM_identity [name=bom_number]").val())// BOM 코드번호
+            form.append("product_name", $("#BOM_identity [name=product_name]").val())// 생산제품명
+            form.append("detail", $("#BOM_identity [name=item-detail]").val())  // 품명상세
+            form.append("item_division", $("#BOM_identity [name=item_division] option:selected").val() || "");  // 자재분류
+
+            form.append("brand", $('#BOM_identity select[name=brand] option:selected').val() || "");  // 브랜드
+            form.append("item_group", $('#BOM_identity select[name=item_group] option:selected').val() || "");  // 제품군
+            form.append("nice_number", $('#BOM_identity [name=item-nice]').val() || "")  // 나이스번호
+            form.append("shape", $('#BOM_identity [name=item-shape]').val() || "")  // 형태
+            form.append("amount", $('#BOM_identity [name=amount]').val() || 0)// 수량
+            form.append("price", $("#BOM_identity [name=item-price]").val() || 0)  // 단가
+            form.append("master_customer", $("#BOM_identity select[name=customer] option:selected").val() || "");  // 고객사
+            form.append("file", uploadFile || "")  // file
+            uploadFile = ""
+            return form
+    }
+</script>
+
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

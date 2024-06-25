@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+{#내 정보 관리#}
+
+<body style="overflow: hidden;">
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form id="my_info" class="content-content w-100">
+            {% csrf_token %}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">내용</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>사업장<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="company_division" placeholder="본사 / 영업소"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>회사명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="company_name"/>
+                            </div>
+                        </div>
+
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>사업자번호<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="licensee_number"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>대표자명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="owner_name"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>업태</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="business_conditions"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>종목</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="business_event"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>우편번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="post_code" autocomplete='off'/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>주소</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="address"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>전화번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="office_phone"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>팩스번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="office_fax"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header col-2">
+                                <label>이메일</label>
+                            </div>
+                            <div class="content-input-group-input col-10">
+                                <input class="form-control" id="email"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header col-2">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input col-10">
+                                <input class="form-control" id="note"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>날인</label>
+                            </div>
+                            <div class="content-input-group-input" style="border: #bebebe solid 1px; ">
+                                <input type="file" id="file-selector" class="fs-selector" style="line-height: 24px;"
+                                       accept="image/*" onchange='chk_file_type(this)'>
+                                <input class="form-control fs-delete" style="width: 48%;" id="filename" readonly>
+                                <button type="button" class="btn button-custom2 fs-delete"
+                                        style="width: 48%; float:right;">파일 삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row no-gutters w-100 mt-3 justify-content-end">
+                    <div class="col-1 px-0 mr-2">
+                        <button
+                                class="btn button-custom2 w-100"
+                                type="button"
+                                onclick="refresh_data();"
+                        >
+                            초기화
+                        </button>
+                    </div>
+
+                    <div class="col-1 px-0 mr-2">
+                        <button
+                                class="btn button-custom2 w-100"
+                                type="button"
+                                onclick="add();"
+                        >
+                            추가
+                        </button>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <button
+                                class="btn button-custom2 w-100"
+                                type="button"
+                                onclick="modify();"
+                        >
+                            수정
+                        </button>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button
+                                class="btn button-custom2 w-100"
+                                type="button"
+                                onclick="remove();"
+                        >
+                            삭제
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 상세 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:540px;">
+            <table
+                    id="detail_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+
+                    <th>사업장</th>
+                    <th>회사명</th>
+                    <th>사업자번호</th>
+                    <th>대표자명</th>
+                    <th data-tableexport-display="none">날인</th>
+
+                    <th>업태</th>
+                    <th>종목</th>
+                    <th>우편번호</th>
+                    <th>주소</th>
+
+                    <th>대표번호</th>
+                    <th>팩스번호</th>
+                    <th>이메일</th>
+                    <th>비고</th>
+
+                </tr>
+                </thead>
+                <tbody id="detail_tbody"></tbody>
+
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+
+    let selected_tr = null;
+    let my_info_id = null;
+
+    let nation_data1 = {
+        cname: 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 10,
+    };
+
+    let nation1 = new Pnations(nation_data1, my_info_load_table);  // 인스턴스 명
+
+    $('#post_code').on("click", function () {
+        addrPostCodeFinder(
+            document.querySelector('#post_code'),
+            document.querySelector('#address'),
+        );
+    });
+
+    $(function () {
+        refresh();
+
+    });
+
+
+    function refresh() {
+        nation1.page = 1;
+        my_info_load_table();
+        $('.fs-delete').css('display', 'none');
+    }
+
+
+    function my_info_load_table() {
+        let query = "?page=" + nation1.page + "&";
+        api_gp("/myinfo/" + query, "GET", {}, (done) => {
+            my_info_draw_table(done);
+        });
+    }
+
+
+    function my_info_load_table_add() {
+        api_gp("/myinfo/", "GET", {}, (done) => {
+            my_info_draw_table(done);
+
+            selected_tr = $('#detail_tbody tr').eq(done.length - 1);
+            selected_tr.parent().find('tr').removeClass('clicked');
+            selected_tr.addClass('clicked');
+            my_info_id = selected_tr.find("[name='list_id']").text();
+        });
+    }
+
+    function my_info_draw_table(done) {
+        let data = done.results;
+        console.table(data)
+
+        let rows = "";
+        let num = (((nation1.page * 1) - 1) * nation_data1["page_size"]) + 1;
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num + i) + "</td>";  // 순번
+            row += "<td class='d-none' name='list_id'>" + item.id + "</td>";  // id
+
+            row += "<td name='company_division'>" + (item.company_division ? item.company_division : "") + "</td>";
+            row += "<td name='company_name'>" + (item.company_name ? item.company_name : "") + "</td>";
+            row += "<td name='licensee_number'>" + (item.licensee_number ? item.licensee_number : "") + "</td>";
+            row += "<td name='owner_name'>" + (item.owner_name ? item.owner_name : "") + "</td>";
+            row += "<td name='file' data-tableexport-display=\"none\">" +
+                (nullapply(item.file) ? "<a href='" + nullapply(item.file) +
+                    "' onclick=\"writeLog(this.href); window.open(this.href, '_blank', 'width=800, height=600'); return false;\" download>" +
+                    "<img src='../../../static/img/pdf_icon.png' width='20' height='20'></a>" : "") + "</td>";
+
+            row += "<td name='business_conditions'>" + (item.business_conditions ? item.business_conditions : "") + "</td>";
+            row += "<td name='business_event'>" + (item.business_event ? item.business_event : "") + "</td>";
+            row += "<td name='post_code'>" + (item.post_code ? item.post_code : "") + "</td>";
+            row += "<td name='address'>" + (item.address ? item.address : "") + "</td>";
+
+            row += "<td name='office_phone'>" + (item.office_phone ? item.office_phone : "") + "</td>";
+            row += "<td name='office_fax'>" + (item.office_fax ? item.office_fax : "") + "</td>";
+            row += "<td name='email'>" + (item.email ? item.email : "") + "</td>";
+            row += "<td name='note'>" + (item.note ? item.note : "") + "</td>";
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+
+        $('#detail_tbody').html(rows);
+        $('#detail_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            selected_tr = $(this);
+            my_info_id = $(this).find("[name='list_id']").text();
+
+            $("#company_division").val($(this).find("[name='company_division']").text());
+            $("#company_name").val($(this).find("[name='company_name']").text());
+            $("#licensee_number").val($(this).find("[name='licensee_number']").text());
+            $("#owner_name").val($(this).find("[name='owner_name']").text());
+
+            $("#business_conditions").val($(this).find("[name='business_conditions']").text());
+            $("#business_event").val($(this).find("[name='business_event']").text());
+            $("#post_code").val($(this).find("[name='post_code']").text());
+            $("#address").val($(this).find("[name='address']").text());
+
+            $("#office_phone").val($(this).find("[name='office_phone']").text());
+            $("#office_fax").val($(this).find("[name='office_fax']").text());
+            $("#email").val($(this).find("[name='email']").text());
+            $("#note").val($(this).find("[name='note']").text());
+
+            let _file = $(this).find("[name='file']")
+            if (_file.text() !== "") {
+                // 동원엔텍 버튼 / 이미지 업로드 처리
+                $('.fs-selector').css('display', 'none');
+                $('.fs-delete').css('display', 'inline-block');
+                let furls = decodeURI(_file.children().attr('href')).split('/');
+                $('#filename').val(furls[furls.length - 1]);
+            } else {
+                $('.fs-selector').css('display', 'inline-block');
+                $('.fs-delete').css('display', 'none');
+            }
+        });
+
+        spinner();
+    }
+
+
+    function writeLog(_file) {
+        let userinfo = get_userinfo();
+        let file = decodeURI(_file);
+        let user = userinfo["name"];
+        let enterprise = userinfo["enterprise_name"];
+
+        console.log("print");
+        console.table(userinfo);
+
+        $.ajax({
+            url: "/write_log/",
+            type: "POST",
+            dataType: "json",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}', 'user': user, 'enterprise': enterprise, 'file': file,
+            },
+            success: function (data) {
+                // alert(data.message);
+                location.reload();
+            },
+            error: function (data) {
+                // alert(data.message);
+            },
+        });
+    }
+
+
+    function add() {
+        let data = get_data();
+
+        if (data == null) {
+            return;
+        }
+
+        api_myinfo_post(data, (done) => {
+            console.table(done)
+            alert("추가되었습니다.");
+            my_info_load_table_add();
+
+        }, () => {
+            alert("예외가 발생했습니다.");
+        });
+    }
+
+
+    function modify() {
+        let data = get_data();
+
+        if (data == null) {
+            return;
+        }
+
+        api_myinfo_patch(my_info_id, data, (done) => {
+            selected_tr.find("td[name=company_division]").text((done['company_division'] ? done['company_division'] : ""));
+            selected_tr.find("td[name=company_name]").text((done['company_name'] ? done['company_name'] : ""));
+            selected_tr.find("td[name=licensee_number]").text((done['licensee_number'] ? done['licensee_number'] : ""));
+            selected_tr.find("td[name=owner_name]").text((done['owner_name'] ? done['owner_name'] : ""));
+            selected_tr.find("td[name=file]").html(
+                (nullapply(done['file']) ? "<a href='" + nullapply(done['file']) +
+                    "' onclick=\"writeLog(this.href); window.open(this.href, '_blank', 'width=800, height=600'); return false;\" download>" +
+                    "<img src='../../../static/img/pdf_icon.png' width='20' height='20' download></a>" : ""));
+            selected_tr.find("td[name=business_conditions]").text((done['business_conditions'] ? done['business_conditions'] : ""));
+            selected_tr.find("td[name=business_event]").text((done['business_event'] ? done['business_event'] : ""));
+            selected_tr.find("td[name=post_code]").text((done['post_code'] ? done['post_code'] : ""));
+            selected_tr.find("td[name=address]").text((done['address'] ? done['address'] : ""));
+
+            selected_tr.find("td[name=office_phone]").text((done['office_phone'] ? done['office_phone'] : ""));
+            selected_tr.find("td[name=office_fax]").text((done['office_fax'] ? done['office_fax'] : ""));
+            selected_tr.find("td[name=email]").text((done['email'] ? done['email'] : ""));
+            selected_tr.find("td[name=note]").text((done['note'] ? done['note'] : ""));
+
+            alert("수정되었습니다.");
+
+        }, () => {
+            alert("예외가 발생했습니다.");
+        });
+    }
+
+
+    function remove() {
+        if (my_info_id == null) {
+            alert("삭제할 리스트를 선택해 주세요.");
+            return;
+        }
+
+        api_gp("/myinfo/" + my_info_id + "/", "DELETE", {}, () => {
+            alert("삭제하였습니다.");
+            my_info_load_table();
+            refresh_data();
+
+        }, () => {
+            alert("예외가 발생했습니다.");
+        });
+    }
+
+
+    function refresh_data() {
+        selected_tr.parent().find('tr').removeClass('clicked');
+        selected_tr = null;
+        my_info_id = null;
+
+        $("#company_division").val("");
+        $("#company_name").val("");
+        $("#licensee_number").val("");
+        $("#owner_name").val("");
+        $("#file").val("");
+
+        $("#business_conditions").val("");
+        $("#business_event").val("");
+        $("#post_code").val("");
+        $("#address").val("");
+
+        $("#office_phone").val("");
+        $("#office_fax").val("");
+        $("#email").val("");
+        $("#note").val("");
+    }
+
+
+    function get_data() {
+        let company_division = $('#company_division').val();
+        if (company_division == null || company_division == '') {
+            alert("사업장을 입력해 주세요.");
+            return null;
+        }
+
+        let company_name = $('#company_name').val();
+        if (company_name == null || company_name == '') {
+            alert("회사명을 입력해 주세요.");
+            return null;
+        }
+
+        let licensee_number = $('#licensee_number').val();
+        if (licensee_number == null || licensee_number == '') {
+            alert("사업자번호를 입력해 주세요.");
+            return null;
+        }
+
+        let owner_name = $('#owner_name').val();
+
+        let business_conditions = $('#business_conditions').val();
+        let business_event = $('#business_event').val();
+        let post_code = $('#post_code').val();
+        let address = $('#address').val();
+
+        let office_phone = $('#office_phone').val();
+        let office_fax = $('#office_fax').val();
+        let email = $('#email').val();
+        let note = $('#note').val();
+
+        let allData = {
+            company_division: company_division,
+            company_name: company_name,
+            licensee_number: licensee_number,
+            owner_name: owner_name,
+
+            business_conditions: business_conditions,
+            business_event: business_event,
+            post_code: post_code,
+            address: address,
+
+            office_phone: office_phone,
+            office_fax: office_fax,
+            email: email,
+            note: note,
+        };
+
+        console.log(allData);
+
+        let form = new FormData();
+        for (let key in allData) {
+            form.append(key, allData[key]);
+            console.log("append:" + key + ":" + allData[key]);
+        }
+
+        if ($('.fs-delete').css('display') === 'none') {
+            let fileSelector = document.getElementById('file-selector');
+            let file = fileSelector.files[0];
+            if (file === undefined) file = '';
+            form.append("file", file)
+            fileSelector.value = '';
+        }
+
+        for (let key of form.keys()) {
+            console.log("return form keys:" + key);
+        }
+
+        for (let value of form.values()) {
+            console.log("return form values:" + value);
+        }
+
+        return form;
+    }
+
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+    function chk_file_type(obj) {
+
+        var file_kind = obj.value.lastIndexOf('.');
+        var file_name = obj.value.substring(file_kind + 1, obj.length);
+        var file_type = file_name.toLowerCase();
+
+        var check_file_type = new Array();
+        check_file_type = ['png', 'jpg', 'jpeg', 'svg', 'bmp', 'pdf',];
+
+        if (check_file_type.indexOf(file_type) == -1) {
+            alert('이미지 파일만 선택할 수 있습니다.');
+
+            $("#file-selector").val("");
+
+            return false;
+        } else {
+            let ret = fileCheck(obj);
+            return ret;
+        }
+    }
+
+    function fileCheck(file) {
+        alert("배경을 제거한 이미지를 등록 해 주시기 바랍니다.");
+        // 사이즈체크
+        var maxSize = 1 * 1024 * 1024 //1MB
+        var fileSize = 0;
+
+        fileSize = file.files[0].size;
+        if (fileSize > maxSize) {
+            alert("파일 사이즈는 1MB 이내로 등록 가능합니다.");
+            return false;
+        }
+        return true;
+    }
+
+    function api_myinfo_post(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/myinfo/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+    function api_myinfo_patch(id, allData, done_callback) {
+        $.ajax({
+            type: "PATCH",
+            url: "/myinfo/" + id + "/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function (json) {
+                done_callback(json);
+            })
+            .fail(handle_error);
+    }
+
+</script>

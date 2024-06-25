@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {##}
+{#{% block title %}#}
+{#    <title>거래처 기준정보관리</title>#}
+{#{% endblock title %}#}
+
+{#{% block content %}#} -->
+{#<div class="spinner" id="spinner">#}
+{#    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>#}
+{#</div>#}
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div class="content-search row no-gutters align-items-center content-input-group">
+            {{ searchForm.media }}
+            <div class="content-title col-1 align-self-stretch">검색</div>
+            <form id="customer_search_form" class="col-11" method="get">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>거래구분</label>
+                        </div>
+                        <div class="input-group" id="customer_type_search">
+                            {{ searchForm.division }}
+                        </div>
+                    </div>
+
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>거래처 명</label>
+                        </div>
+                        <div class="input-group" id="customer_name_search">
+                            {{ searchForm.customerName }}
+                        </div>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-search rounded-0 w-100 h-100" type="submit">
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form method="post" enctype="multipart/form-data" id="detail_customer" class="content-content w-100">
+            <!-- TODO: submit 시 validation 구현 -->
+            {% csrf_token %}
+            {{ form.media }}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">내용</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>거래처코드<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.code }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>거래처명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.name }}
+                            </div>
+                        </div>
+
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>사업자번호<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.licensee_number }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>대표자명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.owner_name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>업태</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.business_conditions }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>종목</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.business_event }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>우편번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.postal_code }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>주소</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.address }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>전화번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.office_phone }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>팩스번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.office_fax }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>담당자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.charge_name }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header">
+                                <label>직급</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.charge_level }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>담당자 연락처</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.charge_phone }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>E-mail</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-2">
+                            <div class="content-input-group-header">
+                                <label>거래구분</label>
+                            </div>
+                            <div class="input-group">
+                                {{ form.division }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-4">
+                            <div class="content-input-group-header col-2">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input col-10">
+                                {{ form.etc }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters w-100 mt-3 justify-content-end">
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100" type="button" onclick="customer_refresh();">
+                            초기화
+                        </button>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100 add" type="submit">
+                            {{ method }}
+                        </button>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-custom2 w-100" type="button" onclick="customer_remove();">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:420px;">
+            <table id="customer_data-table" class="table table-sm text-center" style="min-width: 1300px">
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>거래처코드</th>
+                    <th>거래처명</th>
+                    <th>거래구분</th>
+                    <th>사업자번호</th>
+                    <th>대표자명</th>
+                    <th>업태</th>
+                    <th>종목</th>
+                    <th>우편번호</th>
+                    <th>주소</th>
+                    <th>회사전화번호</th>
+                    <th>팩스번호</th>
+                    <th>담당자</th>
+                    <th>직급</th>
+                    <th>담당자 연락처</th>
+                    <th>E-mail</th>
+                    <th>비고</th>
+                    <th>등록자</th>
+                    <th>등록일</th>
+                    <th>최종변경자</th>
+                    <th>최종변경일</th>
+                </tr>
+                </thead>
+                <tbody id="customer_tbody"></tbody>
+                {% load mathfilters %}
+                {% for row in queryset %}
+                <tr onclick=" location.href='/basic_information/customer/{{ row.id }}'" style="cursor: pointer;">
+                    <td>{{ page | sub:1 | mul:10 | add:forloop.counter }}</td>
+
+                    {% comment %}
+                    {# 역순인 경우 처리 #}
+                    {% with total=page|sub:1|mul:10 %}
+                    <td> {{ count | sub:forloop.counter | add:1 | sub:total}} </td>
+                    {% endwith %}
+                    {% endcomment %}
+
+                    <td>{{ row.code }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.division.name }}</td>
+                    <td>{{ row.licensee_number }}</td>
+                    <td>{{ row.owner_name | default:'-' }}</td>
+                    <td>{{ row.business_conditions | default:'-' }}</td>
+                    <td>{{ row.business_event | default:'-' }}</td>
+                    <td>{{ row.postal_code | default:'-' }}</td>
+                    <td>{{ row.address | default:'-' }}</td>
+                    <td>{{ row.office_phone | default:'-' }}</td>
+                    <td>{{ row.office_fax | default:'-' }}</td>
+
+                    <td>{{ row.charge_name | default:'-' }}</td>
+                    <td>{{ row.charge_level | default:'-' }}</td>
+                    <td>{{ row.charge_phone | default:'-' }}</td>
+                    <td>{{ row.email | default:'-' }}</td>
+                    <td>{{ row.etc | default:'-' }}</td>
+                    <td>{{ row.created_by.username }}</td>
+                    <td>{{ row.created_at | date:'Y-m-d' }}</td>
+                    <td>{{ row.updated_by.username }}</td>
+                    <td>{{ row.updated_at | date:'Y-m-d' }}</td>
+
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <script src="/static/js/sb-admin-2.js"></script>
+    <div class="row no-gutters d-flex justify-content-center">
+        <ul class="pagination">
+            {% if queryset.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page=1">&laquo;
+                        처음</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.previous_page_number }}">이전</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">&laquo; 처음</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">이전</a>
+                </li>
+            {% endif %}
+
+            {% for page in page_range %}
+                <li class="page-item {% if queryset.number == page %}active{% endif %}">
+                    <a class="page-link"
+                       href="?page={{ page }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+
+            {% if queryset.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.next_page_number }}">다음</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.paginator.num_pages }}">마지막
+                        &raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">다음</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">마지막 &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <label class="mb-0"
+        >(<strong id="customer_table_row">{{ count }}</strong>) 건 로딩</label
+        >
+    </div>
+</div>
+<script
+        src="{% static 'js/api_customer.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_codemaster.js' %}"
+        type="text/javascript"
+></script>
+<script>
+    $('#detail_customer [name="business_event"]').keydown(function (e) {
+        let code = e.keyCode || e.which;
+        if (code === 9) {
+            addrPostCodeFinder(
+                document.querySelector(
+                    '#detail_customer [name="office_post_code"]'
+                ),
+                document.querySelector('#detail_customer [name="office_address"]')
+            );
+        }
+    });
+    $('#detail_customer [name="office_post_code"]').on("click", function () {
+        addrPostCodeFinder(
+            document.querySelector('#detail_customer [name="office_post_code"]'),
+            document.querySelector('#detail_customer [name="office_address"]')
+        );
+    });
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+    function customer_refresh() {
+        location.href='/basic_information/customer/';
+    }
+    function customer_remove() {
+        {% if customerId %}
+            location.href ='/basic_information/customer_delete/{{ customerId }}'
+        {% endif %}
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

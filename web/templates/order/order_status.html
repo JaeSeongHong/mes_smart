@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+{# 발주대비 입고현황 #}
+
+
+<body style="overflow: hidden;">
+
+{% load static %}
+{{ it.media }}
+
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">거래처</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.cu_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">입고현황</label>
+                                        <div class="content-input-group-input">
+                                         <select class="form-control form-control-sm" id="in_status">
+                                            <option value="">전체</option>
+                                            <option selected value="F">입고완료</option>
+                                            <option value="P">일부입고</option>
+                                            <option value="U">미입고</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label class="col-form-label">발주일자</label>
+                                        <div class="input-group input-daterange">
+                                        <input type="text"
+                                            class="form-control created_at_after datepicker form-control-sm"
+                                            id="make_from"
+                                            autocomplete="off"
+                                        />
+                                        <div class="input-group-addon px-3">~</div>
+                                        <input type="text"
+                                            class="form-control created_at_before datepicker form-control-sm"
+                                            id="make_to"
+                                            autocomplete="off"
+                                        />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="refresh" id="page_refresh"><i class="fa fa-refresh"></i></li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+                <div class="col-sm-6">
+                    <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="order_status_data_table" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in column %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="order_status_tbody">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+            <div class="col-sm-6">
+            <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="order_status_data_table_sub" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in subcolumn %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="order_status_tbody_sub"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+<script>
+    let maintable = null;
+    let subtable = null;
+    let re_column = []
+    let sub_column = []
+    let re_invisual_col = []
+    let sub_re_invisual_col = []
+    let re_name = []
+    let sub_re_name = []
+    let hidden_name = []
+    let sub_hidden_name = []
+    let list_id = null;
+    let order_item_list_id = null;
+
+    {% for item in column %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            re_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+    re_column.push("id")
+
+    {% for item in subcolumn %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                sub_re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                sub_hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            sub_re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            sub_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $(".datepicker").datepicker("setDate", "today");
+
+    $(function () {
+        let now = new Date();
+        let first_date = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        $("#make_from").datepicker("setDate", first_date);
+        $("#make_to").datepicker("setDate", "today");
+
+        let supply_tatal_idx = re_column.indexOf("item_supply_total");
+        let in_status_idx = re_column.indexOf("in_status");
+
+        main_table = $('#order_status_data_table').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                    {
+                        targets: [0],
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },{
+                        targets: [supply_tatal_idx],
+                        render: function(data, type, row) {
+                            data = parseInt(data);
+                            if (type === 'display' && typeof data === 'number') {
+                              return '₩' + data.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                            }
+                        return data;
+                      }
+                    },{
+                        targets: [in_status_idx],
+                        render: function(data, type, row) {
+                            switch (data) {
+                                case "U":
+                                    data = "미입고";
+                                    break;
+                                case "P":
+                                    data = "일부입고";
+                                    break;
+                                case "F":
+                                    data = "입고완료";
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            return data;
+                        }
+                    }
+                ],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+
+                        list_id=data[data.length-1]
+
+                        setRowColor(this, 'M');
+
+                        load_detail_table()
+                    });
+                },
+        });
+        let un_quantity_idx = sub_column.indexOf("un_quantity");
+        let quantity_idx = sub_column.indexOf("quantity");
+        let in_quantity_idx = sub_column.indexOf("in_quantity");
+        let in_faulty_idx = sub_column.indexOf("in_faulty");
+        sub_table = $('#order_status_data_table_sub').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                    {
+                        targets: [0],
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },{
+                        targets: [un_quantity_idx],
+                        render: function (data, type, row, meta){
+
+                            let un_quan = row[quantity_idx] - (row[in_quantity_idx] - row[in_faulty_idx]);
+                            if(un_quan < 0){
+                                un_quan = 0;
+                            }
+                            return un_quan
+                        }
+                    }
+                ]
+        });
+
+        refresh();
+
+    });
+
+
+    function refresh() {
+
+        search();
+    }
+
+
+    function search(){
+        let customer_search = $('#id_cu_name_sch').val();
+        if (customer_search === undefined || customer_search === null) customer_search = ''
+
+        let make_from = $("#make_from").val();
+        let make_to = $("#make_to").val();
+        let in_status = $("#in_status").val();
+
+        let query = "?page=1&";
+        if (customer_search === ''){} else query += "customer_id=" + customer_search + "&";
+
+        if (make_from === ''){} else query += "make_from=" + make_from + "&";
+        if (make_to === ''){} else query += "make_to=" + make_to + "&";
+
+        if (in_status === ''){} else query += "in_status=" + in_status + "&";
+
+        api_gp("/order_s/read" + query + "/", "GET", {}, (done) => {
+            load_list_table(done);
+        });
+    }
+
+
+    function load_list_table(done) {
+        {#console.table(data)#}
+
+        let data = done.results;
+        main_table.rows().remove().draw();
+        main_table.rows.add(formatData(data, re_column)).draw();
+
+        sub_table.rows().remove().draw();
+    }
+
+
+    function load_detail_table() {
+
+        let query = "?";
+        if (list_id) query += "orders_id=" + list_id + "&";
+
+        api_gp("/order_s_items/read/" + query, "GET", {}, (done) => {
+            //console.table(done);
+            load_in_table(done);
+
+        });
+    }
+
+    function load_in_table(done) {
+
+        let data = done.results;
+        console.log(data);
+        sub_table.rows().remove().draw();
+        sub_table.rows.add(formatData(data, sub_column)).draw();
+
+    }
+
+    $('#page_refresh').on('click', function (){
+        location.reload();
+
+    })
+
+
+</script>

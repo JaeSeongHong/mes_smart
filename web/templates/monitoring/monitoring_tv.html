@@ -1,0 +1,494 @@
+{% include 'header.html' %}
+
+
+<div class="vh-100">
+
+    <!-- 검색 -->
+    <form class="card m-2" id="monitoring_search-form">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div
+                        class="content-title col-lg-1 align-self-stretch d-lg-flex d-md-none d-sm-none"
+                >
+                    조회
+                </div>
+                <div class="col-lg-11 col-md-12">
+                    <div class="row no-gutters">
+                        <div
+                                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <div class="content-input-group-header">
+                                <label>공장명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control factory_select"
+                                        name="master__factory__id"
+                                ></select>
+                            </div>
+                        </div>
+                        <div
+                                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <div class="content-input-group-header">
+                                <label>설비명<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control facilities_select"
+                                        name="master__facilities__id"
+                                ></select>
+                            </div>
+                        </div>
+                        <div
+                                class="content-input-group col-lg-2 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <div class="content-input-group-header">
+                                <label>관리구분<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select
+                                        class="form-control type_select"
+                                        name="master__type__id"
+                                ></select>
+                            </div>
+                        </div>
+                        <div
+                                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+                        >
+                            <div class="content-input-group-header">
+                                <label>기간</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <div class="input-group input-daterange">
+                                    <input
+                                            type="text"
+                                            class="form-control datepicker"
+                                            autocomplete="off"
+                                            name="fetch_datetime_after"
+                                    />
+                                    <div class="input-group-addon px-3">~</div>
+                                    <input
+                                            type="text"
+                                            class="form-control datepicker"
+                                            autocomplete="off"
+                                            name="fetch_datetime_before"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-12 ml-auto px-0">
+                            <button
+                                    class="btn button-search rounded-0 w-100 h-100"
+                                    onclick="monitoring_load_table();return false;"
+                            >
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <!-- 차트 제목 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-content w-100">
+                <label class="mb-0">공장명 : </label
+                ><strong id="factory_label"></strong>
+                <label class="mb-0">설비명 : </label
+                ><strong id="facilities_label"></strong>
+                <label class="mb-0">관리구분 : </label
+                ><strong id="type_label"></strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- 차트 들어갈 자리 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-content w-100" style="height: 550px">
+                <canvas id="myChart" width="100" height="550"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <!-- 본문 -->
+            <div class="content-table col-12" style="height: 150px">
+                <table
+                        id="monitoring_data-table"
+                        class="table table-sm text-center"
+                        style="min-width: 1300px"
+                >
+                    <thead id="monitoring_main-thead">
+                    <tr>
+                        <th>구분</th>
+                        <th>1시</th>
+                        <th>2시</th>
+                        <th>3시</th>
+                        <th>4시</th>
+                        <th>5시</th>
+                        <th>6시</th>
+                        <th>7시</th>
+                        <th>8시</th>
+                        <th>9시</th>
+                        <th>10시</th>
+                        <th>11시</th>
+                        <th>12시</th>
+                        <th>13시</th>
+                        <th>14시</th>
+                        <th>15시</th>
+                        <th>16시</th>
+                        <th>17시</th>
+                        <th>18시</th>
+                        <th>19시</th>
+                        <th>20시</th>
+                        <th>21시</th>
+                        <th>22시</th>
+                        <th>23시</th>
+                        <th>24시</th>
+                    </tr>
+                    </thead>
+                    <tbody id="monitoring_main-tbody">
+                    <tr>
+                        <td>온도</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>습도</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 뒤로가기 버튼 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <button
+                class="btn button-custom2 ml-auto"
+                type="button"
+                onclick="javascript:history.back();"
+        >
+            뒤로가기
+        </button>
+    </div>
+</div>
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+<script>
+    var monitoring_lookup_filters = [
+        "master__factory__id",
+        "master__facilities__id",
+        "master__type__id",
+        "fetch_datetime_after",
+        "fetch_datetime_before",
+    ];
+    var sensor = null;
+
+    function monitoring_load_table() {
+        function render_table_realtime(data) {
+            let desc = data.reverse();
+            let table_d = desc.slice(0, 12).reverse();
+
+            let current = new Date();
+            let hour = current.getHours();
+
+            let cols = "<th>구분</th>";
+            let temp_rows = "<td>온도</td>";
+            let heu_rows = "<td>습도</td>";
+            for (let i = 0; i < table_d.length; i++) {
+                let item = table_d[i];
+                cols +=
+                    "<th>" + new Date(item.fetch_datetime).getHours() + "시</th>";
+                temp_rows += "<td>" + item.temp + "</td>";
+                heu_rows += "<td>" + item.hue + "</td>";
+            }
+
+            $("#monitoring_main-thead").html("<tr>" + cols + "</tr>");
+            $("#monitoring_main-tbody").html(
+                "<tr>" + temp_rows + "</tr><tr>" + heu_rows + "</tr>"
+            );
+
+            return desc.slice(0, 24).reverse();
+        }
+
+        function render_table_static(data) {
+            let current = new Date();
+            let is_multiday = data.length > 24;
+
+            let cols = "<th>구분</th>";
+            let temp_rows = "<td>온도</td>";
+            let heu_rows = "<td>습도</td>";
+            for (let i = 0; i < data.length; i++) {
+                let date = new Date(data[i].fetch_datetime);
+                if (is_multiday)
+                    cols +=
+                        "<th>" + date.getDate() + "일 " + date.getHours() + "시</th>";
+                else cols += "<th>" + date.getHours() + "시</th>";
+                temp_rows += "<td>" + data[i].temp + "</td>";
+                heu_rows += "<td>" + data[i].hue + "</td>";
+            }
+
+            $("#monitoring_main-thead").html("<tr>" + cols + "</tr>");
+            $("#monitoring_main-tbody").html(
+                "<tr>" + temp_rows + "</tr><tr>" + heu_rows + "</tr>"
+            );
+
+            return data;
+        }
+
+        function mock(data, realtime) {
+            if (data.length > 0) {
+                api_gp("/sensors/" + data[0].master + "/", "GET", {}, (data) => {
+                    sensor = data;
+                });
+            }
+
+            let chart_raw_data = null;
+            if (realtime) chart_raw_data = render_table_realtime(data);
+            else chart_raw_data = render_table_static(data);
+
+            // render chart
+            let chart_data = {
+                labels: [],
+                datasets: [
+                    {
+                        label: "온도",
+                        backgroundColor: "red",
+                        borderColor: "red",
+                        data: [],
+                        fill: false,
+                    },
+                    {
+                        label: "습도",
+                        backgroundColor: "blue",
+                        borderColor: "blue",
+                        data: [],
+                        fill: false,
+                    },
+                ],
+            };
+
+            chart_raw_data.forEach((x) => {
+                if (x !== -1) {
+                    let d = new Date(x.fetch_datetime);
+                    let str_d =
+                        (d.getFullYear() % 100).toString() +
+                        "/" +
+                        (d.getMonth() + 1) +
+                        "/" +
+                        d.getDate() +
+                        " " +
+                        d.getHours() +
+                        "시";
+                    chart_data.labels.push(str_d);
+                    chart_data.datasets[0].data.push(x.temp);
+                    chart_data.datasets[1].data.push(x.hue);
+                }
+            });
+
+            var ctx = document.getElementById("myChart");
+            ctx.height = 300;
+            var myLineChart = new Chart(ctx, {
+                type: "line",
+                data: chart_data,
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        yAxes: [
+                            {
+                                ticks: {
+                                    suggestedMin: 0,
+                                    suggestedMax: 100,
+                                },
+                            },
+                        ],
+                    },
+                },
+            });
+        }
+
+        // filter
+        let query_params = "?";
+        let success = true;
+        let realtime = true;
+        monitoring_lookup_filters.forEach((item) => {
+            let val = $("#monitoring_search-form [name='" + item + "']").val();
+            let is_period = false;
+            if (item.indexOf("after") !== -1 || item.indexOf("before") !== -1)
+                is_period = true;
+
+            if (!is_period && val === "") {
+                success = false;
+            } else if (val !== "") {
+                query_params += "&" + item + "=" + val;
+                if (is_period) {
+                    realtime = false;
+                }
+            }
+        });
+
+        if (success === true) {
+            if (realtime) {
+                let today = new Date();
+                query_params += "&fetch_datetime_before=" + formatDate(today);
+                today.setDate(today.getDate() - 1);
+                query_params += "&fetch_datetime_after=" + formatDate(today);
+            }
+
+            api_gp("/sensors/values/" + query_params, "GET", {}, (data) => {
+                console.table(data);
+                mock(data, realtime);
+            });
+
+            $("#factory_label").text(
+                $(".factory_select").select2("data")[0].text
+            );
+            $("#facilities_label").text(
+                $(".facilities_select").select2("data")[0].text
+            );
+            $("#type_label").text($(".type_select").select2("data")[0].text);
+        } else alert("공정명, 설비명, 관리구분 선택하시기 바랍니다.");
+    }
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = "" + (d.getMonth() + 1),
+            day = "" + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("-");
+    }
+
+    function monitoring_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                list +=
+                    "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // facilities dropdown
+        api_gp("/facilities/", "GET", {}, (data) => {
+            make_dropdown(data, ".facilities_select");
+        });
+
+        // TODO enable 필터 리팩토링
+        // factory dropdown
+        api_gp("/codes/?group=104&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".factory_select");
+        });
+
+        // type dropdown
+        api_gp("/codes/?group=123&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".type_select");
+        });
+    }
+
+    function monitoring_test() {
+        if (sensor === null) {
+            console.log(
+                "테스트 할 수 없습니다. 아직 검색되지 않았거나 한번도 데이터를 받지 않은 경우, 연결 테스트가 가능합니다."
+            );
+            alert("연결되어 있지 않습니다.");
+            return;
+        }
+
+        api_gp("/sensors/check/" + sensor.id + "/", "GET", {}, (data) => {
+            console.log("연결되어 있습니다. (센서 RAW 출력값 = " + data + ")");
+            alert("정상적으로 연결되어 있습니다.");
+        });
+    }
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+    $(".datepicker").datepicker("setDate", "today");
+
+    $(() => {
+        refresh();
+        // Table export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#monitoring_data-table"), "온습도현황조회")
+        );
+    });
+
+    function refresh() {
+        monitoring_init();
+    }
+</script>

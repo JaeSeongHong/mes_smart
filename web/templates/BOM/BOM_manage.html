@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+
+<!-- BOM 등록 -->
+<div id="bom_register">
+    <!-- 검색 -->
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div class="content-search row no-gutters align-items-center">
+                <form class="col-11" method="GET" id="BOM_main-form" onsubmit="nation1.page =1; return BOM_manage_search_submit(event)">
+                     <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>브랜드</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control brand-dropdown" id="search_brand">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제품군</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item_group-dropdown" id="search_item_group">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품번</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item-code-dropdown" id="search_item-code">
+                                </select>
+                            </div>
+                        </div>
+                              <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>나이스번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <select class="form-control item-nice-dropdown" id="search_item-nice">
+                                </select>
+                            </div>
+
+                    </div>
+
+
+
+
+
+                        </div>
+                              <div class="row no-gutters">
+                        <div class="content-input-group col-4 mt-2">
+                            <div class="content-input-group-input input-group">
+                                <input class="form-control" id="multiSearch" placeholder="검색어를 입력해주세요
+                                "/>
+                              <div class="input-group-append">
+                         <button class="btn btn-outline-secondary" type="button" onclick="nation1.page =1; BOM_search()"> 🔍</button>
+
+                            </div>
+                        </div>
+                        </div>
+                              </div>
+                </form>
+                  <div class="col-1 px-0">
+                      <button class="btn button-search w-100" form="BOM_main-form">검색</button>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+        <div class="row no-gutters card-body p-2">
+            <div class="col-12 px-0">
+                <!-- 본문 -->
+                <div class="content-table col-12 px-0 mb-2" style="overflow-x:auto; overflow-y:hidden; height:251px">
+                    <table
+                            id="BOM_manage_data-table-up"
+                            class="table table-sm text-center"
+                    >
+                        <thead>
+                        <tr>
+                            <th>순번</th>
+                            <th>브랜드</th>
+                            <th>제품군</th>
+                            <th>품명</th>
+                            <th>품번</th>
+                            <th>나이스번호</th>
+                            <th>품명상세</th>
+                            <th>형태</th>
+                            <th>설계도면</th>
+                            <th>최종등록일</th>
+                            <th>최초 등록자</th>
+                            <th>최종 변경자</th>
+                            <th>최종 변경일</th>
+                        </tr>
+                        </thead>
+                        <tbody id="bom_manage_tbody"></tbody>
+                    </table>
+
+                    <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                         style="margin-top: -20px;">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 형식내용 -->
+<form>
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div class="content-title col-1 align-self-stretch">형식내용</div>
+                <div class="col-11">
+                    <div class="row no-gutters" id="detail_form">
+                            <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>브랜드</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="item-brand" disabled/>
+                                </div>
+                            </div>
+                         <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>제품군</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control" name="item-group" disabled/>
+                                </div>
+                            </div>
+                         <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>품명<strong> *</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select class="form-control item-name-dropdown" name="item-name">
+                                    </select>
+                                </div>
+                            </div>
+                         <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>품번 <strong>*</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select class="form-control item-code-dropdown" name="item-code">
+                                    </select>
+                                </div>
+                            </div>
+                         <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>나이스번호<strong> *</strong></label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <select class="form-control item-nice-dropdown" name="item-nice">
+                                    </select>
+                                </div>
+                            </div>
+                         <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>품명 상세</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control  item-detail" name="item-detail" disabled>
+                                </div>
+                            </div>
+                         <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>형태</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control item-shape" name="item-shape" disabled>
+                                </div>
+                            </div>
+                         <div class="content-input-group col-3 px-0">
+                                <div class="content-input-group-header">
+                                    <label>소요량</label>
+                                </div>
+                                <div class="content-input-group-input">
+                                    <input class="form-control required_amount" name="required_amount">
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters d-flex justify-content-end">
+        <div class="col-1 px-0 mr-2">
+            <button
+                    type="button"
+                    class="btn button-custom2 w-100"
+                    onclick="document.getElementById('file-selector').click();"
+            >
+                엑셀 업로드
+            </button>
+            <input
+                    type="file"
+                    id="file-selector"
+                    style="display: none"
+                    accept=".xlsx, .xls"
+            />
+        </div>
+        <div class="col-1 px-0 mr-2">
+            <button type="button" class="btn button-custom2 w-100" id="item_add">
+                자재추가
+            </button>
+        </div>
+        <div class="col-1 px-0 mr-2">
+            <button type="button" class="btn button-custom2 w-100" id="item_edit">
+                자재수정
+            </button>
+        </div>
+        <div class="col-1 px-0 mr-2">
+            <button
+                    type="button"
+                    class="btn button-custom2 w-100"
+                    id="item_delete"
+            >
+                자재삭제
+            </button>
+        </div>
+    </div>
+</form>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x:auto; overflow-y:hidden;height: 251px">
+            <table
+                    id="BOM_manage_data-table-down"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr id="bom_manage_th">
+                    <th>순번</th>
+                    <th>브랜드</th>
+                    <th>제품군</th>
+                    <th>품명</th>
+                    <th>품번</th>
+                    <th>나이스번호</th>
+                    <th>품명상세</th>
+                    <th>형태</th>
+                    <th>소요량</th>
+                </tr>
+                </thead>
+                <tbody id="bom_manage_detail_tbody"></tbody>
+            </table>
+                     <div class="row no-gutters d-flex justify-content-center" id="item_nation2">
+                    </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_BOMmaster.js' %}" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.min.js" integrity="sha512-W/mRQs9ZSFpF14X/4aRgQss7+HRsVXsph+Y6DGLeqIqK8IpO+rQz0ISUEXkTeeKF7tivoGv+Ru7SpocS/1qahg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+
+<script>
+    // radio change 이벤트
+    $("#bom_copy, #bom_copy_btn").hide();
+
+    $("input[name=BOM_group]").change(function () {
+        var radioValue = $(this).val();
+        if (radioValue === "register_BOM") {
+            $("#bom_copy, #bom_copy_btn").hide();
+            $("#bom_register, #bom_register_btn").fadeIn();
+        } else if (radioValue === "copy_BOM") {
+            $("#bom_register, #bom_register_btn").hide();
+            $("#bom_copy, #bom_copy_btn").fadeIn();
+        }
+    });
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+
+    let nation_data2={
+        cname: 'nation2',
+        table_id: 'item_nation2',
+        range:5,
+        page_size:5
+    }
+
+    let nation1 = new Pnations(nation_data1, BOM_search);  // 인스턴스 명
+    let nation2 = new Pnations(nation_data2, get_detail_table)
+
+    var text = null;
+
+    // {#function showPopup() {#}
+    // {#    var url = "add";#}
+    // {#    var name = "BOM 추가";#}
+    // {#    var option = "width=900, height=250, location=no";#}
+    // {#    window.open(url, name, option);#}
+    // {# }#}
+
+
+    // starting point
+    $(function () {
+        set_naming();
+        init();
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() => {
+            init_excel_export($("#BOM_manage_data-table-up"), "BOM조회");
+            init_excel_export($("#BOM_manage_data-table-down"), "BOM");
+        });
+    });
+
+
+    function set_naming(){
+        let enterprise_name = get_userinfo().enterprise_name;
+        if (enterprise_name == '(주)건강생활연구소'){
+            $("#n_bom_search").text("조회");
+            $("#n_bom_code").text("코드");
+
+            $("#n_bom_model1").text("제품군");
+        }
+
+        if (enterprise_name == '온교육') {
+            $("#n_bom_code").text("품번");
+        }
+    }
+
+
+    function refresh() {
+        let c = getParameters("customer");
+        let bn = getParameters("bom_name");
+
+        if (c === "선택 및 검색") c = "";
+        if (bn === "선택 및 검색") bn = "";
+        api_get_BOMmaster(c, bn, (data) => {
+            // {#console.table(data);#}
+            BOM_manage_load_data(data);
+        });
+    }
+    let selected_tr = ''
+    function BOM_manage_load_data(done) {
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        let rows = "";
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            let updated_date = item.updated_at;
+                // append it
+                let row =
+                    "<tr id='" +
+                    item.id + "'" + "/>";
+                row += "<td>" + (num + i) + "</td>";
+                row += "<td name='item-brand'>" + nullapply(item?.brand?.name)+ "</td>";  // BOM 코드
+                row += "<td name='item-group'>" + nullapply(item.item_group?.name) + "</td>";  // BOM 코드
+                row += `<td name='product_name' data-toggle=tooltip title='${item.product_name}'>${item.product_name.length > 10 ? item.product_name.slice(0,10) + "..." :item.product_name }</td>`
+                row += `<td name='bom_number' data-toggle=tooltip title='${item.bom_number}'>${item.bom_number.length > 10 ? item.bom_number.slice(0,10) + "..." :item.bom_number }</td>`
+                row += `<td name='item-nice' data-toggle=tooltip title='${item.nice_number}'>${item.nice_number.length > 10 ? item.nice_number.slice(0,10) + "..." :item.nice_number }</td>`
+                row += `<td name='item-detail' data-toggle=tooltip title='${item.detail}'>${item.detail ? item.detail.length > 10 ? item.detail.slice(0,10) + "..." : item.detail: ""}</td>`
+                row += "<td name='item-shape'>" + nullapply(item?.shape) + "</td>";  // 모델
+                row += `<td name='item-file'>${item.file !== null ? `<a href=${item.file} download=""><img src='../../../static/img/pdf_icon.png' width='20' height='20'/></a>`: ""}</td>`
+                row += "<td name='version'>" + (item.version ? item.version : "") + "</td>";  // 버전
+                row += "<td name='created_by'>" + item.created_by + "</td>";
+                row += "<td name='updated_by'>" + item.updated_by + "</td>";
+                row +=
+                    "<td name='updated_at'>" +
+                    updated_date.substring(0, 4) +
+                    "-" +
+                    updated_date.substring(5, 7) +
+                    "-" +
+                    updated_date.substring(8, 10) +
+                    "</td>";
+                row += "</tr>";
+
+                rows += row;
+        }
+
+        $("#bom_manage_tbody").html(rows);
+        nation1.nation_display(done);
+
+        document.querySelector("#bom_manage_tbody").innerHTML =rows
+            document.querySelectorAll("#bom_manage_tbody > tr").forEach(element =>
+
+        element.addEventListener("click", function () {
+            // {#console.log('data.id : ' + $(this).attr('id'));#}
+            // table click highlight
+            document.querySelectorAll("#bom_manage_tbody > tr").forEach(subElement=>
+                subElement.classList.remove("clicked")
+            )
+            element.classList.add("clicked")
+            text = element.id
+
+            selected_tr = element.id
+            nation2.page =1
+            get_detail_table();
+        })
+    )
+        nation1.nation_display(done);
+
+        //$(".content-search [name='customer']").html(customer_option);
+        //$(".content-search [name='bom_name']").html(bom_name_option);
+
+        spinner();
+
+    }
+
+    // 자재 추가
+    $("#item_add").on("click", function (e) {
+        let upload_data = get_form_data();
+        console.log(upload_data);
+
+        api_gp("/bom/", "POST", upload_data, (data) => {
+            alert("성공적으로 등록하였습니다.");
+            {#console.log("text : ", text);#}
+            $("#BOM_manage_data-table-up #" + text).click();
+            // TODO: window reload or click event here for show changed data
+        });
+
+    });
+
+    // 자재 수정
+    $("#item_edit").on("click", function (e) {
+        {#e.preventDefault();#}
+        let upload_data = get_form_data();
+        // clicked class 는 테이블이 클릭되면 나타납니다. 이를 이용하여 tbody 밑의 선택된 id를 찾아서 가져옵니다.
+        let BOM_manage_id = $("#bom_manage_detail_tbody")
+            .find(".clicked")
+            .attr("id");
+
+        {#console.table(upload_data);#}
+        api_gp("/bom/" + BOM_manage_id + "/", "PATCH", upload_data, (data) => {
+            alert("성공적으로 수정하였습니다.");
+            {#console.log("text : ", text);#}
+            $("#BOM_manage_data-table-up #" + text).click();
+            // TODO: window reload or click event here for show changed data
+        });
+    });
+
+    // 자재 삭제
+    $("#item_delete").on("click", function (e) {
+        e.preventDefault();
+        let upload_data = get_form_data();
+        // clicked class 는 테이블이 클릭되면 나타납니다. 이를 이용하여 tbody 밑의 선택된 id를 찾아서 가져옵니다.
+        let BOM_manage_id = $("#bom_manage_detail_tbody")
+            .find(".clicked")
+            .attr("id");
+        api_gp("/bom/" + BOM_manage_id + "/", "DELETE", upload_data, (data) => {
+            alert("성공적으로 삭제하였습니다.");
+            {#console.log("text : ", text);#}
+            $("#BOM_manage_data-table-up #" + text).click();
+            // TODO: window reload or click event here for show changed data
+        });
+    });
+
+    function get_detail_table() {
+        api_gp(
+            "/bom/?master__id=" + selected_tr + `&page=${nation2.page}`,
+            "GET",
+            {},
+            (result) => {
+                {#console.table(detail_data);#} // for test
+
+                let detail_rows = "";
+                let detail_list_num =(((nation2.page*1) - 1) * nation_data2["page_size"]) + 1 ;
+                // {#console.log(now_bom_columns);#}
+
+                // 테이블 동적생성
+
+                for (let i = 0; i < result.results.length; i++) {
+                    let detail_item = result.results[i];
+
+                    {#console.log("detail item : " + JSON.stringify(detail_item));#}
+                    {#console.log("detail data : " + JSON.stringify(detail_data[i]));#}
+                    let detail_row =
+                        "<tr id='" + detail_item.id + "' style='cursor:pointer;'>";
+                    detail_row += "<td>" + detail_list_num++ + "</td>";
+                    detail_row += "<td  data-item='item-brand'>" + nullapply(detail_item.item?.brand_name) + "</td>";
+                    detail_row += "<td  data-item='item-group'>" + nullapply(detail_item.item?.item_group_name) + "</td>";
+                    detail_row += `<td item_id=${detail_item.item.id} data-item='item-name' data-toggle=tooltip title=${detail_item.item.name}>${nullapply(detail_item.item.name.length > 10 ? detail_item.item.name.slice(0,10) + "..." :detail_item.item.name )}</td>`
+                    detail_row += `<td item_id=${detail_item.item.id} data-item='item-code' data-toggle=tooltip title=${detail_item.item.code}>${nullapply(detail_item.item.code.length > 10 ? detail_item.item.code.slice(0,10) + "..." :detail_item.item.code )}</td>`
+                    detail_row += `<td item_id=${detail_item.item.id} data-item='item-nice' data-toggle=tooltip title=${detail_item.item.nice_number}>${nullapply(detail_item.item.nice_number.length > 10 ? detail_item.item.nice_number.slice(0,10) + "..." :detail_item.item.nice_number )}</td>`
+                    detail_row += `<td data-item='item-detail' data-toggle=tooltip title=${detail_item.item.detail}>${nullapply(detail_item.item.detail ? detail_item.item.detail.length > 10 ? detail_item.item.detail.slice(0,10) + "..." : detail_item.item.detail: "")}</td>`
+                    detail_row += "<td  data-item='item-shape'>" + nullapply(detail_item.item?.shape) + "</td>";
+                    detail_row += "<td data-item='required_amount'>" + nullapply(detail_item.required_amount) + "</td>";
+                      detail_row += "</tr>";
+                    detail_rows += detail_row;
+                    }
+                nation2.nation_display(result);
+
+                document.querySelector("#bom_manage_detail_tbody").innerHTML = detail_rows
+                document.querySelectorAll("#bom_manage_detail_tbody > tr").forEach(element =>
+                    element.addEventListener("click", function () {
+
+                    // table click highlight
+                    document.querySelectorAll("#bom_manage_detail_tbody > tr").forEach(subElement =>
+                    subElement.classList.remove("clicked"))
+                    element.classList.add("clicked");
+                    $("#detail_form [name='item-brand']").val($(this).find("[data-item='item-brand']").text())
+                    $("#detail_form [name='item-group']").val($(this).find("[data-item='item-group']").text())
+                    $("#detail_form [name='item-name']").val($(this).find("[data-item='item-name']").attr("item_id")).trigger("change")
+                    $("#detail_form [name='item-code']").val($(this).find("[data-item='item-code']").attr("item_id")).trigger("change")
+                    $("#detail_form [name='item-nice']").val($(this).find("[data-item='item-nice']").attr("item_id")).trigger("change")
+                    $("#detail_form [name='item-detail']").val($(this).find("[data-item='item-detail']").attr('title'))
+                    $("#detail_form [name='item-shape']").val($(this).find("[data-item='item-shape']").text())
+                    $("#detail_form [name='required_amount']").val($(this).find("[data-item='required_amount']").text())
+                }));
+            }
+        );
+    }
+
+    function BOM_manage_search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+        nation2.page = 1
+        text = null;
+        BOM_search();
+        return false;
+    }
+
+
+    function BOM_search() {
+        let query = "page=" + nation1.page
+
+        let code =$("#search_item-code option:selected").text();
+        if(code !== "선택 및 검색" && code !== "") query += `&item_code=${code}`
+        let brand = $("#search_brand option:selected").text()
+        if(brand !== "선택 및 검색" && brand !== "") query += `&brand=${brand}`
+        let item_group = $("#search_item_group option:selected").text()
+        if(item_group !== "선택 및 검색" && item_group !== "") query += `&item_group=${item_group}`
+        let nice = $("#search_item-nice option:selected").text()
+        if(nice !== "선택 및 검색" && nice !== "") query += `&nice=${nice}`
+        let multiSearch = $("#multiSearch").val()
+        api_gp(`/bom/master/?search=${multiSearch}&` + query, "GET", {}, (data) => {
+            BOM_manage_load_data(data);
+        });
+    }
+
+
+    function get_form_data() {
+        let _item = $("#detail_form [name=item-code]").val();
+        let _item_name = $("#detail_form [name=item_name] :selected").text();
+        let _required_amount = $("#detail_form [name=required_amount]").val().replace(/,/g, '');
+
+
+
+        let _location = $("#detail_form [name=location]").val();
+        let _manufacturer = $("#detail_form [name=manufacturer]").val();
+        let _customer = $("#detail_form [name=customer]").val();
+        let _master = $("#bom_manage_tbody").find(".clicked").attr("id");
+        let _shape = $("#detail_form [name=item-shape]").val();
+
+
+        return {
+            item: _item ? _item : "",
+            item_name: _item_name ? _item_name : "",
+            required_amount: parseFloat(_required_amount ? _required_amount : 0),
+            location: _location ? _location : "",
+            manufacturer: _manufacturer ? _manufacturer : "",
+            customer: _customer ? _customer : "",
+            // clicked class 는 테이블이 클릭되면 나타납니다. 이를 이용하여 tbody 밑의 선택된 id를 찾아서 가져옵니다.
+            master: _master ? _master : "",
+            shape: _shape ? _shape : ""
+
+            // TODO: need more data for upload?
+        };
+    }
+
+    function get_form_data_excel(excelObj, done_callback) {
+        let _item = excelObj["품번"];
+
+        let _item_name = excelObj["품명"];
+        let _required_amount = excelObj["소요량"];
+
+        let _level = excelObj["레벨"];
+        let _part = excelObj["PART"];
+        let _part_num = excelObj["PART no"];
+        let _capacity = excelObj["용량"];
+        let _size = excelObj["사이즈"];
+        let _voltage = excelObj["전압"];
+        let _band = excelObj["허용범위"];
+        let _unit = excelObj["단위"];
+        let _tnb = excelObj["T / B"];
+        let _lnr = excelObj["L / R"];
+
+        let _location = excelObj["자재 위치"];
+        let _manufacturer = excelObj["거래처"];
+        let _customer = excelObj["고객사"];
+        let _etc = excelObj["비고"];
+        let _weight = excelObj["중량"];
+        let _standard = excelObj["사양"];
+        let _master = $("#bom_manage_tbody").find(".clicked").attr("id");
+        let _master_number = $("#bom_manage_tbody").find(".clicked").find("[name='bom_number']").text();
+        let _package = excelObj["Package"];
+        let _storage = excelObj["생산공정(창고)"];
+
+        done_callback({
+            item: _item ? _item : null,
+            item_name: _item_name ? _item_name : null,
+            required_amount: parseFloat(_required_amount ? _required_amount : 0),
+            level: _level ? _level : null,
+            part: _part ? _part : null,
+            part_num: _part_num ? _part_num : null,
+            capacity: _capacity ? _capacity : null,
+            size: _size ? _size : null,
+            voltage: _voltage ? _voltage : null,
+            band: _band ? _band : null,
+            unit: _unit ? _unit : null,
+            tnb: _tnb ? _tnb : null,
+            lnr: _lnr ? _lnr : null,
+            location: _location ? _location : null,
+            manufacturer: _manufacturer ? _manufacturer : null,
+            customer: _customer ? _customer : null,
+            etc: _etc ? _etc : null,
+            weight: _weight ? _weight : null,
+            standard: _standard ? _standard : null,
+            package: _package ? _package : 0,
+            storage: _storage ? _storage : null,
+
+
+            master: _master ? _master : "",
+            master_number: _master_number ? _master_number : "",
+
+            // TODO: need more data for upload?
+        });
+    }
+
+
+    function excelToJSDate(excelDate) {
+        var date = new Date(Math.round((excelDate - (25569)) * 86400 * 1000));
+        var converted_date = date.toISOString().split('T')[0];
+        return converted_date;
+    }
+
+    function init() {
+        function make_dropdown(data, selectors) {
+         let list = "<option value=''>선택 및 검색</option>";
+         for (let i = 0; i < data.length; i++) {
+             let item = data[i];
+               if (selectors === '.product-dropdown') {
+                 list += "<option value='" + item.id + "'>" + item.product_name + "</option>";
+             }
+            else if (selectors === ".item-code-dropdown") {
+                 list += `<option value=${item.id}
+                          data-brand=${item.brand_name ? item.brand_name : null}
+                          data-group=${item.item_group_name ? item.item_group_name : null}
+                          data-detail=${item.datail ? item.datail : null}
+                          data-shape=${item.shape ? item.shape : null}
+                          data-nice=${item.nice_number ? item.nice_number : null}>${item.code}</option>`
+             } else if (selectors === ".item-name-dropdown") {
+                 list += `<option value=${item.id}
+                          data-brand=${item.brand_name ? item.brand_name : null}
+                          data-group=${item.item_group_name ? item.item_group_name : null}
+                          data-detail=${item.datail ? item.datail : null}
+                          data-shape=${item.shape ? item.shape : null}
+                          data-nice=${item.nice_number ? item.nice_number : null}>${item.name}</option>`
+             }
+             else if (selectors === ".item-nice-dropdown"){
+                 list +=`<option value=${item.id}
+                          data-brand=${item.brand_name ? item.brand_name : null}
+                          data-group=${item.item_group_name ? item.item_group_name : null}
+                          data-detail=${item.datail ? item.datail : null}
+                          data-shape=${item.shape ? item.shape : null}
+                          data-nice=${item.nice_number ? item.nice_number : null}>${item.nice_number}</option>`
+             }else{
+                 list += "<option value='" + item.id + "'>" + item.name + "</option>";
+             }
+         }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+     }
+            // 생산제품명
+            api_gp("/bom/master_select/", "GET", {}, (data) => {
+                make_dropdown(data, ".product-dropdown");
+                make_dropdown(data, ".bom_number-dropdown")
+            });
+
+            // 고객사
+            api_gp("/customers_select/", "GET", {}, (data) => {
+                make_dropdown(data, ".customer-dropdown");
+            });
+
+            //품번 품명
+            api_gp('/items_part/', 'GET', {}, (data) => {
+                make_dropdown(data, '.item-code-dropdown');
+                make_dropdown(data, '.item-name-dropdown');
+                make_dropdown(data, '.item-nice-dropdown');
+
+                $("#detail_form .item-code-dropdown").on("select2:select", ()=>{
+                    let selector = $("#detail_form .item-code-dropdown option:selected")
+                    $("#detail_form .item-name-dropdown").val($(selector).val()).trigger("change")
+                    $("#detail_form .item-nice-dropdown").val($(selector).val()).trigger("change")
+                    $("input[name=item-brand]").val($(selector).data("brand")).trigger("change")
+                    $("input[name=item-group]").val($(selector).data("group")).trigger("change")
+                    $("input[name=item-detail]").val($(selector).data("detail")).trigger("change")
+                    $("input[name=item-shape]").val($(selector).data("shape")).trigger("change")
+                })
+                $("#detail_form .item-name-dropdown").on("select2:select", ()=>{
+                    let selector = $("#detail_form .item-name-dropdown option:selected")
+                    $("#detail_form .item-code-dropdown").val($(selector).val()).trigger("change")
+                    $("#detail_form .item-nice-dropdown").val($(selector).val()).trigger("change")
+                    $("input[name=item-brand]").val($(selector).data("brand")).trigger("change")
+                    $("input[name=item-group]").val($(selector).data("group")).trigger("change")
+                    $("input[name=item-detail]").val($(selector).data("detail")).trigger("change")
+                    $("input[name=item-shape]").val($(selector).data("shape")).trigger("change")
+                })
+
+                $("#detail_form .item-nice-dropdown").on("select2:select", ()=>{
+                    let selector = $("#detail_form .item-nice-dropdown option:selected")
+                    $("#detail_form .item-code-dropdown").val($(selector).val()).trigger("change")
+                    $("#detail_form .item-name-dropdown").val($(selector).val()).trigger("change")
+                    $("input[name=item-brand]").val($(selector).data("brand")).trigger("change")
+                    $("input[name=item-group]").val($(selector).data("group")).trigger("change")
+                    $("input[name=item-detail]").val($(selector).data("detail")).trigger("change")
+                    $("input[name=item-shape]").val($(selector).data("shape")).trigger("change")
+                })
+
+
+            });
+
+            api_gp("/codes_select/?group=127&enable=true", "GET", {}, (data) => {
+                make_dropdown(data, "#search_brand");
+            });
+            api_gp("/codes_select/?group=128&enable=true", "GET", {}, (data) => {
+                make_dropdown(data, "#search_item_group");
+            });
+
+            // for file upload
+        const fileSelector = document.getElementById("file-selector");
+            fileSelector.addEventListener("change", (event) => {
+                let form = new FormData();
+                let file = (fileSelector.files[0] ? fileSelector.files[0] : null);
+
+                form.append("csrfmiddlewaretoken", '{{ csrf_token }}')
+                form.append("excel", file)
+
+                api_excel_upload(form, () => {
+                    alert("성공적으로 등록하였습니다.");
+                });
+            });
+        }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+    function api_excel_upload(allData, done_callback) {
+        let v = allData.values();
+
+        for (let value of v){
+            console.log(value);
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/bom/excel/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

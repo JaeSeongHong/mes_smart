@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}
+
+</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+<!-- {#{% block title %}#}
+{#    <title>자재재고실사 조정</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+<!-- 검색 -->
+<form class="card m-2" id="adjust_search">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>브랜드</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control brand-dropdown-search"
+                                    id="brand_search"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>제품군</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control item_group-dropdown-search"
+                                    id="item_group_search"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>품번</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control item-code-dropdown-search"
+                                    id="item_code_search"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label id="n_bom_model1">나이스번호</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control nice_number-dropdown-search"
+                                    id="nice_number_search"
+                            ></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+               <div class="col-1 ml-auto px-0">
+                        <button class="btn button-search rounded-0 w-100 h-100">
+                            검색
+                        </button>
+                    </div>
+        </div>
+                <div class="row no-gutters">
+                      <div class="content-input-group col-4 mt-2">
+                        <div class="content-input-group-input input-group">
+                            <input class="form-control" id="multiSearch" placeholder="검색어를 입력해주세요
+                            "/>
+                          <div class="input-group-append">
+                     <button class="btn btn-outline-secondary" type="button" onclick="nation1.page =1; search();"> 🔍</button>
+
+                        </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+
+</form>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; overflow-x:scroll; height: 700px;">
+            <table id="material_adjust_data-table" class="table table-sm text-center" style="min-width: 1300px"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>조정날짜</th>
+                    <th>브랜드</th>
+                    <th>제품군</th>
+                    <th class="sorting_item_name" onclick="search('name')">품명</th>
+                    <th class="sorting_item_code" onclick="search('code')">품번</th>
+                    <th class="sorting_item_nice_number" onclick="search('nice_number')">나이스번호</th>
+                    <th>품명상세</th>
+                    <th>형태</th>
+                    <th>기존 전산재고</th>
+                    <th>조정 수량</th>
+                    <th>조정후 수량</th>
+                    <th>현재고</th>
+                    <th>조정창고</th>
+                    <th>조정사유</th>
+                    <th>실사조정자</th>
+                </tr>
+                </thead>
+                <tbody id="material-adjust-tbody"></tbody>
+            </table>
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+{#    <div class="col-1 ml-auto">#}
+{#                 <a href="#" id="excel-export" class="col-1 text-center">#}
+{#                    <img src="/static/img/i_excel_c.png" width="38" height="38" />#}
+{#                    <p class="mb-0">엑셀 변환</pi>#}
+{#                </a>#}
+{#            </div>#}
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/api_materials.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 15,
+    };
+
+    let nation1 = new Pnations(nation_data1, search);  // 인스턴스 명
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+
+    // click on "검색" on the right side of "그룹코드"
+    $("#adjust_search").submit(function (e) {
+        e.preventDefault();
+        nation1.page = 1;
+        material_adjust_id_idx = null;
+        order =""
+        $("#amount").val("");
+        $("#reason").val("");
+        search();
+        return false;
+    });
+
+    var material_adjust_id_idx = null;
+    var material_adjust_amount;
+    // TODO: 실사재고수량 추가해야함
+    var material_adjust_columns = ["amount", "location", "reason", "item-brand", "item_group", "item-name", "item-code", "nice_number", "item-detail", "item-shape",  "adjustDate"];
+    // let filters = ['factory', 'process', 'enable', 'name'];
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+    $(".datepicker").datepicker("setDate", "today");
+
+    function main_table_draw(done) {
+        console.log(done);
+
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        let rows = "";
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            // TODO: 실사일자 여기서 filtering 할 것.
+            let latest = {
+                previous_amount: item.stock,
+                current_amount: item.stock,
+            };
+            let reasons = "";
+            let adjust_amount = 0;
+            if(item.adjusts.length !== 0) {
+                for (let a = 0; a < item.adjusts.length; a++) {
+                    let adjust = item.adjusts[a];
+                    console.log(adjust);
+                    reasons = nullapply(adjust.reason);
+                    if (a === item.adjusts.length - 1) latest = adjust;
+                    let row =
+                        "<tr id='" +
+                        item.id +
+                        "' data-amount='" +
+                        latest.current_amount +
+                        "' style='cursor:pointer;'>";
+                    row += "<td>" + (num + a) + "</td>";
+                    row += "<td data-item='adjustDate'>" + item.created_at + "</td>"; // 조정날짜
+                    row += "<td data-item='item-brand'" + `item-id='${item.brand_id}'>` + (item.brand_name ? item.brand_name : "") + "</td>"; // 품번
+                    row += "<td data-item='item_group'" + `item-id='${item.item_group_id}'>` + (item.item_group_name ? item.item_group_name : "") + "</td>"; // 품번
+                    row += "<td data-item='item-name'" + `item-id='${item.id}' class='d-none'>` + item.name + "</td>"; // 품명
+                    row += `<td data-item='item-name title=${item.name} data-toggle='tooltip'>${item.name.length >10 ? item.name.slice(0,10) + "...": item.name}</td>`
+                    row += "<td data-item='item-code'" + `item-id='${item.id}' class='d-none'>` + item.code + "</td>"; // 품번
+                    row += `<td data-item='item-code' title=${item.code} data-toggle='tooltip'>${item.code.length >10 ? item.code.slice(0,10) + "...": item.code}</td>`
+                    row += "<td data-item='nice_number'" + `item-id='${item.id}' class='d-none'>` + (item.nice_number ? item.nice_number : "") + "</td>"; // 품번
+                    row += `<td data-item='nice_number' title=${item.nice_number} data-toggle="tooltip">` + (item.nice_number ? item.nice_number.length >10 ? item.nice_number.slice(0,10) + "..." : item.nice_number : "") + "</td>"; // 품번
+                    row += "<td data-item='item-detail' class='d-none'>" + (item.detail ? item.detail : "") + "</td>"; // 품번
+                    row += `<td data-item='item-detail' title=${item.detail} data-toggle="tooltip">` + (item.detail ? item.detail.length>10 ? item.detail.slice(0,10) + "..." : item.detail : "") + "</td>"; // 품번
+                    row += "<td data-item='item-shape'>" + (item.shape ? item.shape : "") + "</td>"; // 품번
+                    "<td data-item='item-division'>" +
+                    (item.division_name ? item.division_name : "") +
+                    "</td>"; // 자재구분
+                    row +=
+                        "<td data-item='current-amount'>" +
+                        (adjust.previous_amount ? adjust.previous_amount.toLocaleString() : 0) +
+                        "</td>"; // 기존 전산재고
+
+
+                    let adjust_num = adjust.current_amount - adjust.previous_amount;
+                    if (adjust_num > 1) {
+                        row += "<td data-item='diff'>" + '+' + adjust_num.toLocaleString() + "</td>"; // 조정 수량
+                    } else {
+                        row += "<td data-item='diff'>" + adjust_num.toLocaleString() + "</td>"; // 조정 수량
+                    }
+                    adjust_amount += adjust_num
+
+                    row += "<td data-item='amount'>" + (adjust.current_amount ? adjust.current_amount.toLocaleString() : 0) + "</td>"; // 조정후 수량
+                    row += "<td data-item='stock'>" + item.stock.toLocaleString() + "</td>"; // 현재고
+
+                    row += "<td data-item='location'" + `item-id='${(adjust.location ? adjust.location.id : "")}'>` + (adjust.location ? adjust.location.name : "입고창고") + "</td>"; // 조정사유
+                    row += "<td data-item='reason'>" + nullapply(reasons) + "</td>"; // 조정사유
+                    row += "<td data-item=''>" + item.username + "</td>"; // 실사조정자
+                    row += "</tr>";
+
+                    rows += row;
+                }
+                rows += `<tr><td></td> <td colspan="9">소계</td><td>${numberWithCommas(adjust_amount)}</td><td colspan="5"></td></tr>`
+            }
+        }
+
+        spinner();
+        nation1.nation_display(done);
+        $("#material-adjust-tbody").html(rows);
+
+        if (material_adjust_id_idx != null){
+            $("#material-adjust-tbody #" + material_adjust_id_idx).addClass('clicked');
+        }
+
+        $("#material-adjust-tbody > tr").on("click", function () {
+                 if($(this).attr("id") !== undefined ){
+                  document.querySelectorAll("#material-adjust-tbody > tr").forEach(subElement=>
+                  subElement.classList.remove("clicked"))
+                $(this).addClass("clicked");
+
+                material_adjust_columns.forEach((item) => {
+                    if (item === "location") {
+                        {#let location_value = $(this).find("[data-item='" + item + "']").attr("property");#}
+                        {#$("#detail_adjust [name='" + item + "']").val(location_value).trigger("change");#}
+                        $("#detail_adjust .location-dropdown").val($(this)
+                            .find("[data-item='" + item + "']")
+                            .attr("item-id"))
+                            .trigger("change");
+                    } else if (item === "item-code" || item === "item-name" || item === "nice_number") {
+                        $("#detail_adjust .item-name-dropdown").val($(this)
+                            .find("[data-item='" + item + "']")
+                            .attr("item-id"))
+                            .trigger("change");
+                        $("#detail_adjust .item-code-dropdown").val($(this)
+                            .find("[data-item='" + item + "']")
+                            .attr("item-id"))
+                            .trigger("change");
+                        $("#detail_adjust .nice_number-dropdown").val($(this)
+                            .find("[data-item='" + item + "']")
+                            .attr("item-id"))
+                            .trigger("change");
+                    } else if (item === "item-brand") {
+                        $("#detail_adjust .brand-dropdown").val($(this)
+                            .find("[data-item='" + item + "']")
+                            .attr("item-id"))
+                            .trigger("change");
+                    } else if (item === "item_group") {
+                        $("#detail_adjust .item_group-dropdown").val($(this)
+                            .find("[data-item='" + item + "']")
+                            .attr("item-id"))
+                            .trigger("change");
+                    } else {
+                        $("#detail_adjust [name='" + item + "']").val(
+                            $(this)
+                                .find("[data-item='" + item + "']")
+                                .text()
+                        );
+                    }
+                });
+                material_adjust_id_idx = $(this).attr("id");
+                material_adjust_amount = $(this).attr("data-amount");
+
+                 }
+        });
+    }
+
+    $(function () {
+        set_naming();
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#material_adjust_data-table"), "재고조정")
+        );
+    });
+
+
+    function set_naming(){
+        let enterprise_name = get_userinfo().enterprise_name;
+        if (enterprise_name == '(주)건강생활연구소'){
+            $("#n_bom_model1").text("제품군");
+            $("#n_bom_model2").text("제품군");
+        }
+    }
+
+
+    function refresh() {
+        material_adjust_init();
+        {#material_adjust_load_table();#}
+        search();
+    }
+
+    function material_adjust_load_table() {
+        api_gp("/items/adjust/status/", "GET", {}, (data) => {
+            main_table_draw(data);
+        });
+    }
+    function form_blank(){
+        document.querySelectorAll("#material-adjust-tbody tr").forEach(element=>
+                 element.classList.remove("clicked")
+        )
+        material_adjust_columns.forEach((item) => {
+            $(`#detail_adjust [name=${item}]`).val("").trigger("change")
+        });
+        set_default_value();
+
+    }
+
+    function set_default_value(){
+        {#$("#material_output_main-form [name='out-amount']").val('0');#}
+        {#$("#material_output_main-form [name='out-price']").val('0');#}
+
+        $("#item-code").attr("disabled", false);
+        $("#item-name").attr("disabled", false);
+        {#$("#material_output_customer").attr("disabled", false);#}
+        $("#nice_number").attr("disabled", false);
+    }
+
+    let order = ""
+    function search(ordering){
+        let customer_search = $('#customer_search :selected').val();
+        {#let division_search = $('#division_search :selected').val();#}
+        let item_code_search = $('#item_code_search :selected').val();
+        let nice_number_search = $('#nice_number_search :selected').val();
+        {#let model_search = $('#model_search :selected').val();#}
+        let brand = ($('#brand_search :selected').val() ? $('#brand_search :selected').val() : "");
+        let item_group = ($('#item_group_search :selected').val() ? $('#item_group_search :selected').val() : "");
+
+        let query = "?page=" + nation1.page + "&";
+
+        let multiSearch = $("#multiSearch").val();
+
+        if (ordering === '' || ordering === null || ordering=== undefined ){
+        } else {
+              order === ordering ? order = "-" +ordering : order = ordering
+        }
+
+        $(".sorting_item_name").html("품명▽")
+        $(".sorting_item_code").html("품번▽")
+        $(".sorting_item_nice_number").html("나이스번호▽")
+        switch(order){
+            case "name":
+                $(".sorting_item_name").html("품명▼")
+                break;
+            case "-name":
+                $(".sorting_item_name").html("품명▲")
+                break;
+            case "code":
+                $(".sorting_item_code").html("품번▼")
+                break;
+            case "-code":
+                $(".sorting_item_code").html("품번▲")
+                break;
+             case "nice_number":
+                $(".sorting_item_nice_number").html("나이스번호▼")
+                break;
+            case "-nice_number":
+                $(".sorting_item_nice_number").html("나이스번호▲")
+                break;
+            default:
+                break;
+        }
+        query += "ordering=" + order + "&";
+        if (customer_search === '' || customer_search == null){
+        } else { query += "purchase_from=" + customer_search + "&"; }
+        {#if (division_search == '' || division_search == null){} else { query += "item_division=" + division_search + "&"; }#}
+        if (item_code_search === '' || item_code_search == null){
+        } else { query += "item_code=" + item_code_search + "&"; }
+        if (nice_number_search === '' || nice_number_search == null){
+        } else { query += "nice_number=" + nice_number_search + "&"; }
+        if (brand !== '') query += "brand=" + brand + "&";
+        if (item_group !== '') query += "item_group=" + item_group + "&";
+        {#if (item_name_search == '' || item_name_search == null){} else { query += "item=" + item_name_search + "&"; }#}
+        {#if (model_search == '' || model_search == null){} else { query += "model=" + model_search + "&"; }#}
+        if (multiSearch !=='') query += 'search=' + multiSearch + "&";
+
+        api_gp("/items/adjust/status/" + query + "/", "GET", {}, (done) => {
+            main_table_draw(done);
+        });
+    }
+
+    function material_adjust_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택 및 검색</option>";
+            let distinct = [];
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors.includes('.bom-dropdown')) {
+                    list += "<option value='" + item.id + "'>" + item.bom_name + "</option>";
+                } else if (selectors.includes('.item-code-dropdown')) {
+                    list += "<option value='" + item.id + "'" +
+                    " data-shape='" + (item.shape ? item.shape : "") + "'" +
+                    " data-detail='" + (item.detail ? item.detail : "") + "'" +
+                    " data-item_group='" + (item.item_group_id ? item.item_group_id : "") + "'" +
+                    " data-brand='" + (item.brand_id ? item.brand_id : "") + "'>" +
+                    item.code + "</option>";
+                } else if (selectors.includes('.nice_number-dropdown')) {
+                    list += "<option value='" + item.id + "'" +
+                    " data-shape='" + (item.shape ? item.shape : "") + "'" +
+                    " data-detail='" + (item.detail ? item.detail : "") + "'" +
+                    " data-item_group='" + (item.item_group_id ? item.item_group_id : "") + "'" +
+                    " data-brand='" + (item.brand_id ? item.brand_id : "") + "'>" +
+                    item.nice_number + "</option>";
+                } else if (selectors.includes('.item-name-dropdown')) {
+                    if (distinct.indexOf(item.name) === -1) {
+                        list += "<option value='" + item.id + "'" +
+                        " data-shape='" + (item.shape ? item.shape : "") + "'" +
+                        " data-detail='" + (item.detail ? item.detail : "") + "'" +
+                        " data-item_group='" + (item.item_group_id ? item.item_group_id : "") + "'" +
+                        " data-brand='" + (item.brand_id ? item.brand_id : "") + "'>" +
+                        item.name + "</option>";
+                        distinct.push(item.name);
+                    }
+                } else {
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: '100%'});
+        }
+
+        // 구매처
+        api_gp('/customers_select/', 'GET', {}, (data) => {
+            make_dropdown(data, '.customer-dropdown');
+        });
+
+        // 자재구분
+        api_gp('/codes_select/?group=118&enable=true', 'GET', {}, (data) => {
+            make_dropdown(data, '.item-division-dropdown');
+        });
+
+        // 모델
+        api_gp('/codes_select/?group=116&enable=true', 'GET', {}, (data) => {
+            make_dropdown(data, '.model-dropdown');
+        });
+
+        // 브랜드
+        api_gp('/codes_select/?group=127&enable=true', 'GET', {}, (data) => {
+            make_dropdown(data, '.brand-dropdown');
+            make_dropdown(data, '.brand-dropdown-search');
+        });
+
+        // 제품군
+        api_gp('/codes_select/?group=128&enable=true', 'GET', {}, (data) => {
+            make_dropdown(data, '.item_group-dropdown');
+            make_dropdown(data, '.item_group-dropdown-search');
+        });
+
+        // 품번, 품명
+        api_gp('/items_part/', 'GET', {}, (data) => {
+            make_dropdown(data, '.item-code-dropdown');
+            make_dropdown(data, '.item-code-dropdown-search');
+            make_dropdown(data, '.item-name-dropdown');
+            make_dropdown(data, '.item-name-dropdown-search');
+            make_dropdown(data, '.nice_number-dropdown');
+            make_dropdown(data, '.nice_number-dropdown-search');
+
+            $('.item-code-dropdown').on('select2:select', function (e) {
+                let select2_data = e.params.data;
+
+                let detail = $(this).find("option:selected").data("detail");
+                let brand = $(this).find("option:selected").data("brand");
+                let item_group = $(this).find("option:selected").data("item_group");
+                let shape = $(this).find("option:selected").data("shape");
+
+                $(".item_group-dropdown").val(item_group).trigger('change');
+                $(".brand-dropdown").val(brand).trigger('change');
+                $("#item-shape").val(shape);
+                $("#item-detail").val(detail);
+
+                $(".item-name-dropdown").val(select2_data.id).trigger("change")
+                $(".nice_number-dropdown").val(select2_data.id).trigger("change")
+                material_adjust_id_idx = select2_data.id;
+
+            })
+            $('.item-name-dropdown').on('select2:select', function (e) {
+                let select2_data = e.params.data;
+
+                let detail = $(this).find("option:selected").data("detail");
+                let brand = $(this).find("option:selected").data("brand");
+                let item_group = $(this).find("option:selected").data("item_group");
+                let shape = $(this).find("option:selected").data("shape");
+
+                $(".item_group-dropdown").val(item_group).trigger('change');
+                $(".brand-dropdown").val(brand).trigger('change');
+                $("#item-shape").val(shape);
+                $("#item-detail").val(detail);
+
+                $(".item-code-dropdown").val(select2_data.id).trigger("change")
+                $(".nice_number-dropdown").val(select2_data.id).trigger("change")
+                material_adjust_id_idx = select2_data.id;
+            })
+            $('.nice_number-dropdown').on('select2:select', function (e) {
+                let select2_data = e.params.data;
+
+                let detail = $(this).find("option:selected").data("detail");
+                let brand = $(this).find("option:selected").data("brand");
+                let item_group = $(this).find("option:selected").data("item_group");
+                let shape = $(this).find("option:selected").data("shape");
+
+                $(".item_group-dropdown").val(item_group).trigger('change');
+                $(".brand-dropdown").val(brand).trigger('change');
+                $("#item-shape").val(shape);
+                $("#item-detail").val(detail);
+
+                $(".item-code-dropdown").val(select2_data.id).trigger("change")
+                $(".item-name-dropdown").val(select2_data.id).trigger("change")
+                material_adjust_id_idx = select2_data.id;
+            })
+
+        });
+          api_gp("/codes_select/?group=107&enable=true", "GET", {}, (data)=>{
+            make_dropdown(data, ".location-dropdown")
+        })
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

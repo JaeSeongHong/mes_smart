@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow-y: hidden;">
+
+<!-- spinner -->
+{% comment %}<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>{% endcomment %}
+
+<h5 class="m-3" style="font-weight: bold;"> 주문서 조회 </h5>
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="content-title col-1 align-self-stretch">주문서 검색</div>
+            <form id="search_form" class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>거래처</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control customer_search"
+                                    id="customer_search"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>주문일자</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <div class="input-group input-daterange">
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="created-at-after"
+                                        autocomplete="off"
+
+                                />
+                                <div class="input-group-addon px-3">~</div>
+                                <input
+                                        type="text"
+                                        class="form-control datepicker"
+                                        id="created-at-before"
+                                        autocomplete="off"
+
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button
+                                class="btn button-search rounded-0 w-100 h-100"
+                                type="button"
+                                onclick="return search_submit(event);"
+                        >
+                            검색
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 주문서 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:253px;">
+            <table
+                    id="ordering_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>주문번호</th>
+                    <th>주문일자</th>
+                    <th>거래처</th>
+                    <th>거래처담당자</th>
+                    <th>담당자연락처</th>
+                    <th>공급가</th>
+                    <th>작성자</th>
+                </tr>
+                </thead>
+                <tbody id="ordering_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5 class="m-3" style="font-weight: bold;"> 주문서대비 원가조회 </h5>
+
+<!-- 주문 항목 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: scroll; height:253px;">
+            <table
+                    id="detail_table"
+                    class="table table-sm text-center"
+            >
+                <thead id="detail_thead">
+                <tr>
+                    <th>순번</th>
+                    <th>품번</th>
+                    <th>품명</th>
+                    <th>품명상세</th>
+                    <th>수량</th>
+
+                    <th>주문단가</th>
+                    <th>원가</th>
+                    <th>공급가</th>
+                    <th>원가합계</th>
+
+                    <th>비고</th>
+                </tr>
+                </thead>
+                <tbody id="detail_tbody"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="card m-2">
+
+    {# NOTE #}
+    <div class="card-body col-12 p-0">
+        <div class="row no-gutters card-body p-2">
+            <div class="col-8"></div>
+            <div class="content-title col-2 align-self-stretch ">원가 총합계</div>
+            <form id="sum_form" class="col-2 w-100">
+                <div class="row gutters">
+                    <div class="content-input-group col-12 px-0" >
+                        <div
+                                class="content-input-group-input px-0"
+                        >
+                            <input id="cost_all_total" class="form-control px-0" style="text-align: center" disabled/>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+<script src="{% static 'js/api_customer.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_ordering.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $(".datepicker").datepicker("setDate", "today");
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+
+    let nation1 = new Pnations(nation_data1, search);
+
+
+    function isNumber(value) {
+        return typeof value === 'number' && isFinite(value);
+    }
+
+    $(function () {
+        refresh();
+
+        // Table export
+        {% comment %}
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#detail_table"), "거래처기준정보")
+        );
+        {% endcomment %}
+    });
+
+
+    function refresh() {
+        $("#cost_all_total").val(0);
+
+        init_drop_down();
+        init_ordering_table();
+    }
+
+
+    function init_drop_down() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // 거래처 코드
+        api_gp('/customers_select/', 'GET', {}, (done) => {
+            make_dropdown(done, ".customer_search");
+        });
+    }
+
+
+    function init_ordering_table() {
+        $("#created-at-after").datepicker("setDate", "today");
+        $("#created-at-before").datepicker("setDate", "today");
+
+        let today = new Date();
+        let year = today.getFullYear(); // 년도
+        let month = today.getMonth() + 1;  // 월
+        let date = today.getDate();  // 날짜
+        let now = year + "-" + (("00" + month.toString()).slice(-2)) + "-" + (("00" + date.toString()).slice(-2));
+
+        let query = "?";
+        query += "fr_date=" + now + "&";
+        query += "to_date=" + now + "&";
+        api_gp("/ordering_input/" + query + "/", "GET", {}, (done) => {
+            load_ordering_table(done);
+        });
+    }
+
+
+    function load_ordering_table(done) {
+        {#console.table(data)#}
+        let rows = "";
+
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (num++) + "</td>";  // 순번
+            row += "<td class='d-none' name='ordering_id'>" + item.id + "</td>";  // id
+
+            row += "<td name='ordering_code'>" + item.ordering_code + "</td>";  // 견적번호
+            row += "<td name='created_at'>" + item.created_at + "</td>";  // 견적일자
+            row += "<td class='d-none' name='code'>" + (item.code_id ? item.code_id : "") + "</td>";  // 거래처 코드
+            {#row += "<td name='customer'>" + (item.code ? item.code.name : "") + "</td>";  // 거래처#}
+            row += "<td name='customer' property='" + (item.code_id ? item.code_id : "") + "'>"
+                + (item.code_id ? item.code_name : "") + "</td>"; // 거래처
+            row += "<td name='charge_name'>" + (item.charge_name ? item.charge_name : "") + "</td>";  // 거래처담당자
+            row += "<td name='charge_phone'>" + (item.charge_phone ? item.charge_phone : "") + "</td>";  // 담당자연락처
+            row += "<td name='provide_sum'>" + item.provide_sum.toLocaleString() + "</td>";  // 공급가
+            row += "<td class='d-none' name='provide_surtax'>" + item.provide_surtax + "</td>";  // 부가세포함
+            row += "<td name='username'>" + item.username + "</td>";  // 작성자
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+
+        $('#ordering_tbody').html(rows);
+        $('#ordering_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+
+            ordering_id = $(this).find("[name='ordering_id']").text();
+
+            api_gp('/ordering_items_input/?ordering_id=' + ordering_id + "&", 'GET', {}, (done) => {
+                load_detail_table(done);
+            });
+        });
+    }
+
+
+    function search() {
+        let customer_search = $('#customer_search :selected').val();
+        if (customer_search === "선택") customer_search = null;
+
+        let fr_date = $("#created-at-after").val();
+        let to_date = $("#created-at-before").val();
+
+
+        let query = "?page=" + nation1.page + "&";
+        if (customer_search !== null) query += "code_id=" + customer_search + "&";
+
+        if (fr_date !== null || fr_date !== '') query += "fr_date=" + fr_date + "&";
+        if (to_date !== null || to_date !== '') query += "to_date=" + to_date + "&";
+
+        api_gp("/ordering_input/" + query + "/", "GET", {}, (done) => {
+            {#console.table(done);#}
+            load_ordering_table(done);
+        });
+
+        $('#detail_tbody').html("");
+        $("#cost_all_total").val(0);
+    }
+
+
+    function load_detail_table(data) {
+        console.table(data)
+
+        let rows = "";
+        let list_num = 1;
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + (list_num++) + "</td>";  // 순번
+            row += "<td class='d-none' name='item_id'>" + item.item.id + "</td>";  // 품번 id
+            row += "<td name='item_code'>" + (item.item.code ? item.item.code : "") + "</td>";  // 품번
+            row += "<td name='item_name'>" + (item.item.name ? item.item.name : "") + "</td>";  // 품명
+            row += "<td name='item_detail'>" + (item.item_detail ? item.item_detail : "") + "</td>";  // 품명상세
+            row += "<td name='item_quantity'>" + (item.quantity ? item.quantity.toLocaleString() : 0 ) + "</td>";  // 수량
+
+            row += "<td name='item_price'>" + (item.item_price ? item.item_price.toLocaleString() : 0 ) + "</td>";  // 주문단가
+            row += "<td name='cost_price'>" + (item.cost_price ? item.cost_price.toLocaleString() : 0 ) + "</td>";  // 원가
+            row += "<td name='supply_price'>" + (item.supply_price ? item.supply_price.toLocaleString() : 0 ) + "</td>";  // 공급가
+            row += "<td name='cost_total'>" + (item.cost_total ? item.cost_total.toLocaleString() : 0 ) + "</td>";  // 원가합계
+
+            row += "<td class='d-none' name='surtax'>" + (item.surtax ? item.surtax.toLocaleString() : 0 ) + "</td>";  // 부가세
+            row += "<td class='d-none' name='item_supply_total'>" + (item.item_supply_total ? item.item_supply_total.toLocaleString() : 0 ) + "</td>";  // 합계
+
+            row += "<td name='item_remark'>" + (item.remarks ? item.remarks : "") + "</td>";  // 비고
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        $('#detail_tbody').html(rows);
+        $('#detail_tbody > tr').on('click', function () {
+
+            // table click highlight
+            $(this).parent().find('tr').removeClass('clicked');
+            $(this).addClass('clicked');
+            selected_tr = $(this);
+        });
+
+        count_cost_total();
+    }
+
+
+    function count_cost_total(){
+        let cost_all_total = 0;
+        let table = $('#detail_tbody tr');
+
+        for (let i = 0; i < table.length; i++) {
+
+            let tr = table.eq(i);
+            let cost_total = tr.find("td[name=cost_total]").text().replace(/,/g, "");  // 원가합계
+
+            cost_total = parseFloat(cost_total);
+            if (!isNumber(cost_total)){
+                cost_total = 0;
+            }
+            cost_all_total += cost_total;
+
+        }
+        $("#cost_all_total").val(cost_all_total.toLocaleString());
+    }
+
+    function search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+
+        search();
+        return false;
+    }
+
+</script>

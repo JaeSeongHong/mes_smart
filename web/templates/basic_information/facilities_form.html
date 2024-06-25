@@ -1,0 +1,228 @@
+<html>
+  <head>
+    <!-- {#        {% include "header.html" %}#} -->
+    <title>설비대장</title>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      let item = {};
+      let col = [
+        "name",
+        "type",
+        "dwe_rating",
+        "dwe_making_country",
+        "code",
+        "made_by",
+        "dwe_making_number",
+        "_id",
+        "buy_at",
+        "dwe_price",
+        "detail",
+        "kill_at",
+        "dwe_kill_reason",
+        "etc",
+        "dwe_image",
+      ];
+      $(function () {
+        item = JSON.parse(window.item);
+        col.forEach(function (k, i) {
+          let image_mark = false;
+          let val = item[k];
+          if (k === "dwe_image") {
+            if (val !== "" && val !== null) {
+              $("#" + k).attr("src", val);
+              image_mark = true;
+            } else {
+              $("#" + k).css("display", "none");
+            }
+          } else {
+            if (val !== "" && val !== null) {
+              $("#" + k).text(val);
+            }
+          }
+          console.log(val);
+
+          if (i === col.length - 1) {
+            if (image_mark === true) {
+              $("img").on("load", function () {
+                window.print();
+              });
+            } else window.print();
+          }
+        });
+
+        window.onafterprint = function () {
+          window.close();
+        };
+      });
+    </script>
+    <style>
+      @media print {
+        table {
+          height: 99%;
+        }
+      }
+
+      table,
+      th,
+      td {
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      table {
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      td,
+      th {
+        border: 1px solid black;
+      }
+
+      .title {
+        font-size: 1.6em;
+      }
+
+      .label {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <table width="800" height="1200">
+      <tr>
+        <td class="title label" colspan="8">설&nbsp;비&nbsp;대&nbsp;장</td>
+      </tr>
+      <tr>
+        <td class="label">설비명</td>
+        <td id="name"></td>
+        <td class="label">형식</td>
+        <td id="type"></td>
+        <td class="label">등급</td>
+        <td id="dwe_rating"></td>
+        <td class="label">제조국</td>
+        <td id="dwe_making_country"></td>
+      </tr>
+      <tr>
+        <td class="label">관리번호</td>
+        <td id="code"></td>
+        <td class="label">제작</td>
+        <td id="made_by"></td>
+        <td class="label" colspan="2">제조번호</td>
+        <td id="dwe_making_number" colspan="2"></td>
+      </tr>
+      <tr>
+        <td class="label">자산번호</td>
+        <td id="_id"></td>
+        <td class="label">구입일</td>
+        <td id="buy_at"></td>
+        <td class="label" colspan="2">구입가격</td>
+        <td id="dwe_price" colspan="2"></td>
+      </tr>
+      <tr>
+        <td class="label" colspan="3">사양</td>
+        <td class="label" colspan="5">이력</td>
+      </tr>
+      <tr>
+        <td id="detail" colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="label" colspan="3">부 속 품 및 예 비 품</td>
+        <td class="label">폐기년월일</td>
+        <td id="kill_at"></td>
+        <td class="label">신청팀</td>
+        <td colspan="2"></td>
+      </tr>
+      <tr>
+        <td colspan="3"></td>
+        <td class="label">폐기사유</td>
+        <td id="dwe_kill_reason" colspan="4"></td>
+      </tr>
+      <tr>
+        <td colspan="3"></td>
+        <td class="label">비고</td>
+        <td id="etc" colspan="4"></td>
+      </tr>
+      <tr>
+        <td class="label" colspan="4">수리기록</td>
+        <td rowspan="10" colspan="4">
+          <img id="dwe_image" src="" alt="이미지" style="width: 100%" />
+        </td>
+      </tr>
+      <tr>
+        <td class="label">년월일</td>
+        <td class="label" colspan="2">수리사항</td>
+        <td class="label">수리처</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2">&nbsp;</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2">&nbsp;</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2">&nbsp;</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2">&nbsp;</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2">&nbsp;</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2">&nbsp;</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td class="label" colspan="4">특기사항</td>
+      </tr>
+      <tr>
+        <td colspan="4">&nbsp;</td>
+      </tr>
+    </table>
+  </body>
+</html>

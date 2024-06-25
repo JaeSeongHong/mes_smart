@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+
+<!-- {#{% block title %}#}
+{#    <title>BOM 조회</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <form
+                class="content-search row no-gutters align-items-center content-input-group"
+                id="lookup_search"
+        >
+            <div class="content-title col-1 align-self-stretch" id="n_bom_search">BOM 조회</div>
+            <div class="col-11">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>생산제품명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control product_name"
+                                    name="product_name"
+                                    id="BOM_lookup_product_name"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label id="n_bom_model1">모델명</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control model-dropdown"
+                                    id="model_name" name="model_name"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>고객사</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control customer"
+                                    name="customer"
+                                    id="BOM_lookup_customer"
+                            ></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>등록기간</label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <div class="input-group input-daterange">
+                                <input
+                                        type="text"
+                                        class="form-control created_at_after datepicker"
+                                        autocomplete="off"
+                                        name="created_at_after"
+                                        id="created_at_after"
+                                />
+                                <div class="input-group-addon px-3">~</div>
+                                <input
+                                        type="text"
+                                        class="form-control created_at_before datepicker"
+                                        autocomplete="off"
+                                        name="created_at_before"
+                                        id="created_at_before"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 d-flex justify-content-end mt-2">
+                <div class="col-1 px-0">
+                    <button class="btn button-search rounded-0 w-100 h-100">
+                        검색
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="col-12 d-flex justify-content-end mt-2">
+    <div class="col-1 px-0">
+        <button class="btn button-search rounded-0 w-100 h-100"
+                onclick="excel_export()"
+        >
+            엑셀 다운로드
+        </button>
+    </div>
+</div>
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+
+        {# Todo hjlim : Table Line 수 지정 #}
+        <div class="content-table col-12" style="overflow-x:auto; overflow-y:hidden;height:1110px;">
+            <table
+                    id="data-table-BOM_lookup"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th id="n_bom_code">BOM 코드</th>
+                    <th>생산제품명</th>
+                    <th>품명상세</th>
+                    <th>자재분류</th>
+                    <th id="n_bom_model2">모델</th>
+                    <th>버전</th>
+                    <th>고객사</th>
+                    <th>도면</th>
+
+
+                    <th>최초 등록자</th>
+                    <th>최종 변경자</th>
+                    <th>최초 등록일</th>
+                    <th>최종 변경일</th>
+                </tr>
+                </thead>
+                <tbody id="bom-lookup-tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+
+        </div>
+    </div>
+</div>
+<script
+        src="{% static 'js/api_BOMmaster.js' %}"
+        type="text/javascript"
+></script>
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.min.js" integrity="sha512-BMIFH0QGwPdinbGu7AraCzG9T4hKEkcsbbr+Uqv8IY3G5+JTzs7ycfGbz7Xh85ONQsnHYrxZSXgS1Pdo9r7B6w=="#}
+{#        crossorigin="anonymous" referrerpolicy="no-referrer">#}
+{#</script>#}
+<script lang="javascript" src="https://cdn.jsdelivr.net/gh/gitbrent/xlsx-js-style@master/dist/xlsx.bundle.js"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 10,
+    };
+
+    let nation1 = new Pnations(nation_data1, BOM_search);  // 인스턴스 명
+
+    var popupWindow;
+    var bom_lookup_id_idx = null;
+    var bom_lookup_columns = [
+        "out-at",
+        "customer",
+        "item-code",
+        "item-name",
+        "item-type",
+        "item-model",
+        "item-item-division",
+        "item-unit",
+        "current-amount",
+        "out-amount",
+        "etc",
+        "purpose",
+    ];
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+    {#$(".datepicker").datepicker("setDate", "today");#}
+
+    // click on "검색" on the right side of "그룹코드"
+    $("#lookup_search").submit(function (e) {
+        e.preventDefault();
+        nation1.page = 1;
+        bom_lookup_id_idx = null;
+        BOM_search();
+    });
+
+
+    function BOM_search() {
+        let search_product = $("#lookup_search [name='product_name'] :selected").text();
+        if (search_product === "선택 및 검색") search_product = null;
+
+        let search_customer = $("#lookup_search [name='customer'] :selected").text();
+        if (search_customer === "선택 및 검색") search_customer = null;
+
+        let search_model = $("#lookup_search [name='model_name']").val();
+        if (search_model === "선택 및 검색") search_model = null;
+
+        let fr_date = $("#created_at_after").val();
+        let to_date = $("#created_at_before").val();
+
+        let query = "?page=" + nation1.page + "&";
+        if (search_product == '' || search_product == null){
+        } else {
+            query += "product_name=" + search_product + "&";
+        }
+        if (search_customer == '' || search_customer == null){
+        } else {
+            query += "master_customer__name=" + search_customer + "&";
+        }
+
+        if (search_model == '' || search_model == null){
+        } else {
+            query += "model_name=" + search_model + "&";
+        }
+
+        if (fr_date == null || fr_date == '') {
+        } else {
+            query += "fr_date=" + fr_date + "&";
+        }
+
+        if (to_date == null || to_date == ''){
+        } else {
+            query += "to_date=" + to_date + "&";
+        }
+
+        api_gp("/bom/master10/" + query, "GET", {}, (data) => {
+            BOM_lookup_draw_out_table(data);
+        });
+    }
+
+
+    $(function () {
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() =>
+            init_excel_export($("#data-table-BOM_lookup"), "BOM조회")
+        );
+    });
+
+    function refresh() {
+        set_naming();
+        BOM_lookup_init();
+        {#BOM_lookup_load_table();#}
+        BOM_search();
+    }
+
+    function set_naming(){
+        let enterprise_manage = get_userinfo().enterprise_manage;
+        if (enterprise_manage == '(주)건강생활연구소'){
+            $("#n_bom_search").text("조회");
+            $("#n_bom_code").text("코드");
+
+            $("#n_bom_model1").text("제품군");
+            $("#n_bom_model2").text("제품군");
+        }
+
+        if (enterprise_manage == '(주)온교육'){
+            $("#n_bom_code").text("품번");
+        }
+    }
+
+
+    function BOM_lookup_load_table() {
+        var param = null;
+
+        api_lookup_BOMmaster(param, (data) => {
+            BOM_lookup_draw_out_table(data);
+        });
+    }
+
+    function BOM_lookup_draw_out_table(done) {
+        console.table(done);
+        let data = done.results;
+
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+
+        let rows = "";
+        let list_num = data.length;
+        for (let i = 0; i < data.length; i++) {
+            let bom = data[i];
+            let created_date = bom.created_at;
+            let updated_date = bom.updated_at;
+
+            let row =
+                "<tr id='" +
+                bom.id +
+                "' style='cursor:pointer;' data-details=" +
+                '\'{"product_name":"' +
+                bom.product_name +
+                '", "level":"' +
+                bom.level +
+                '", "item":"' +
+                bom.item +
+                '",' +
+                '"part":"' +
+                bom.part +
+                '", "part_num":"' +
+                bom.part_num +
+                '", "capacity":"' +
+                bom.capacity +
+                '",' +
+                '"size":"' +
+                bom.size +
+                '", "voltage":"' +
+                bom.voltage +
+                '", "band":"' +
+                bom.band +
+                '", ' +
+                '"unit":"' +
+                bom.unit +
+                '", "tnb":"' +
+                bom.tnb +
+                '", "lnr":"' +
+                bom.lnr +
+                '", ' +
+                '"required_amount":"' +
+                bom.required_amount +
+                '", "location":"' +
+                bom.location +
+                '", "manufacturer":"' +
+                bom.manufacturer +
+                '", ' +
+                '"customer":"' +
+                bom.customer +
+                '", "standard":"' +
+                bom.standard +
+                '", "weight":"' +
+                bom.weight +
+                '", ' +
+                '"etc":"' +
+                bom.etc +
+                '", "package":"' +
+                bom.package +
+                '", "enable":"' +
+                bom.enable +
+                '", ' +
+                '"storage":"' +
+                bom.storage +
+                '", "item_name":"' +
+                bom.item_name +
+                "\" }'>";
+            row += "<td>" + (num + i) + "</td>";
+            row += "<td name='bom_number'>" + bom.bom_number + "</td>";  // BOM 코드
+            row += "<td name='product_name'>" + bom.product_name + "</td>";  // 생산제품명
+            row += "<td name='detail'>" + (bom.detail ? bom.detail : "") + "</td>"; // 품명상세
+            row += "<td name='item_division'>" + (bom.item_division ? bom.item_division.name : "") + "</td>"; // 자재분류
+            row += "<td data-item='model_name'>" + (bom.model_name ? bom.model_name.name : "") + "</td>"; // 모델
+            row += "<td data-item='version' style='border-right: none'>"
+                + (bom.version ? bom.version : "") + "</td>"; // 버전
+
+            if (!bom?.master_customer) {
+                row += "<td name='master_customer' property=''>" + "" + "</td>";  // 고객사
+            } else {
+                row +=
+                    "<td name='master_customer' property='" +
+                    bom.master_customer.id +
+                    "'>" +
+                    bom.master_customer.name +
+                    "</td>";
+            }
+
+            row += "<td name='file' style='border-left: none'>" + (nullapply(bom.file) ? "<a href='" + nullapply(bom.file) + "' onclick=\"window.open(this.href, '_blank', 'width=800, height=600'); return false;\"><img src='../../../static/img/pdf_icon.png' width='20' height='20'></a>" : "") + "</td>";
+
+            row += "<td name='created_by'>" + bom.created_by + "</td>";
+            row += "<td name='updated_by'>" + bom.updated_by + "</td>";
+            row +=
+                "<td name='created_at'>" +
+                created_date.substring(0, 4) +
+                "-" +
+                created_date.substring(5, 7) +
+                "-" +
+                created_date.substring(8, 10) +
+                "</td>";
+            row +=
+                "<td name='updated_at'>" +
+                updated_date.substring(0, 4) +
+                "-" +
+                updated_date.substring(5, 7) +
+                "-" +
+                updated_date.substring(8, 10) +
+                "</td>";
+
+            // {#row += "<td class='d-none' data-item='product_name'>" + bom.product_name + "</td>"; // 생산제품명#}
+            // {#row += "<td class='d-none' data-item='level'>" + bom.level + "</td>";   // 레벨#}
+            // {#row += "<td class='d-none' data-item='item'>" + bom.item + "</td>";   // item 코드#}
+            // {#row += "<td class='d-none' data-item='part'>" + bom.part + "</td>";   // part#}
+            // {#row += "<td class='d-none' data-item='part_num'>" + bom.part_num + "</td>";   // part no#}
+            // {#row += "<td class='d-none' data-item='capacity'>" + bom.capacity + "</td>";   // 용량#}
+            // {#row += "<td class='d-none' data-item='size'>" + bom.size + "</td>";   // 사이즈#}
+            // {#row += "<td class='d-none' data-item='voltage'>" + bom.voltage + "</td>";   // 전압#}
+            // {#row += "<td class='d-none' data-item='band'>" + bom.band + "</td>";   // 허용범위#}
+            // {#row += "<td class='d-none' data-item='unit'>" + bom.unit + "</td>";   // 단위#}
+            // {#row += "<td class='d-none' data-item='tnb'>" + bom.tnb + "</td>";   // T/B#}
+            // {#row += "<td class='d-none' data-item='lnr'>" + bom.lnr + "</td>";   // L/R#}
+            // {#row += "<td class='d-none' data-item='required_amount'>" + bom.required_amount + "</td>";   // 소요량#}
+            // {#row += "<td class='d-none' data-item='location'>" + bom.location + "</td>";   // 자재위치#}
+            // {#row += "<td class='d-none' data-item='manufacturer'>" + bom.manufacturer + "</td>";   // 거래처#}
+            // {#row += "<td class='d-none' data-item='customer'>" + bom.customer + "</td>";   // 고객사#}
+            // {#row += "<td class='d-none' data-item='standard'>" + bom.standard + "</td>";   // 사양#}
+            // {#row += "<td class='d-none' data-item='weight'>" + bom.weight + "</td>";   // 중량#}
+            // {#row += "<td class='d-none' data-item='etc'>" + bom.etc + "</td>";   // 비고#}
+            // {#row += "<td class='d-none' data-item='package'>" + bom.package + "</td>";   // Package#}
+            // {#row += "<td class='d-none' data-item='enable'>" + bom.enable + "</td>";   // 사용구분#}
+            row += "</tr>";
+
+            rows += row;
+        }
+        spinner();
+
+        nation1.nation_display(done);
+        $("#bom-lookup-tbody").html(rows);
+
+        if (bom_lookup_id_idx != null){
+            $("#" + bom_lookup_id_idx).addClass('clicked');
+        }
+
+
+        $("#bom-lookup-tbody > tr").on("click", function () {
+            // {#bom_lookup_columns.forEach((item) => {#}
+            // {#    if ((item === 'item-code') || (item === 'customer') || (item === 'item-item-division') || (item === 'item-unit')) {#}
+            // {#        $("#" + item + "").val($(this).find("[data-item='" + item + "_id']").text()).trigger('change');#}
+            // {#    } else {#}
+            // {#        $("#" + item + "").val($(this).find("[data-item='" + item + "']").text());#}
+            // {#    }#}
+            // {##}
+            // {# });#}
+            bom_lookup_id_idx = $(this).attr("id");
+            let url = "/BOM/lookup/popup";
+            let name = "BOM 조회";
+            let option = "width=1000, height=600, location=no";
+            popupWindow = window.open(url, name, option);
+        });
+
+        // table click highlight
+        $(".content-table tbody tr").on("click", function () {
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+        });
+
+        {#//Table pagination#}
+        {#$('.pagination-container').remove();#}
+        {#$('.table tbody').paginathing();#}
+    }
+
+    function BOM_lookup_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors === "#BOM_lookup_product_name") {
+                    list +=
+                        "<option value='" +
+                        item.id +
+                        "'>" +
+                        item.product_name +
+                        "</option>";
+                } else if (selectors === ".bom-dropdown") {
+                    list +=
+                        "<option value='" +
+                        item.id +
+                        "'>" +
+                        item.bom_name +
+                        "</option>";
+                } else {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        // 생산제품명
+        api_gp(
+            "/bom/master_select/",
+            "GET",
+            {},
+            (data) => {
+                make_dropdown(data, "#BOM_lookup_product_name");
+            },
+            handle_error,
+            (xhr, status) => {
+            }
+        );
+
+        // 고객사
+        api_gp("/customers_select/", "GET", {},
+            (data) => {
+                make_dropdown(data, "#BOM_lookup_customer");
+            },
+            handle_error,
+            (xhr, status) => {
+            }
+        );
+
+        // 모델
+        api_gp("/codes_select/?group=116&enable=true", "GET", {}, (data) => {
+            make_dropdown(data, ".model-dropdown");
+        });
+
+
+    }
+    function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
+
+    function excel_export(){
+        if (!bom_lookup_id_idx){
+            alert("BOM을 선택해주세요.");
+            return;
+        }
+
+        let columns = ['level', 'item', 'part', 'part_num', 'capacity', 'size', 'voltage', 'band',
+        'unit', 'tnb', 'lnr', 'required_amount', 'location', 'manufacturer', 'customer', 'etc',
+            'weight', 'standard', 'package', 'storage', 'item_name' ];
+        let now_tr_details = $('#bom-lookup-tbody #' + bom_lookup_id_idx).data('details');
+        let now_columns = [];
+
+        columns.forEach((item) => {
+            if ( now_tr_details[item] !== '-1' ) {
+                now_columns[item] = now_tr_details[item];
+            }
+        });
+        var sorted_columns = [];
+        for (var columnss in now_columns) {
+          sorted_columns.push([columnss, now_columns[columnss]]);
+        }
+
+        sorted_columns.sort(function(a, b) {
+          return a[1] - b[1];
+        });
+        console.log(sorted_columns);
+
+
+        let title_merge_flag_col = 1;
+        let tt_merge_flag_row = 4;
+        let ut_merge_flag_row = 13;
+        let ut_merge_flag_col = 0;
+        let ut_style_flag_row = 13;
+        let bc_counter = 0;
+        let blank_cell = {
+            v: '',
+            s: {
+                border:{
+                    right: {style: "thin"},
+                    left: {style: "thin"},
+                    top: {style: "thin"},
+                    bottom: {style: "thin"},
+                }
+            }
+        }
+
+        let dt = new Date();
+
+        let filename = "BOM조회-" + $('.clicked td[name="bom_number"]').text() + "-" + dt.getFullYear()+'-'+(dt.getMonth()+1)+'-'+dt.getDate();
+
+        var ws = XLSX.utils.aoa_to_sheet([]);
+        let wb = XLSX.utils.book_new();
+
+        let top_table_info = {'bom_number': $('.clicked td[name="bom_number"]').text(), 'product_name' : $('.clicked td[name="product_name"]').text(),
+                                'detail': $('.clicked td[name="detail"]').text(), 'created_at': $('.clicked td[name="created_at"]').text(),
+                                'created_by': $('.clicked td[name="created_by"]').text(), 'item_division': $('.clicked td[name="item_division"]').text(),
+                                'model_name': $('.clicked td[name="model_name"]').text(), 'master_customer': $('.clicked td[name="master_customer"]').text()}
+
+        api_gp('/myinfo/', "GET", {}, (done)=>{
+            let data = done.results;
+            top_table_info['enterprise_name'] = data[0].company_name;
+            top_table_info['licensee_number'] = data[0].licensee_number;
+            top_table_info['address'] = data[0].address;
+
+            let model_name = '모델';
+            let enterprise_manage = get_userinfo().enterprise_manage;
+            if (enterprise_manage == '(주)건강생활연구소'){
+                model_name = '제품군';
+            }
+
+            XLSX.utils.sheet_add_aoa(ws, [['사업자등록번호', '', top_table_info["licensee_number"], '', '', '상호', '', top_table_info["enterprise_name"], '', ''],
+                ['주소', '', top_table_info["address"], '', '', '', '', '', '', ''],
+                ['품번', '', top_table_info["bom_number"], '', '', '품명', '', top_table_info["product_name"], '', ''],
+                ['품명상세', '', top_table_info["detail"], '', '', '작성날짜', '', top_table_info["created_at"], '', ''],
+                ['작성자', '', top_table_info["created_by"], '', '', '자재분류', '', top_table_info["item_division"], '', ''],
+                [model_name, '', top_table_info["model_name"], '', '', '고객사', '', top_table_info["master_customer"], '', ''],]
+            , {origin: {r: 4, c: 0}});
+
+            if (enterprise_manage == '(주)건강생활연구소'){
+                XLSX.utils.sheet_add_aoa(ws, [['레      시      피']], {origin: {r: 0, c: 2}});
+            } else{
+                XLSX.utils.sheet_add_aoa(ws, [['B      O      M']], {origin: {r: 0, c: 2}});
+            }
+            XLSX.utils.sheet_add_aoa(ws, [['내  용']], {origin: {r: 11, c: 0}});
+            XLSX.utils.sheet_add_aoa(ws, [['순번']], {origin: {r: 13,c: 0}})
+        })
+
+
+        let merge = [
+            { s: { r: 0, c: 2}, e: {r: 1, c: 7} },
+            {#{ s: { r: ut_merge_flag_row, c: 1}, e: {r: ut_merge_flag_row, c: 2} }, {s: { r: ut_merge_flag_row, c: 3}, e: {r: ut_merge_flag_row, c: 5} },#}
+        ];
+
+        for(tt_merge_flag_row; tt_merge_flag_row < 10; tt_merge_flag_row++){
+            if(tt_merge_flag_row === 5){
+                merge.push({ s: { r: tt_merge_flag_row, c: 0}, e: {r: tt_merge_flag_row, c: 1} }, { s: { r: tt_merge_flag_row, c: 2}, e: {r: tt_merge_flag_row, c: 9} },)
+            }
+            merge.push({ s: { r: tt_merge_flag_row, c: 0}, e: {r: tt_merge_flag_row, c: 1} }, { s: { r: tt_merge_flag_row, c: 2}, e: {r: tt_merge_flag_row, c: 4} }, { s: { r: tt_merge_flag_row, c: 5}, e: {r: tt_merge_flag_row, c: 6} }, { s: { r: tt_merge_flag_row, c: 7}, e: {r: tt_merge_flag_row, c: 9} },)
+        }
+
+        api_gp("/bom/?master__id=" + bom_lookup_id_idx, "GET", {}, (data)=>{
+            let list_num = 1;
+            for(let i = 0; i <= data.length; i++){
+                ut_merge_flag_col = 0;
+                ut_style_flag_row = ut_merge_flag_row + i;
+                if(ut_merge_flag_row + i !== 13) XLSX.utils.sheet_add_aoa(ws, [[list_num++]], {origin: {r: ut_merge_flag_row + i,c: ut_merge_flag_col}})
+                if(data.length === 0) {
+                    for (let j = 1; j <= 10; j++)
+                    XLSX.utils.sheet_add_aoa(ws, [[list_num++]], {
+                        origin: {
+                            r: ut_merge_flag_row + i + j,
+                            c: ut_merge_flag_col
+                        }
+                    })
+                }
+                for (let item in sorted_columns) {
+                    let korean_header = '';
+                    switch(sorted_columns[item][0]) {
+                        case 'item': ut_merge_flag_col = ut_merge_flag_col+2; title_merge_flag_col = ut_merge_flag_col - 1; bc_counter=1; korean_header = "품번"; break;
+                        case 'item_name': ut_merge_flag_col = ut_merge_flag_col+3; title_merge_flag_col = ut_merge_flag_col - 2; bc_counter=2; korean_header = "품명"; break;
+                        case 'required_amount': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "소요량"; break;
+                        case 'level': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "레벨"; break;
+                        case 'part': ut_merge_flag_col = ut_merge_flag_col+2; title_merge_flag_col = ut_merge_flag_col - 1; bc_counter=1; korean_header = "PART"; break;
+                        case 'part_num': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "PART no"; break;
+                        case 'capacity': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "용량"; break;
+                        case 'size': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "사이즈"; break;
+                        case 'voltage': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "전압"; break;
+                        case 'band': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "허용범위"; break;
+                        case 'unit': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "단위"; break;
+                        case 'tnb': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "T / B"; break;
+                        case 'lnr': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "L / R"; break;
+                        case 'location': ut_merge_flag_col = ut_merge_flag_col+2; title_merge_flag_col = ut_merge_flag_col - 1; bc_counter=1; korean_header = "자재 위치"; break;
+                        case 'manufacturer': ut_merge_flag_col = ut_merge_flag_col+2; title_merge_flag_col = ut_merge_flag_col - 1; bc_counter=1; korean_header = "거래처"; break;
+                        case 'customer': ut_merge_flag_col = ut_merge_flag_col+2; title_merge_flag_col = ut_merge_flag_col - 1; bc_counter=1; korean_header = "고객사"; break;
+                        case 'standard': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "사양"; break;
+                        case 'weight': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "중량"; break;
+                        case 'etc': ut_merge_flag_col = ut_merge_flag_col+3; title_merge_flag_col = ut_merge_flag_col - 2; bc_counter=2; korean_header = "비고"; break;
+                        case 'package': ut_merge_flag_col = ut_merge_flag_col+1; title_merge_flag_col = ut_merge_flag_col; korean_header = "Package"; break;
+                        case 'storage': ut_merge_flag_col = ut_merge_flag_col+2; title_merge_flag_col = ut_merge_flag_col - 1; bc_counter=1; korean_header = "생산공정(창고)"; break;
+                        default: break;
+                    }
+                    if(data.length === 0) {
+                        XLSX.utils.sheet_add_aoa(ws, [[korean_header]], {origin: {r: ut_merge_flag_row + i,c: title_merge_flag_col}})
+                        if(bc_counter !== 0){
+                            for(let k = 1; k <= bc_counter; k++){
+                                ws[XLSX.utils.encode_cell({r: ut_merge_flag_row + i, c: title_merge_flag_col + k})] = blank_cell
+                            }
+                        }
+                        if(ut_merge_flag_col === 0) title_merge_flag_col = 0;
+                        ut_style_flag_row = 23;
+                        merge.push({ s: { r: ut_merge_flag_row + i, c: title_merge_flag_col}, e: {r: ut_merge_flag_row + i, c: ut_merge_flag_col} },);
+                        for(let j = 1; j <= 10; j++) {
+                            merge.push({
+                                s: {r: ut_merge_flag_row + i + j, c: title_merge_flag_col},
+                                e: {r: ut_merge_flag_row + i + j, c: ut_merge_flag_col}
+                            },);
+                            ws[XLSX.utils.encode_cell({r: ut_merge_flag_row + i + j, c: title_merge_flag_col})] = blank_cell
+                            if(bc_counter !== 0){
+                                for(let k = 1; k <= bc_counter; k++){
+                                    ws[XLSX.utils.encode_cell({r: ut_merge_flag_row + i + j, c: title_merge_flag_col + k})] = blank_cell
+                                }
+                            }
+                        }
+                        bc_counter = 0;
+                        continue;
+                    }
+
+                    if(ut_merge_flag_row + i === 13) {
+                        XLSX.utils.sheet_add_aoa(ws, [[korean_header]], {origin: {r: ut_merge_flag_row + i,c: title_merge_flag_col}})
+                        if(sorted_columns[item][0] === 'item') XLSX.utils.sheet_add_aoa(ws, [[data[i][sorted_columns[item][0]].code]], {origin: {r: ut_merge_flag_row + 1,c: title_merge_flag_col}})
+                        XLSX.utils.sheet_add_aoa(ws, [[data[i][sorted_columns[item][0]]]], {origin: {r: ut_merge_flag_row + 1,c: title_merge_flag_col}})
+                    }
+                    else if(i === data.length) {
+                        merge.push({ s: { r: ut_merge_flag_row + i, c: title_merge_flag_col}, e: {r: ut_merge_flag_row + i, c: ut_merge_flag_col} },);
+                        if(bc_counter !== 0){
+                        for(let k = 1; k <= bc_counter; k++){
+                                ws[XLSX.utils.encode_cell({r: ut_merge_flag_row + i, c: title_merge_flag_col + k})] = blank_cell
+                            }
+                        }
+                        bc_counter = 0;
+                        continue;
+                    }
+                    if(sorted_columns[item][0] === 'item') XLSX.utils.sheet_add_aoa(ws, [[data[i][sorted_columns[item][0]].code]], {origin: {r: ut_merge_flag_row + i+1,c: title_merge_flag_col}});
+                    if (!data[i][sorted_columns[item][0]] && sorted_columns[item][0] !== 'item') ws[XLSX.utils.encode_cell({r: ut_merge_flag_row + i+1,c: title_merge_flag_col})] = blank_cell;
+                    else if (data[i][sorted_columns[item][0]] !== null && sorted_columns[item][0] !== 'item') XLSX.utils.sheet_add_aoa(ws, [[data[i][sorted_columns[item][0]]]], {origin: {r: ut_merge_flag_row + i+1,c: title_merge_flag_col}});
+
+                    if(ut_merge_flag_col === 0) title_merge_flag_col = 0;
+                    merge.push({ s: { r: ut_merge_flag_row + i, c: title_merge_flag_col}, e: {r: ut_merge_flag_row + i, c: ut_merge_flag_col} },);
+                    if(bc_counter !== 0){
+                        for(let k = 1; k <= bc_counter; k++){
+                            ws[XLSX.utils.encode_cell({r: ut_merge_flag_row + i, c: title_merge_flag_col + k})] = blank_cell
+                        }
+                    }
+                    bc_counter = 0;
+                }
+            }
+            merge.push({ s: { r: 11, c: 0}, e: {r: 12, c: title_merge_flag_col} },)
+        })
+        ws["!merges"] = merge;
+        setTimeout(function (){
+            for (let i in ws) {
+                let cell = XLSX.utils.decode_cell(i);
+                if ((cell.c === 0 && (4 <= cell.r && cell.r <= 9)) || (cell.c === 5 && (4 <= cell.r && cell.r <= 9))) {
+                    ws[i].s = { // background color
+                        font: {
+                            name: "맑은 고딕",
+                            sz: "10",
+                        },
+                        alignment: {
+                            vertical: "center",
+                            horizontal: "center",
+                        },
+                        fill: {
+                            patternType: "solid",
+                            bgColor: {rgb: "E4DFEC"},
+                            fgColor: {rgb: "E4DFEC"}
+                        },
+                        border: {
+                            right: {style: "thin"},
+                            left: {style: "thin"},
+                            top: {style: "thin"},
+                            bottom: {style: "thin"},
+                        }
+                    };
+                }
+                else if (cell.r === 13 && (0 <= cell.c && cell.c <= title_merge_flag_col)){
+                    ws[i].s = { // background color
+                        font: {
+                            name: "맑은 고딕",
+                            sz: "10",
+                        },
+                        alignment: {
+                            vertical: "center",
+                            horizontal: "center",
+                        },
+                        fill: {
+                            patternType: "solid",
+                            bgColor: {rgb: "DCE6F1"},
+                            fgColor: {rgb: "DCE6F1"}
+                        },
+                        border: {
+                            right: {style: "thin"},
+                            left: {style: "thin"},
+                            top: {style: "thin"},
+                            bottom: {style: "thin"},
+                        }
+                    };
+                }
+                else if ((14 <= cell.r && cell.r <= ut_style_flag_row) && (0 <= cell.c && cell.c <= ut_merge_flag_col)){
+                    ws[i].s = {
+                        font: {
+                            name: "맑은 고딕",
+                            sz: "9",
+                        },
+                        alignment: {
+                            vertical: "center",
+                            horizontal: "center",
+                        },
+                        border: {
+                            right: {style: "thin"},
+                            left: {style: "thin"},
+                            top: {style: "thin"},
+                            bottom: {style: "thin"},
+                        }
+                    };
+                }
+                else{
+                    ws[i].s = { // styling for all cells
+                        font: {
+                            name: "맑은 고딕",
+                            sz: "10",
+                        },
+                        alignment: {
+                            vertical: "center",
+                            horizontal: "center",
+                        },
+                        border: {
+                            right: {style: "thin"},
+                            left: {style: "thin"},
+                            top: {style: "thin"},
+                            bottom: {style: "thin"},
+                        }
+                    };
+                }
+            }
+            ws["C1"].s = {
+                font: {
+                    name: "맑은 고딕",
+                    sz: "20",
+                    bold: true,
+                },
+                alignment: {
+                    vertical: "center",
+                    horizontal: "center",
+                },
+            };
+
+            ws["A12"].s = {
+                font: {
+                    name: "맑은 고딕",
+                    sz: "12",
+                    bold: true,
+                },
+                alignment: {
+                    vertical: "center",
+                    horizontal: "center",
+                },
+            };
+            wb.SheetNames.push('test'); // create new worksheet
+            wb.Sheets['test'] = ws; // set workseet data to the cell data
+            var wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'binary' }); //workbook output
+            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), filename + ".xlsx") // save workbook
+        }, 3000)
+    }
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}
+    <script>
+        $.ajaxSetup({
+            headers: {"X-CSRFToken": '{{csrf_token}}'}
+        });
+    </script>
+</header>
+{#내 정보 관리#}
+
+<!-- 내용 -->
+<body>
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+
+                        <div class="col-md-12 mt-2 mb-2">
+                            <ul class="notification-area pull-right">
+                                <li class="refresh" id="page_refresh"><i class="fa fa-refresh"></i></li>
+                                <li class="settings-btn">
+                                <i class="ti-settings"></i>
+                                </li>
+                            </ul>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+                <div class="col-sm-12">
+                    <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="my_info_data_table" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in column %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="my_info_tbody">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#my_info_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="my_info_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="my_info_form">
+                            <div class="form-row">
+                                {% for item in column %}
+                                    {% if item.edit_flag %}
+                                        {% if item.tag == "input" %}
+                                    <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="text" class="{{ item.class_name|safe }}"
+                                           name="{{ item.label_en|safe }}"
+                                           autocomplete="off"
+                                            {% if item.attr != None %} {{ item.attr|safe }} {% endif %}
+                                            {% if item.event != None %} {{ item.event|safe }} {% endif %}/>
+                                     </div>
+                                        {% elif item.tag == "btn" %}
+                                            <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="button" class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" onclick="{{ item.event|safe }}" {{ item.attr }}/>
+                                     </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+                                {% endfor %}
+                            <div class="col-md-6 mb-3">
+                                <label>날인</label>
+                            <input type="file" id="file-selector" class="fs-selector" style="line-height: 24px;"
+                                       accept="image/*" onchange='chk_file_type(this)'>
+                                {% comment %}<input class="form-control form-control-sm fs-delete" style="width: 48%;" id="filename" readonly>
+
+                                <button type="button" id="file-delete" class="btn fs-delete"
+                                        style="width: 48%; float:right;">파일 삭제
+                                </button>{% endcomment %}
+                            </div>
+
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                        {% for item in column %}
+                            {% if item.tag == "button" %}
+                                <div class="{{ item.class_name|safe }}" onclick="{{ item.event|safe }}">{{ item.label }}</div>
+                            {% endif %}
+                        {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+
+<script>
+    let maintable = null;
+
+    let re_column = []
+
+    let re_invisual_col = []
+
+    let re_name = []
+
+    let hidden_name = []
+
+    let list_id = null;
+
+
+    {% for item in column %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            re_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+
+    $('#post_code').on("click", function () {
+        addrPostCodeFinder(
+            document.querySelector('#post_code'),
+            document.querySelector('#address'),
+        );
+    });
+
+    $(function () {
+        let file_idx = re_column.indexOf("file");
+        main_table = $('#my_info_data_table').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                    {
+                        targets: [0],
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
+                        targets: [file_idx],
+                        render: function (data, type, row, meta) {
+                            let result = "";
+                            if(data.length > 0){
+                                result =  "<a href='" + nullapply(data) +
+                    "' onclick=\"writeLog(this.href); window.open(this.href, '_blank', 'width=800, height=600'); return false;\" download>" +
+                    "<img src='../../../static/img/pdf_icon.png' width='20' height='20'></a>"
+                            }
+
+                            return result;
+                        }
+                    },
+                    {
+                        "targets": "_all",
+                        "className": "ellipsis"
+                    }
+                ],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+                        // 클릭 로우 색상
+                        setRowColor(this, 'M');
+                        // 데이터 셋팅
+                        setInput_api(data,re_column, re_name, hidden_name);
+
+
+                        //material_import_id_idx = data[data.length-1];
+                        //console.log(data);
+                    });
+                }
+        });
+        refresh();
+    });
+
+
+    function refresh() {
+
+        my_info_load_table_add();
+
+    }
+
+
+    {% comment %}function my_info_load_table() {
+        let query = "?page_size=1";
+
+        api_gp('/basic_information/my_info_read/' + query, 'GET', {}, (done) => {
+            my_info_draw_table(done);
+        });
+    }{% endcomment %}
+
+
+    function my_info_load_table_add() {
+        api_gp("/myinfo/", "GET", {}, (done) => {
+            my_info_draw_table(done);
+
+        });
+    }
+
+    function my_info_draw_table(done) {
+
+        //console.table(done);
+
+        let data = done.results;
+        main_table.rows().remove().draw();
+        main_table.rows.add(formatDataArray(data, re_column)).draw();
+
+    }
+
+    function writeLog(_file) {
+        let userinfo = get_userinfo();
+        let file = decodeURI(_file);
+        let user = userinfo["name"];
+        let enterprise = userinfo["enterprise_name"];
+
+        $.ajax({
+            url: "/write_log/",
+            type: "POST",
+            dataType: "json",
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}', 'user': user, 'enterprise': enterprise, 'file': file,
+            },
+            success: function (data) {
+                // alert(data.message);
+                location.reload();
+            },
+            error: function (data) {
+                // alert(data.message);
+            },
+        });
+    }
+
+
+    function my_info_add() {
+        let formData =$('#my_info_form').serializeArray();
+
+        formData.push({name:'csrfmiddlewaretoken', value: '{{ csrf_token }}'});
+
+        let fileSelector = document.getElementById('file-selector');
+        let file = fileSelector.files[0];
+        formData.push({name:'fileChange', value: false});
+
+        if (file === null || file === undefined) file = '';
+        formData.push({name:'file', value: file});
+
+        fileSelector.value = '';
+
+        let form = new FormData();
+
+        formData.forEach(item => {
+            if (!form.has(item.name)) {
+                form.append(item.name, item.value);
+            }
+        });
+
+
+        api_gp_file("/basic_information/my_info_create/", "POST", form, (done) => {
+            console.log(done);
+            refresh_data();
+
+            alert("추가하였습니다.");
+            my_info_load_table();
+        });
+    }
+
+
+    function modify() {
+        if (my_info_id == null) {
+            alert("데이터를 먼저 선택하십시오.");
+            return;
+        } else {
+            let data = get_data();
+
+            if (data == null) {
+                return;
+            }
+
+            api_gp_file("/basic_information/my_info_update/", "POST", data, (done) => {
+
+                //my_info_id = done.id;
+                my_info_company_name = done.company_name;
+
+                alert("수정 완료.");
+                my_info_load_table();
+            });
+        }
+    }
+
+
+    function remove() {
+        if (my_info_id == null) {
+            alert("삭제할 리스트를 선택해 주세요.");
+            return;
+        }
+
+        let allData = {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            pk: my_info_id,
+        }
+
+        api_gp("/basic_information/my_info_delete/", "post", allData, (done_callback) => {
+            alert("삭제하였습니다.");
+            //nation1.page = 1;
+
+            my_info_load_table();
+        });
+    }
+
+    function refresh_data() {
+
+        $('#my_info_form input').val('');
+
+        $('#my_info_form select').val(null).trigger('change');
+
+
+        $('#my_info_tbody').find('tr').siblings().css('background-color', '');
+    }
+
+
+    function chk_file_type(obj) {
+
+        let file_kind = obj.value.lastIndexOf('.');
+        let file_name = obj.value.substring(file_kind + 1, obj.length);
+        let file_type = file_name.toLowerCase();
+
+        let check_file_type = new Array();
+        check_file_type = ['png', 'PNG', 'jpg', 'jpeg', 'svg', 'bmp', 'pdf',];
+
+        if (check_file_type.indexOf(file_type) == -1) {
+            alert('이미지 파일만 선택할 수 있습니다.');
+
+            $("#file-selector").val("");
+
+            return false;
+        } else {
+            let ret = fileCheck(obj);
+            return ret;
+        }
+    }
+
+    function fileCheck(file) {
+        alert("배경을 제거한 이미지를 등록 해 주시기 바랍니다.");
+        // 사이즈체크
+        var maxSize = 1 * 1024 * 1024 //1MB
+        var fileSize = 0;
+
+        fileSize = file.files[0].size;
+        if (fileSize > maxSize) {
+            alert("파일 사이즈는 1MB 이내로 등록 가능합니다.");
+            return false;
+        }
+        return true;
+    }
+
+    function api_myinfo_post(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/myinfo/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+    function api_myinfo_patch(id, allData, done_callback) {
+        $.ajax({
+            type: "PATCH",
+            url: "/myinfo/" + id + "/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function (json) {
+                done_callback(json);
+            })
+            .fail(handle_error);
+    }
+
+    // 바꾸기 전...
+
+</script>

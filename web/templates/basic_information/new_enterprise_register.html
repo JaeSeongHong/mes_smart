@@ -1,0 +1,388 @@
+<!DOCTYPE HTML>
+<html>
+<header>
+    {% include "header.html" %}
+
+</header>
+<body>
+
+{% load static %}
+
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label class="col-form-label">기업코드</label>
+                                        <div class="content-input-group-input">
+                                        <input type="text"
+                                            class="form-control form-control-sm"
+                                            id="enter_code"
+                                            autocomplete="off"
+                                        />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">기업명</label>
+                                        <div class="content-input-group-input">
+                                         <input type="text"
+                                            class="form-control form-control-sm"
+                                            id="enter_name"
+                                            autocomplete="off"
+                                        />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">관리명</label>
+                                        <div class="content-input-group-input">
+                                         <input type="text"
+                                            class="form-control form-control-sm"
+                                            id="enter_manage"
+                                            autocomplete="off"
+                                        />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="refresh" id="page_refresh"><i class="fa fa-refresh"></i></li>
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+
+            <div class="row no-gutters ml-4 mr-4">
+                <div class="col-lg-12 col-ml-12">
+                    <div class="card">
+                        <div class="card-body">
+
+                            {% comment %}<table id="enter_data_table" class="table table-hover table-striped table-bordered table-responsive display nowrap" style="width: 100%;">{% endcomment %}
+                        <table id="enter_data_table" class="table table-hover table-striped table-bordered display nowrap">
+                                <thead>
+                                    <tr>
+                                        {% for item in column %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="enter_tbody"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#enter_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="enter_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="enter_main_form">
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3">
+                                    <label><strong>*</strong>기업유형</label>
+                                    <select class="form-control form-control-sm" name="com_type" disabled>
+                                        <option value="C">고객사</option>
+                                        <option value="S">공급사</option>
+                                        <option value="M">소상인</option>
+                                        <option value="I">운영기관</option>
+                                        <option value="" selected>선택해주세요</option>
+                                    </select>
+                                </div>
+                                {% for item in column %}
+                                    {% if item.edit_flag %}
+
+
+                                        {% if item.tag == "input" %}
+                                    <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type={% if item.type == 'password' %} {{ item.type|safe }} {% else %} text {% endif %}
+                                           class="{{ item.class_name|safe }}"
+                                           name="{{ item.label_en|safe }}"
+                                           autocomplete="off"
+                                            {% if item.attr != None %} {{ item.attr|safe }} {% endif %}
+                                            {% if item.event != None %} {{ item.event|safe }} {% endif %}/>
+                                     </div>
+                                        {% elif item.tag == "btn" %}
+                                            <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="button" class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" onclick="{{ item.event|safe }}" {{ item.attr }}/>
+                                     </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                        {% for item in column %}
+                            {% if item.tag == "button" %}
+                                <div class="{{ item.class_name|safe }}" onclick="{{ item.event|safe }}">{{ item.label }}</div>
+                            {% endif %}
+                        {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+<script>
+   let main_table = null;
+    let re_column = []
+    let re_invisual_col = []
+    let re_name = []
+    let hidden_name = []
+    let enterprise_register_idx = null;
+    let enterprise_register_name = null;
+
+    {% for item in column %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            re_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+    {% endfor %}
+            re_column.push("id")
+
+    $(function () {
+
+        let name_idx = re_column.indexOf('name');
+        let com_type_idx = re_column.indexOf('com_type');
+        main_table = $('#enter_data_table').DataTable(
+            {
+                "columnDefs": [
+                    {
+                        targets: 0,
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },{
+                        targets: [com_type_idx],
+                        render: function (data, type, row, meta) {
+                            let obj = null;
+                            switch (data){
+                                case "I":
+                                    obj = "운영기관"
+                                    break;
+                                case "C":
+                                    obj = "고객사"
+                                    break;
+                                case "O":
+                                    obj = "운영사"
+                                    break;
+                                case "S":
+                                    obj = "공급사"
+                                    break;
+                                default:
+                                    obj = "본사"
+                                    break;
+                            }
+
+                            return obj
+                        }
+                    }
+                ],
+                "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+                        setRowColor(this, 'M');
+                        setInput_api(data,re_column, re_name, hidden_name);
+                        $("#enter_main_form input[name='code']").attr('readonly', 'readonly');
+                        $("#enter_main_form input[name='name']").attr('readonly', 'readonly');
+                        $("#enter_main_form input[name='user_id']").attr('readonly', 'readonly');
+                        $('#enter_main_form select').attr('disabled', 'disabled');
+
+                        enterprise_register_idx = data[data.length-1];
+                        enterprise_register_name = data[name_idx];
+
+                    });
+                }
+
+            }
+        );
+
+        search();
+    });
+
+    function search(){
+        let query = "";
+
+        api_gp('/basic_information/enterprises_read/' + query, 'GET', {}, (done) => {
+
+            table_list_draw(done);
+        });
+    }
+
+    function table_list_draw(done){
+        let data = done.results;
+        console.log(data);
+        console.log(re_column);
+        main_table.rows().remove().draw();
+        main_table.rows.add(formatDataArray(data, re_column)).draw();
+    }
+
+    function refresh_data() {
+        $('#enter_main_form input').val('');
+        $('#enter_main_form input').removeAttr('readonly');
+        $('#enter_main_form select').removeAttr('disabled');
+
+        $('#enter_tbody').find('tr').siblings().css('background-color', '');
+    }
+
+
+
+    // add action
+    function enter_add() {
+        let formData =$('#enter_main_form').serializeArray();
+        formData.push({name:'csrfmiddlewaretoken', value: '{{ csrf_token }}'});
+
+        let data = {};
+
+        {% comment %}formData.forEach(item => {
+            data[item.name] = item.value;
+           });{% endcomment %}
+
+        for (const item of formData) {
+
+           if(item.value == '' || item.value.length == 0){
+               if(item.name === 'manage' || item.name === 'username'){
+
+                   }else{
+                    alert(item.name + " : 필수 입력값입니다.");
+                   break;
+               }
+
+           }
+
+           data[item.name] = item.value;
+
+        };
+
+
+        api_gp('/basic_information/enterprises_create/', 'POST', data, (done) => {
+            console.log(done)
+
+            alert('성공적으로 등록하였습니다.');
+            location.reload();
+        });
+
+        return false;
+    }
+
+    function enter_edit() {
+        if (enterprise_register_idx == null) {
+            alert("데이터를 먼저 선택하십시오.");
+            return;
+
+        } else {
+            let formData =$('#enter_main_form').serializeArray();
+            formData.push({name:'csrfmiddlewaretoken', value: '{{ csrf_token }}'});
+            formData.push({name:'pk', value: enterprise_register_idx});
+
+            let data = {};
+
+            for (const item of formData) {
+
+               if(item.name==='pk' || item.name === 'manage' || item.name === 'username'||item.name==='password'||item.name==='csrfmiddlewaretoken'){
+                   if(item.name==='password'){
+                       if(item.value == '' || item.value.length == 0){
+
+                       }else{
+                           data[item.name] = item.value;
+                       }
+                   }else{
+                       data[item.name] = item.value;
+                   }
+               }
+            };
+
+
+            api_gp('/basic_information/enterprises_update/', 'POST', data, (done) => {
+                alert('수정 완료.');
+                location.reload();
+                enterprise_register_idx = null;
+            });
+        }
+    }
+
+    function enter_del() {
+        if (enterprise_register_idx == null) {
+            alert("데이터를 먼저 선택하십시오.");
+        } else {
+
+
+            let del = confirm(
+                "기업명 : " + enterprise_register_name + " 을 삭제하시겠습니까?"
+            );
+
+            let allData = {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                pk: enterprise_register_idx,
+            }
+
+            if (del) {
+                api_gp('/basic_information/enterprises_delete/', 'post', allData, (done_callback) => {
+                    alert("삭제하였습니다.");
+                    //nation1.page = 1;
+                    location.reload();
+                });
+            }
+        }
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div class="content-search row no-gutters align-items-center content-input-group">
+            {{ searchForm.media }}
+            <div class="content-title col-1 align-self-stretch">대상</div>
+            <form id="customer_search_form" class="col-11" method="get">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>발주 처리일<strong>*</strong></label>
+                        </div>
+                        <div class="input-group" id="customer_date_from">
+                            {{ searchForm.search_date }}
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>납품처 명<strong>*</strong></label>
+                        </div>
+                        <div class="input-group" id="customer_search">
+                            {{ searchForm.search_customer }}
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>제품명</label>
+                        </div>
+                        <div class="input-group" id="product_search">
+                            {{ searchForm.search_product }}
+                        </div>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-search rounded-0 w-100 h-100" type="submit">
+                            세팅
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    #myProgress {
+        width: 100%;
+        height: 10px;
+        background-color: #ddd;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+    }
+
+    #myBar {
+        width: 1%;
+        height: 10px;
+        background-color: #4CAF50;
+        transition: width 0.1s ease-in-out;
+    }
+</style>
+<!-- 발주서 불러오기 -->
+<div class="card m-2" id="load_xls" style="display: none">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form method="post" enctype="multipart/form-data" id="detail_customer" class="content-content w-100">
+            <!-- TODO: submit 시 validation 구현 -->
+            {% csrf_token %}
+            {{ form.media }}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">발주서 불러오기</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-6">
+                            <div class="content-input-group-input">
+                                <input id="input-excel" class="custom-file-input" type="file"
+                                       id='excelupload'>
+                                <label for="input-excel" class="custom-file-label"></label>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-6">
+                            <div class="content-input-group-header">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="input_remarks" id="id_input_remarks"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters w-100 mt-3 justify-content-end">
+                    <p class="pr-2 m-0">* 발주서 불러오기를 통해 생성된 내역은 기준(일자/제품명/납품처)당 1개만 유지 됩니다.</p>
+                    <div class="col-1 px-0">
+                        <button class="btn button-custom2 w-100 add" style="background-image: linear-gradient(#aaffaa, #c6d3e1);" type="button" onclick="loadFile();">
+                            발주서 불러오기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div id="myProgress" style="display: none">
+            <div id="myBar"></div>
+        </div>
+    </div>
+</div>
+
+<div class="card m-2" id="history_form" style="display: none">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form method="post" enctype="multipart/form-data" id="detail_customer" class="content-content w-100">
+            <!-- TODO: submit 시 validation 구현 -->
+            {% csrf_token %}
+            {{ form.media }}
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">내용</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>발주 처리일</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.date }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제품명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.product_name }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>납품처 명</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.customer_name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-12">
+                            <div class="content-input-group-header">
+                                <label>성분</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.ingredient }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>포장 단위</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.unit_package }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.unit }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>총 수량</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" name="total" id="id_total" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>제조일자</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.date_manufacture }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>유통기한</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.date_expiration }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>품목보고번호</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.product_number }}
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>비고</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                {{ form.remarks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters w-100 mt-3 justify-content-end">
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100" type="button" onclick="refresh();">
+                            초기화
+                        </button>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100 add" type="submit">
+                            {{ method }}
+                        </button>
+                    </div>
+                    <div class="col-1 px-0 mr-2">
+                        <button class="btn button-custom2 w-100" type="button" onclick="remove();">
+                            삭제
+                        </button>
+                    </div>
+                    <div class="col-1 px-0">
+                        <button class="btn button-custom2 w-100" style="background-image: linear-gradient(#ffffaa, #c6d3e1);" type="button" onclick="LabelPrint_All();">
+                            전체내역 출력
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2" id="history_table" style="display: none">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: hidden; height:640px;">
+            <table id="customer_data-table" class="table table-sm text-center" style="min-width: 1300px">
+                <thead>
+                <tr>
+                    <th style="width: 1%">순번</th>
+                    <th>발주 처리일</th>
+                    <th>제품명</th>
+                    <th>납품처</th>
+                    <th style="width: 1%">급식구분</th>
+                    <th>납품 예정일</th>
+                    <th>성분</th>
+                    <th>규격</th>
+                    <th style="width: 1%">포장 단위</th>
+                    <th>수량</th>
+                    <th>총량</th>
+                    <th>제조일자</th>
+                    <th>유통기한</th>
+                    <th>품목보고번호</th>
+                    <th>비고</th>
+                </tr>
+                </thead>
+                <tbody id="customer_tbody"></tbody>
+                {% load mathfilters %}
+                {% for row in queryset %}
+                <tr onclick="location.href='/ordering/label_print/{{ row.id }}?page=1&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}'" style="cursor: pointer;">
+                    <td>{{ page | sub:1 | mul:20 | add:forloop.counter }}</td>
+                    <td>{{ row.date | default:'-' }}</td>
+                    {% if row.product_name %}
+                        <td>{{ row.product_name | default:'' }}</td>
+                    {% else %}
+                        <td style="background-color: #ffeeee">-</td>
+                    {% endif %}
+
+                    {% if row.customer_name %}
+                        <td>{{ row.customer_name | default:'' }}</td>
+                    {% else %}
+                        <td style="background-color: #ffeeee">-</td>
+                    {% endif %}
+                    <td>{{ row.meal_type | default:'' }}</td>
+                    <td>{{ row.delivery_date | default:'-' }}</td>
+
+                    <td>{{ row.ingredient | slice:20 }}...</td>
+                    <td>{{ row.standard | default:'-' }}</td>
+                    <td class="text-right pr-3">{{ row.unit_package | floatformat }}kg</td>
+                    <td class="text-right pr-3">{{ row.unit | floatformat }}</td>
+                    <td class="text-right pr-3">{{ row.unit | mul:row.unit_package | floatformat }}kg</td>
+                    <td>{{ row.date_manufacture | default:'' }}</td>
+                    <td>{{ row.date_expiration | default:'' }}</td>
+                    <td>{{ row.product_number | default:'' }}</td>
+                    <td>{{ row.remarks | default:'' }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <script src="/static/js/sb-admin-2.js"></script>
+    <div class="row no-gutters d-flex justify-content-center">
+        <ul class="pagination">
+            {% if queryset.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page=1&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}">&laquo;
+                        처음</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.previous_page_number }}&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}">이전</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">&laquo; 처음</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">이전</a>
+                </li>
+            {% endif %}
+
+            {% for page in page_range %}
+                <li class="page-item {% if queryset.number == page %}active{% endif %}">
+                    <a class="page-link"
+                       href="?page={{ page }}&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+
+            {% if queryset.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.next_page_number }}&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}">다음</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ queryset.paginator.num_pages }}&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}">마지막
+                        &raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">다음</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#">마지막 &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <label class="mb-0"
+        >(<strong id="customer_table_row">{{ count }}</strong>) 건 로딩</label
+        >
+    </div>
+</div>
+<script
+        src="{% static 'js/api_customer.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_codemaster.js' %}"
+        type="text/javascript"
+></script>
+<script>
+    $(document).ready(function () {
+        //This block is called when user will check on 'from' fields in past Employment blocks
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd',
+            // common configurations
+            autoclose: true,
+            language: 'ko',
+        });
+
+        if (!$('#id_search_date').val()) {
+            $('#id_search_date').datepicker('setDate', new Date());
+        }
+
+
+        if ('{{ search_customer }}') {
+            let option = new Option('{{search_customer_name}}', '{{search_customer}}', true, true);
+            $('#id_search_customer').append(option);
+        }
+        if ('{{ search_customer }}') {
+            $('#load_xls').css('display', '');
+            $('#history_form').css('display', '');
+            $('#history_table').css('display', '');
+        }
+
+        $(".custom-file-input").change(function (event) {
+            $(".custom-file-label").html(event.target.files[0].name);
+        });
+
+        // 팩키지
+        $("#id_unit_package").change(function () {
+            // 일자 계산
+            CalTotal();
+        });
+        // 수량
+        $("#id_unit").change(function () {
+            // 일자 계산
+            CalTotal();
+        });
+        // 최초1회
+        CalTotal();
+    });
+    // 일자 계산
+    function CalTotal () {
+        let unit_package = $("#id_unit_package").val();
+        let unit = $("#id_unit").val();
+
+        try {
+            let total = (parseInt(unit_package) * parseInt(unit));
+            if (!isNaN(total))
+                $("#id_total").val( total.toString() + 'kg' );
+            else
+                $("#id_total").val('');
+        }
+        catch (e) {
+            $("#id_total").val('');
+        }
+
+    }
+
+    function loadFile() {
+        let form = $("#modal-excel-form")[0];
+        let formData = new FormData(form);
+        formData.append("file", $("#input-excel")[0].files[0]);
+        formData.append("date", $("#id_search_date").val());
+        formData.append("customer", $("#id_search_customer").val());
+        formData.append("product", $("#id_search_product").val());
+        formData.append("remarks", $("#id_input_remarks").val());
+        formData.append("enterprise_name", '{{ request.COOKIES.enterprise_name }}');
+        formData.append("username", '{{ request.COOKIES.username }}');
+
+        progressOnly();
+
+        $.ajax({
+            url: "/ordering/label_print/excelupload/",
+            processData: false,
+            contentType: false,
+            type: "POST",
+            headers: {"X-CSRFToken": '{{ csrf_token }}'},
+            data: formData,
+            success: function (data) {
+                alert(data.message);
+                location.reload();
+                // $("#modal-excel").modal('hide');
+            },
+            error: function (data) {
+                console.log(data);
+                alert(data.statusText);
+                location.reload();
+            },
+        });
+    }
+
+    function refresh() {
+        location.href='/ordering/label_print/?page=1&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}';
+    }
+    function remove() {
+        {% if itemId %}
+            location.href ='/ordering/label_print_delete/{{ itemId }}?page=1&search_date={{ search_date }}&search_product={{ search_product }}&search_customer={{ search_customer }}&search_customer_name={{ search_customer_name }}'
+        {% endif %}
+    }
+    function LabelPrint_All() {
+        let formData = new FormData();
+        formData.append("date", $("#id_search_date").val());
+        formData.append("customer", $("#id_search_customer").val());
+        formData.append("product", $("#id_search_product").val());
+        formData.append("enterprise_name", '{{ request.COOKIES.enterprise_name }}');
+        formData.append("username", '{{ request.COOKIES.username }}');
+
+        progressOnly();
+
+        $.ajax({
+            url: "/ordering/label_print/labelprint_all/",
+            processData: false,
+            contentType: false,
+            type: "POST",
+            headers: {"X-CSRFToken": '{{ csrf_token }}'},
+            data: formData,
+            success: function (data) {
+                location.href = "/data/xlsForm/" + data.filename;
+                $("#myProgress").css("display", "none");
+            },
+            error: function (data) {
+                console.log(data);
+                alert(data.statusText);
+                location.reload();
+            },
+        });
+    }
+
+    // progress
+    var i = 0;
+    var lastInterval = null;
+
+    function move() {
+        if (i == 0) {
+            i = 1;
+            var elem = document.getElementById("myBar");
+            var width = 1;
+            var id = setInterval(frame, 40);
+            lastInterval = id;
+
+            function frame() {
+                if (width >= 100) {
+                    clearInterval(id);
+                    lastInterval = null;
+                    i = 0;
+                } else {
+                    width++;
+                    elem.style.width = width + "%";
+                }
+            }
+        }
+    }
+    function progress() {
+        $("#myProgress").css("display", "inline");
+        if (lastInterval) {
+            clearInterval(lastInterval);
+            lastInterval = null;
+        }
+        i = 0;
+        $("#myBar").css("width", "1%");
+        move();
+
+        // 폼 서밋
+        document.getElementById("main").submit();
+    }
+
+    function progressOnly() {
+        $("#myProgress").css("display", "inline");
+        if (lastInterval) {
+            clearInterval(lastInterval);
+            lastInterval = null;
+        }
+        i = 0;
+        $("#myBar").css("width", "1%");
+        move();
+    }
+    $(window).on("load", function () {
+        // 애러 메시지가 있으면 에러 표시
+        var error = '{{error}}'
+        console.log(error);
+        if (error) {
+            alert(error)
+        }
+    });
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+
+
+<body style="overflow: hidden;">
+
+{% load static %}
+
+<div class="card m-2">
+    <div class="card-body p-2">
+       <i class="bi bi-exclamation-triangle"></i> IM ERP API 연동 테스트 페이지
+    </div>
+</div>
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="col-lg-6 mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="header-title">Outline buttons</h4>
+                            <button type="button" class="btn btn-outline-primary mb-3" id="alive-check">alive-check</button>
+                            <button type="button" class="btn btn-outline-secondary mb-3" id="Company-sales">Company-sales</button>
+                            <button type="button" class="btn btn-outline-success mb-3" id="off-work">off-work</button>
+                            <button type="button" class="btn btn-outline-danger mb-3" id="Driver-sales">Driver-sales</button>
+                            <button type="button" class="btn btn-outline-warning mb-3" id="Income">Income</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card m-2">
+    <div class="d-none row" id="chart">
+                    <div class="col-lg-6 mt-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="ambarchart1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mt-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="ambarchart2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mt-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="ambarchart3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mt-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="ambarchart4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mt-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="ambarchart5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mt-5">
+                        <div class="card">
+                            <div class="card-body">
+                                <div id="ambarchart6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+</div>
+
+</body>
+<!-- start chart js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <!-- start highcharts js -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <!-- start zingchart js -->
+    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <script>
+    zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
+    ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "ee6b7db5b51705a13dc2339db3edaf6d"];
+    </script>
+    <!-- start amchart js -->
+    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+    <!-- all line chart activation -->
+<script src="{% static 'srtdash/assets/js/line-chart.js' %}"></script>
+    {% comment %}<script src="assets/js/line-chart.js"></script>{% endcomment %}
+    <!-- all bar chart activation -->
+<script src="{% static 'srtdash/assets/js/bar-chart.js' %}"></script>
+    {% comment %}<script src="assets/js/bar-chart.js"></script>{% endcomment %}
+    <!-- all pie chart -->
+<script src="{% static 'srtdash/assets/js/pie-chart.js' %}"></script>
+    {% comment %}<script src="assets/js/pie-chart.js"></script>{% endcomment %}
+    <!-- others plugins -->
+<script src="{% static 'srtdash/assets/js/plugins.js' %}"></script>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}"></script>
+    {% comment %}<script src="assets/js/plugins.js"></script>
+    <script src="assets/js/scripts.js"></script>{% endcomment %}
+<script>
+
+    $(document).ready(function() {
+    $("#alive-check").click(function() {
+         api_gp('/getAlivecheck/', 'GET', {}, (data) => {
+            alert(data.results);
+            {% comment %}console.table(data){% endcomment %}
+        });
+    });
+
+    $("#Income").click(function() {
+
+        {% comment %}navigator.getUserMedia = ( navigator.getUserMedia ||
+                       navigator.webkitGetUserMedia ||
+                       navigator.mozGetUserMedia ||
+                       navigator.msGetUserMedia);
+
+        if (navigator.getUserMedia) {
+               navigator.getUserMedia (
+                  {audio: true},
+                  function(stream) {
+                     // 마이크 입력 스트림을 처리하는 코드
+                  },
+                  function(err) {
+                     console.log("The following error occurred: " + err.name);
+                  }
+               );
+            } else {
+               console.log("getUserMedia not supported");
+            }{% endcomment %}
+
+        let audioContext = new AudioContext();
+        let mediaStreamSource = null;
+
+        navigator.getUserMedia({audio:true}, function(stream) {
+            mediaStreamSource = audioContext.createMediaStreamSource(stream);
+            alert("mediaStreamSource   : " + mediaStreamSource);
+            // 스트림을 처리하는 코드 작성
+        }, function(error) {
+            console.log("Error getting audio");
+        });
+
+
+        {% comment %}api_gp('/recognize/', 'GET', {}, (data) => {
+             console.log(data.results)
+             alert(data.results)
+             if(data.results.length > 0){
+                 $('#chart').removeClass('d-none row').addClass('row');
+             }
+
+        });{% endcomment %}
+    });
+
+});
+
+</script>
+</html>

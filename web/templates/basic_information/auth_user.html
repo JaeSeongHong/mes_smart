@@ -1,0 +1,3636 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+{% load static %}
+
+<!-- spinner -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<div class="row no-gutters" id="root">
+    <div class="col-7">
+        <!-- 사용자 -->
+        <h5 class="m-2"><strong>사용자</strong></h5>
+        <div class="card m-2">
+            <div class="card-body p-2">
+                <!-- 본문 -->
+                <form class="content-search row no-gutters content-input-group">
+                    <div class="content-title col-1 align-self-stretch">검색</div>
+                    <div class="content-input-group col-3 px-0">
+                        <div
+                                class="content-input-group-header"
+                                {#                  style="flex: 0 0 50%; max-width: 50%"#}
+                        >
+                            <label>사번</label>
+                        </div>
+
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control auth_user-dropdown"
+                                    name="code"
+                                    id="auth_user_search_code"
+                            ></select>
+                        </div>
+                        {#                <div#}
+                        {#                  class="content-input-group-input"#}
+                        {#                  style="flex: 0 0 50%; max-width: 50%"#}
+                        {#                >#}
+                        {#                  <input class="form-control" id="auth_user_search_code" />#}
+                        {#                </div>#}
+                    </div>
+                    <div class="content-input-group col-4 px-0">
+                        <div
+                                class="content-input-group-header"
+                                {#                  style="flex: 0 0 50%; max-width: 50%"#}
+                        >
+                            <label>사용자명</label>
+                        </div>
+
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control auth_username-dropdown"
+                                    name="username"
+                                    id="auth_user_search_name"
+                            ></select>
+                        </div>
+                        {#                <div#}
+                        {#                  class="content-input-group-input"#}
+                        {#                  style="flex: 0 0 50%; max-width: 50%"#}
+                        {#                >#}
+                        {#                  <input class="form-control" id="auth_user_search_name" />#}
+                        {#                </div>#}
+                    </div>
+                    <div class="col-1 px-0">
+                        <button
+                                type="button"
+                                id="auth_user_search"
+                                class="btn button-search rounded-0 w-100 h-100"
+                        >
+                            조회
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card m-2">
+            <div class="card-body p-2">
+                <!-- 본문 -->
+                <div class="row no-gutters">
+                    <div class="content-input-group col-4 d-flex px-0">
+                        <div
+                                class="content-input-group-header"
+                                style="flex: 0 0 50%; max-width: 50%"
+                        >
+                            <label>사번</label>
+                        </div>
+                        <div
+                                class="content-input-group-input"
+                                style="flex: 0 0 50%; max-width: 50%"
+                        >
+                            <input class="form-control" id="auth_user_code" disabled/>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-4 d-flex px-0">
+                        <div
+                                class="content-input-group-header"
+                                style="flex: 0 0 50%; max-width: 50%"
+                        >
+                            <label>사용자명</label>
+                        </div>
+                        <div
+                                class="content-input-group-input col-8"
+                                style="flex: 0 0 100%; max-width: 100%"
+                        >
+                            <input class="form-control" id="auth_user_name" disabled/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters">
+                    <!-- insert your code here start -->
+                    <div class="card col-12 mt-2">
+                        <div class="card-body p-2" id="selected-menu">
+                            <div
+                                    class="accordion col-12 h-100"
+                                    id="select-accordionExample"
+                            >
+                                <!-- 의뢰서관리 left -->
+                                <div class="collapsed bg-white" id="select-headingFifteen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="의뢰서관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseFifteen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseFifteen"
+                                        >
+                                            의뢰서관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseFifteen"
+                                        class="collapse"
+                                        aria-labelledby="headingFifteen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="의뢰서작성"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            의뢰서작성
+                                        </div>
+
+                                        <div
+                                                id="의뢰서조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            의뢰서조회
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 견적서관리 left -->
+                                <div class="collapsed bg-white" id="select-headingSixteen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="견적서관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseSixteen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseSixteen"
+                                        >
+                                            견적서관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseSixteen"
+                                        class="collapse"
+                                        aria-labelledby="headingSixteen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="견적서작성"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            견적서작성
+                                        </div>
+
+                                        <div
+                                                id="견적서조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            견적서조회
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- hjlim new-module -->
+                                <!-- 주문관리 left -->
+
+                                <div class="collapsed bg-white" id="select-headingTwelve">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="주문관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseTwelve"
+                                                aria-expanded="false"
+                                                aria-controls="collapseTwelve"
+                                        >
+                                            주문관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseTwelve"
+                                        class="collapse"
+                                        aria-labelledby="headingTwelve"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="주문서등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            주문서등록
+                                        </div>
+
+                                        <div
+                                                id="주문현황조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            주문현황조회
+                                        </div>
+
+                                        <div
+                                                id="주문량통계"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            주문량통계
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 발주관리 left -->
+                                <div class="collapsed bg-white" id="select-headingTen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="발주관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseTen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseTen"
+                                        >
+                                            발주관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseTen"
+                                        class="collapse"
+                                        aria-labelledby="headingTen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="발주등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            발주등록
+                                        </div>
+
+                                        <div
+                                                id="발주대비_입고등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            발주대비 입고등록
+                                        </div>
+
+                                        <div
+                                                id="발주대비_입고현황"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            발주대비 입고현황
+                                        </div>
+                                    </div>
+                                </div>
+                                {% comment %}
+                                <!-- 외주관리 left -->
+                                <div class="collapsed bg-white" id="select-headingNineteen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="외주관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseNineteen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseNineteen"
+                                        >
+                                            외주관리
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div
+                                        id="select-collapseNineteen"
+                                        class="collapse"
+                                        aria-labelledby="headingNineteen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="외주출고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            외주출고
+                                        </div>
+
+                                        <div
+                                                id="외주출고_입고등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            외주출고 입고등록
+                                        </div>
+
+                                        <div
+                                                id="외주제품_수불부"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            외주제품 수불부
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                <!-- BOM 관리 left -->
+                                <div class="collapsed bg-white" id="select-headingTwo">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="BOM_관리1"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseTwo"
+                                                aria-expanded="false"
+                                                aria-controls="collapseTwo"
+                                        >
+                                            BOM 관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseTwo"
+                                        class="collapse"
+                                        aria-labelledby="headingTwo"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="BOM_형식"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            BOM 형식
+                                        </div>
+
+                                        <div
+                                                id="BOM_관리2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            BOM 관리
+                                        </div>
+
+                                        <div
+                                                id="BOM_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            BOM 조회
+                                        </div>
+
+                                        <div
+                                                id="생산계획_대비_재고현황_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            생산계획 대비 재고현황 조회
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 재고관리 left -->
+                                <div class="collapsed bg-white" id="select-headingThree">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="재고관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseThree"
+                                                aria-expanded="false"
+                                                aria-controls="collapseThree"
+                                        >
+                                            재고관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseThree"
+                                        class="collapse"
+                                        aria-labelledby="headingThree"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="재고입고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            재고입고
+                                        </div>
+                                        <div
+                                                id="출고지시"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            출고 지시서
+                                        </div>
+                                        <div
+                                                id="지시대비출고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            출고지시대비 출고
+                                        </div>
+                                        <div
+                                                id="재고출고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            재고출고
+                                        </div>
+                                        <div
+                                                id="재고반입"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            재고반입
+                                        </div>
+                                        <div
+                                                id="재고현황"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            재고현황
+                                        </div>
+                                        <div
+                                                id="재고현황T"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            재고현황(TV)
+                                        </div>
+                                        <div
+                                                id="재고조정"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            재고조정
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 재고알림 관리  -->
+                                  <div class="collapsed bg-white" id="select-headingTwentyThree">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="재고알림"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseTwentyThree"
+                                                aria-expanded="false"
+                                                aria-controls="collapseTwentyThree"
+                                        >
+                                           재고알림
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseTwentyThree"
+                                        class="collapse"
+                                        aria-labelledby="headingTwentyThree"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="재고부족알림"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            재고부족알림
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <!-- 공정관리 left -->
+                                <div class="collapsed bg-white" id="select-headingFour">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="공정관리1"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseFour"
+                                                aria-expanded="false"
+                                                aria-controls="collapseFour"
+                                        >
+                                            생산관리
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div
+                                        id="select-collapseFour"
+                                        class="collapse"
+                                        aria-labelledby="headingFour"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="공정관리2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            공정명등록관리
+                                        </div>
+                                        <div
+                                                id="세부공정관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            생산일정등록 {#세부공정관리 > 세부공정관리#}
+                                        </div>
+                                        <div
+                                                id="공정진행현황_등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            생산진행현황등록
+                                        </div>
+
+                                        <div
+                                                id="공정진행현황_등록T"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            공정진행현황등록(tablet)
+                                        </div>
+
+                                        <div
+                                                id="공정진행현황_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            생산진행현황 조회
+                                        </div>
+
+                                        <div
+                                                id="공정진행현황_조회_tv"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            공정진행현황 조회 (TV)
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                {% comment %}
+                                <!-- 불량관리 left -->
+                                <div class="collapsed bg-white" id="select-headingEighteen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="불량관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseEighteen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseEighteen"
+                                        >
+                                            불량관리
+                                       </div>
+                                    </div>
+                                </div>
+
+                                <div
+                                        id="select-collapseEighteen"
+                                        class="collapse"
+                                        aria-labelledby="headingEighteen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="불량사유_등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            불량사유등록
+                                        </div>
+
+                                        <div
+                                                id="불량사유_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            불량사유조회
+                                        </div>
+
+                                        <div
+                                                id="불량그래프_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            불량그래프조회
+                                       </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                <!-- 출하관리 left -->
+                                <div class="collapsed bg-white" id="select-headingThirteen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="출하관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseThirteen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseThirteen"
+                                        >
+                                            출하관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseThirteen"
+                                        class="collapse"
+                                        aria-labelledby="headingThirteen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="출하등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            출하등록
+                                        </div>
+
+                                        <div
+                                                id="출하내역조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            출하내역조회
+                                        </div>
+                                    </div>
+                                </div>
+                                {% comment %}
+                                <!-- 원가관리 left -->
+                                <div class="collapsed bg-white" id="select-headingFourteen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="원가관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseFourteen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseFourteen"
+                                        >
+                                            원가관리
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                {% comment %}
+                                <div
+                                        id="select-collapseFourteen"
+                                        class="collapse"
+                                        aria-labelledby="headingFourteen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="제품별원가"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            제품별원가
+                                        </div>
+
+                                        <div
+                                                id="주문대비원가"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            주문대비원가
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 매입매출 관리 -->
+                                <div class="collapsed bg-white" id="select-headingTwentyTwo">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="매입매출"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseTwentyTwo"
+                                                aria-expanded="false"
+                                                aria-controls="collapseTwentyTwo"
+                                        >
+                                           매입매출
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+
+                                <div
+                                        id="select-collapseTwentyTwo"
+                                        class="collapse"
+                                        aria-labelledby="headingTwentyTwo"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="매입관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            매입관리
+                                        </div>
+
+                                        <div
+                                                id="매출관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            매출관리
+                                        </div>
+
+                                    </div>
+                                </div>
+                                  <!-- 생산설비 관리  -->
+                                <div class="collapsed bg-white" id="select-headingTwentyOne">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="생산설비관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseTwentyOne"
+                                                aria-expanded="false"
+                                                aria-controls="collapseTwentyOne"
+                                        >
+                                           생산설비관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseTwentyOne"
+                                        class="collapse"
+                                        aria-labelledby="headingTwentyOne"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="생산설비장비관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            생산설비장비관리
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                {% comment %}
+                                <!-- 온도전압 관리 left -->
+                                <div class="collapsed bg-white" id="select-headingNine">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="온도전압_관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseNine"
+                                                aria-expanded="false"
+                                                aria-controls="collapseNine"
+                                        >
+                                            온도전압 관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseNine"
+                                        class="collapse"
+                                        aria-labelledby="headingNine"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="온도전압_장비관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온도전압 장비관리
+                                        </div>
+
+                                        <div
+                                                id="온도전압_현황조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온도전압 현황조회
+                                        </div>
+
+                                        <div
+                                                id="온도전압_이력조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온도전압 이력조회
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                {% comment %}
+                                <!-- 온습도 모니터링 left -->
+                                <div class="collapsed bg-white" id="select-headingSix">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="온습도_모니터링"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseSix"
+                                                aria-expanded="false"
+                                                aria-controls="collapseSix"
+                                        >
+                                            온습도 모니터링
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseSix"
+                                        class="collapse"
+                                        aria-labelledby="headingSix"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="온습도_모니터링_장비관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온습도 모니터링 장비관리
+                                        </div>
+
+                                        <div
+                                                id="온습도_현황_조회_PC"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온습도 현황 조회(PC)
+                                        </div>
+
+                                        <div
+                                                id="온습도_현황_조회_TV"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온습도 현황 조회(TV)
+                                        </div>
+
+                                        <div
+                                                id="온습도_모니터링_장비관리_H2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온습도 모니터링 장비관리 H2
+                                        </div>
+
+                                        <div
+                                                id="온습도_현황_조회_PC_H2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온습도 현황 조회(PC) H2
+                                        </div>
+
+                                        <div
+                                                id="온습도_현황_조회_TV_H2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온습도 현황 조회(TV) H2
+                                        </div>
+
+                                        <div
+                                                id="온습도_현황_조회_전광판_H2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            온습도 현황 조회 전광판 H2
+                                        </div>
+
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                {% comment %}
+                                <!-- 대여관리 left -->
+                                <div class="collapsed bg-white" id="select-headingFive">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="대여관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseFive"
+                                                aria-expanded="false"
+                                                aria-controls="collapseFive"
+                                        >
+                                            대여관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseFive"
+                                        class="collapse"
+                                        aria-labelledby="headingFive"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="대여품목_관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            대여품목 관리
+                                        </div>
+
+                                        <div
+                                                id="대여_등록_회수_관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            대여 등록/회수 관리
+                                        </div>
+
+                                        <div
+                                                id="대여현황_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            대여현황 조회
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+
+                                {% comment %}
+                                <div class="collapsed bg-white" id="select-headingSeven">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="실적관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseSeven"
+                                                aria-expanded="false"
+                                                aria-controls="collapseSeven"
+                                        >
+                                            실적관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseSeven"
+                                        class="collapse"
+                                        aria-labelledby="headingSeven"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="실적관리2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            실적관리
+                                        </div>
+                                        <div
+                                                id="실적관리_세부공정관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            세부공정관리
+                                        </div>
+
+                                        <div
+                                                id="실적관리_작업실적관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            작업실적관리
+                                        </div>
+
+                                        <div
+                                                id="실적관리_공정진행현황_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            공정진행현황 조회
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                {% comment %}
+                                <div class="collapsed bg-white" id="select-headingEight">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="창고관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseEight"
+                                                aria-expanded="false"
+                                                aria-controls="collapseEight"
+                                        >
+                                            창고관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseEight"
+                                        class="collapse"
+                                        aria-labelledby="headingEight"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="원부자재창고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            원부자재 창고
+                                        </div>
+                                        <div
+                                                id="반제품창고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            반제품 창고
+                                        </div>
+
+                                        <div
+                                                id="공정창고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            공정창고
+                                        </div>
+
+                                        <div
+                                                id="외주창고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            외주 창고
+                                        </div>
+                                        <div
+                                                id="완제품창고"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            완제품 창고
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                {% comment %}
+                                <!-- HACCP 관리 left -->
+                                <div class="collapsed bg-white" id="select-headingEleven">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="HACCP관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseEleven"
+                                                aria-expanded="false"
+                                                aria-controls="collapseEleven"
+                                        >
+                                            HACCP 관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseEleven"
+                                        class="collapse"
+                                        aria-labelledby="headingEleven"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="스마트HACCP"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            스마트 HACCP
+                                        </div>
+
+                                        <div
+                                                id="스마트HACCP2"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            스마트 HACCP(새탭)
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endcomment %}
+                                {% comment %}
+                                <!-- 품질측정관리 left -->
+                                <div class="collapsed bg-white" id="select-headingSeventeen">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="품질측정관리"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseSeventeen"
+                                                aria-expanded="false"
+                                                aria-controls="collapseSeventeen"
+                                        >
+                                            품질측정관리
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseSeventeen"
+                                        class="collapse"
+                                        aria-labelledby="headingSeventeen"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="UNBALANCE_등록"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            UNBALANCE 등록
+                                        </div>
+
+                                        <div
+                                                id="UNBALANCE_조회"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            UNBALANCE 조회
+                                        </div>
+                                        <div
+                                                id="회전자검사_관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            회전자검사 관리
+                                        </div>
+
+                                        <div
+                                                id="고정자검사_관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            고정자검사 관리
+                                        </div>
+
+                                    </div>
+                                </div>
+                                {% endcomment %}
+
+                                <!-- 기준정보 left -->
+                                <div class="collapsed bg-white" id="select-headingOne">
+                                    <div class="select-mbutton mb-0">
+                                        <div
+                                                id="기준정보"
+                                                class="select-main-button"
+                                                data-toggle="collapse"
+                                                data-target="#select-collapseOne"
+                                                aria-expanded="false"
+                                                aria-controls="collapseOne"
+                                        >
+                                            기준정보
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                        id="select-collapseOne"
+                                        class="collapse"
+                                        aria-labelledby="headingOne"
+                                        data-parent="#select-accordionExample"
+                                >
+                                    <div class="card-body">
+                                        <div
+                                                id="코드_마스터"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            코드 마스터
+                                        </div>
+
+                                        <div
+                                                id="거래처_기준정보관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            거래처 기준정보관리
+                                        </div>
+
+                                        <div
+                                                id="거래처_단가관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            거래처 단가관리
+                                        </div>
+
+                                        {% comment %}
+                                        <div
+                                                id="사용자_기준정보관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            사용자 기준정보관리
+                                        </div>
+                                        {% endcomment %}
+
+
+                                        <div
+                                                id="설비_기준정보관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            설비 기준정보관리
+                                        </div>
+
+                                        <div
+                                                id="품목_기준정보관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            품목 기준정보관리
+                                        </div>
+
+                                        <!-- {#
+                        <div
+                          id="공정_기준정보관리"
+                          class="select-sub-button col-10"
+                          onclick=""
+                        >
+                          #} {# 공정 기준정보관리#} {#
+                        </div>
+                        #} {#
+                        <div
+                          id="BOM_구성"
+                          class="select-sub-button col-10"
+                          onclick=""
+                        >
+                          #} {# BOM 구성#} {#
+                        </div>
+                        #} -->
+                                        {% comment %}
+                                        <div
+                                                id="사용자_권한관리"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            사용자 권한관리
+                                        </div>
+                                        {% endcomment %}
+
+                                        <div
+                                                id="납품기업"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            납품기업
+                                        </div>
+                                        <div
+                                                id="내정보"
+                                                class="select-sub-button col-10"
+                                                onclick=""
+                                        >
+                                            내 정보 관리
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- insert your code here end -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-5">
+        <!-- 메뉴설정 -->
+        <h5 class="m-2"><strong>메뉴설정</strong></h5>
+        <div class="card m-2">
+            <div class="card-body p-2">
+                <!-- insert your code here start -->
+                <!-- 본문 -->
+                <form
+                        class="content-search row no-gutters align-items-center content-input-group"
+                >
+                    <div class="col-1"></div>
+                    <div class="col-10">
+                        <div class="accordion col-12 h-100" id="auth-accordionExample">
+                            {% comment %}
+                            <!-- 의뢰서관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingFifteen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseFifteen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseFifteen"
+                                    >
+                                        의뢰서관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="의뢰서관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseFifteen"
+                                    class="collapse"
+                                    aria-labelledby="headingFifteen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        의뢰서작성
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="의뢰서작성"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        의뢰서조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="의뢰서조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}{% comment %}
+                            <!-- 견적서관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingSixteen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseSixteen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseSixteen"
+                                    >
+                                        견적서관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="견적서관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseSixteen"
+                                    class="collapse"
+                                    aria-labelledby="headingSixteen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        견적서작성
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="견적서작성"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        견적서조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="견적서조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+                            <!-- 주문관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingTwelve">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseTwelve"
+                                            aria-expanded="false"
+                                            aria-controls="collapseTwelve"
+                                    >
+                                        주문관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="주문관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseTwelve"
+                                    class="collapse"
+                                    aria-labelledby="headingTwelve"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        주문서등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="주문서등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        주문현황조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="주문현황조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        주문량통계
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="주문량통계"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 발주관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingTen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseTen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseTen"
+                                    >
+                                        발주관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="발주관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseTen"
+                                    class="collapse"
+                                    aria-labelledby="headingTen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        발주등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="발주등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        발주대비 입고등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="발주대비_입고등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        발주대비 입고현황
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="발주대비_입고현황"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% comment %}
+                            <!-- 외주관리 Right -->
+                            <div class="collapsed bg-white" id="auth-headingNineteen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseNineteen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseNineteen"
+                                    >
+                                        외주관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="외주관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseNineteen"
+                                    class="collapse"
+                                    aria-labelledby="headingNineteen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        외주출고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="외주출고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        외주출고 입고등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="외주출고_입고등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        외주제품 수불부
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="외주제품_수불부"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+                            <!-- BOM 관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingTwo">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseTwo"
+                                            aria-expanded="false"
+                                            aria-controls="collapseTwo"
+                                    >
+                                        BOM 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="BOM_관리1"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseTwo"
+                                    class="collapse"
+                                    aria-labelledby="headingTwo"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        BOM 형식
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="BOM_형식"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        BOM 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="BOM_관리2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        BOM 조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="BOM_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        생산계획 대비 재고현황 조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="생산계획_대비_재고현황_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 재고관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingThree">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseThree"
+                                            aria-expanded="false"
+                                            aria-controls="collapseThree"
+                                    >
+                                        재고관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseThree"
+                                    class="collapse"
+                                    aria-labelledby="headingThree"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        재고입고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고입고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        출고 지시서
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="출고지시"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        출고지시대비 출고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="지시대비출고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        재고출고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고출고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        재고반입
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고반입"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        재고현황
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고현황"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        재고현황(TV)
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고현황T"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        재고조정
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고조정"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- 재고정보 관리  -->
+                            <div class="collapsed bg-white" id="auth-headingTwentyThree">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseTwentyThree"
+                                            aria-expanded="false"
+                                            aria-controls="collapseTwentyThree"
+                                    >
+                                        재고알림
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고알림"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseTwentyThree"
+                                    class="collapse"
+                                    aria-labelledby="headingTwentyThree"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        재고부족알림
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="재고부족알림"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- 공정관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingFour">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseFour"
+                                            aria-expanded="false"
+                                            aria-controls="collapseFour"
+                                    >
+                                        생산관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="공정관리1"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseFour"
+                                    class="collapse"
+                                    aria-labelledby="headingFour"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        공정명등록관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="공정관리2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        생산일정등록 {#세부공정관리 > 생산일정등록#}
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="세부공정관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        생산진행현황등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="공정진행현황_등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        공정진행현황등록(tablet)
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="공정진행현황_등록T"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        생산진행현황조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="공정진행현황_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        공정진행현황 조회 (TV)
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="공정진행현황_조회_tv"
+                                    >
+                                        &#10003;
+                                    </button>
+
+
+                                </div>
+                            </div>
+                            {% comment %}
+                            <!-- 불량관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingEighteen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseEighteen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseEighteen"
+                                    >
+                                        불량관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="불량관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseEighteen"
+                                    class="collapse"
+                                    aria-labelledby="headingEighteen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        불량사유등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="불량사유_등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        불량사유조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="불량사유_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        불량그래프조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="불량그래프_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+
+                            <!-- 출하관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingThirteen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseThirteen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseThirteen"
+                                    >
+                                        출하관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="출하관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseThirteen"
+                                    class="collapse"
+                                    aria-labelledby="headingThirteen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        출하등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="출하등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        출하내역조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="출하내역조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+
+                            {% comment %}
+                            <!-- 원가관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingFourteen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseFourteen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseFourteen"
+                                    >
+                                        원가관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="원가관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseFourteen"
+                                    class="collapse"
+                                    aria-labelledby="headingFourteen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        제품별원가
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="제품별원가"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        주문대비원가
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="주문대비원가"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+                            {% comment %}
+                            <!-- 매입매출 관리 -->
+                             <div class="collapsed bg-white" id="auth-headingTwentyTwo">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseTwentyTwo"
+                                            aria-expanded="false"
+                                            aria-controls="collapseTwentyTwo"
+                                    >
+                                        매입매출
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="매입매출"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseTwentyTwo"
+                                    class="collapse"
+                                    aria-labelledby="headingTwentyTwo"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        매입관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="매입관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        매출관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="매출관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+                            <!-- 생산설비 관리 right-->
+                             <div class="collapsed bg-white" id="auth-headingTwentyOne">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseTwentyOne"
+                                            aria-expanded="false"
+                                            aria-controls="collapseTwentyOne"
+                                    >
+                                        생산설비관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="생산설비관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseTwentyOne"
+                                    class="collapse"
+                                    aria-labelledby="headingTwentyOne"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        생산설비장비관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="생산설비장비관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% comment %}
+                            <!-- 온습도 모니터링 right -->
+                            <div class="collapsed bg-white" id="auth-headingSix">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseSix"
+                                            aria-expanded="false"
+                                            aria-controls="collapseSix"
+                                    >
+                                        온습도 모니터링
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            onclick=""
+                                            value="온습도_모니터링"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseSix"
+                                    class="collapse"
+                                    aria-labelledby="headingSix"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온습도 모니터링 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온습도_모니터링_장비관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온습도 현황 조회 (PC)
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온습도_현황_조회_PC"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온습도 현황 조회 (TV)
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온습도_현황_조회_TV"
+                                    >
+                                        &#10003;
+                                    </button>
+
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온습도 모니터링 관리 H2
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온습도_모니터링_장비관리_H2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온습도 현황 조회 (PC) H2
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온습도_현황_조회_PC_H2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온습도 현황 조회 (TV) H2
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온습도_현황_조회_TV_H2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온습도 현황 조회 전광판 H2
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온습도_현황_조회_전광판_H2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+
+                            {% comment %}
+                            <div class="collapsed bg-white" id="auth-headingSeven">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseSeven"
+                                            aria-expanded="false"
+                                            aria-controls="collapseSeven"
+                                    >
+                                        실적관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="실적관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseSeven"
+                                    class="collapse"
+                                    aria-labelledby="headingSeven"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        공정관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="실적관리2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        세부공정관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="실적관리_세부공정관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        작업실적관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="실적관리_작업실적관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        공정진행현황 조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="실적관리_공정진행현황_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="collapsed bg-white" id="auth-headingEight">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseEight"
+                                            aria-expanded="false"
+                                            aria-controls="collapseEight"
+                                    >
+                                        창고관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="창고관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseEight"
+                                    class="collapse"
+                                    aria-labelledby="headingEight"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        원부자재 창고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="원부자재창고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        반제품 창고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="반제품창고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        공정 창고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="공정창고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        외주 창고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="외주창고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        완제품 창고
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="완제품창고"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+{% comment %}
+                            <!-- 온도전압 관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingNine">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseNine"
+                                            aria-expanded="false"
+                                            aria-controls="collapseNine"
+                                    >
+                                        온도전압 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온도전압_관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseNine"
+                                    class="collapse"
+                                    aria-labelledby="headingNine"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온도전압 장비관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온도전압_장비관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온도전압 현황조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온도전압_현황조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        온도전압 이력조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="온도전압_이력조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>{% endcomment %}
+                            {% comment %}
+                            <!-- 대여관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingFive">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseFive"
+                                            aria-expanded="false"
+                                            aria-controls="collapseFive"
+                                    >
+                                        대여관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="대여관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseFive"
+                                    class="collapse"
+                                    aria-labelledby="headingFive"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        대여품목 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="대여품목_관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        대여 등록/회수 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="대여_등록_회수_관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        대여현황 조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="대여현황_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>{% endcomment %}
+                            {% comment %}
+                            <!-- HACCP 관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingEleven">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseEleven"
+                                            aria-expanded="false"
+                                            aria-controls="collapseEleven"
+                                    >
+                                        HACCP 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="HACCP관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseEleven"
+                                    class="collapse"
+                                    aria-labelledby="headingEleven"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        스마트 HACCP
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="스마트HACCP"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        스마트 HACCP(새탭)
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="스마트HACCP2"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>{% endcomment %}
+                            {% comment %}
+                            <!-- 품질측정관리 right -->
+                            <div class="collapsed bg-white" id="auth-headingSeventeen">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseSeventeen"
+                                            aria-expanded="false"
+                                            aria-controls="collapseSeventeen"
+                                    >
+                                        품질측정관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="품질측정관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseSeventeen"
+                                    class="collapse"
+                                    aria-labelledby="headingSeventeen"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        UNBALANCE 등록
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="UNBALANCE_등록"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        UNBALANCE 조회
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="UNBALANCE_조회"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        회전자검사 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="회전자검사_관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        고정자검사 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="고정자검사_관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            {% endcomment %}
+                            <!-- 기준정보 right -->
+                            <div class="collapsed bg-white" id="auth-headingOne">
+                                <div class="auth-user-mbtn mb-0">
+                                    <button
+                                            class="auth-main-button col-4"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#auth-collapseOne"
+                                            aria-expanded="false"
+                                            aria-controls="collapseOne"
+                                    >
+                                        기준정보
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="기준정보"
+                                    >
+                                        &#10003;
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                    id="auth-collapseOne"
+                                    class="collapse"
+                                    aria-labelledby="headingOne"
+                                    data-parent="#auth-accordionExample"
+                            >
+                                <div class="card-body">
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        코드 마스터
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="코드_마스터"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        거래처 기준정보관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="거래처_기준정보관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        거래처 단가관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="거래처_단가관리"
+                                    >
+                                        &#10003;
+                                    </button>
+
+                                    {% comment %}
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        사용자 기준정보관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="사용자_기준정보관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    {% endcomment %}
+
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        설비 기준정보관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="설비_기준정보관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        품목 기준정보관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="품목_기준정보관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    <!-- {#
+                      <button
+                        class="auth-sub-button col-10"
+                        type="button"
+                        onclick=""
+                      >
+                        #} {# 공정 기준정보관리#} {#</button
+                      >#} {#
+                      <button
+                        class="auth-user-check-btn col-1"
+                        type="button"
+                        value="공정_기준정보관리"
+                      >
+                        #} {# &#10003;#} {#</button
+                      >#} {#
+                      <button
+                        class="auth-sub-button col-10"
+                        type="button"
+                        onclick=""
+                      >
+                        #} {# BOM 구성#} {#</button
+                      >#} {#
+                      <button
+                        class="auth-user-check-btn col-1"
+                        type="button"
+                        value="BOM_구성"
+                      >
+                        #} {# &#10003;#} {#</button
+                      >#} -->
+                                    {% comment %}
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        사용자 권한관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="사용자_권한관리"
+                                    >
+                                        &#10003;
+                                    </button>
+                                    {% endcomment %}
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        납품기업
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="납품기업"
+                                    >
+                                        &#10003;
+                                    </button>
+
+                                    <button
+                                            class="auth-sub-button col-10"
+                                            type="button"
+                                            onclick=""
+                                    >
+                                        내 정보 관리
+                                    </button>
+                                    <button
+                                            class="auth-user-check-btn col-1"
+                                            type="button"
+                                            value="내정보"
+                                    >
+                                        &#10003;
+                                    </button>
+
+                                    <!-- {#
+                      <button
+                        class="auth-sub-button col-10"
+                        type="button"
+                        onclick=""
+                      >
+                        #} {# 업체별 권한관리#} {#</button
+                      >#} {#
+                      <button
+                        class="auth-user-check-btn col-1"
+                        type="button"
+                        value="업체별_권한관리"
+                      >
+                        #} {# &#10003;#} {#</button
+                      >#} -->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-1"></div>
+                </form>
+
+                <!-- insert your code here end -->
+            </div>
+        </div>
+        <div class="card m-2">
+            <div class="card-body row">
+                <div class="col-10"></div>
+                <!-- {# <a class="btn button-custom2 col-2 px-0" role="button">추가</a>#} -->
+                <button
+                        id="edit-btn-user"
+                        class="btn button-custom2 col-2 px-0"
+                        type="button"
+                >
+                    수정
+                </button>
+                <!-- {# <a class="btn button-custom2 col-2 px-0" role="button">삭제</a>#} -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/api_user.js' %}" type="text/javascript"></script>
+<script
+        src="{% static 'js/api_adapter.js' %}"
+        type="text/javascript"
+></script>
+<script>
+    const AUTH_CNT_MAX = 73 + 1; // idx 마지막 수 + 1 을 해줘야 함
+    var auth_user_data = {
+        코드_마스터: {idx: 0, enable: false},
+        거래처_기준정보관리: {idx: 1, enable: false},
+
+        // 사용자 기준정보관리, 사용자 권한관리는 [슈퍼관리자 & 업체 마스터] 로그인시만 설정 가능하도록 수정
+        // 사용자_기준정보관리: {idx: 2, enable: false},
+        설비_기준정보관리: {idx: 3, enable: false},
+        품목_기준정보관리: {idx: 4, enable: false},
+        // 사용자_권한관리: {idx: 5, enable: false},
+        납품기업: {idx: 42, enable: false}, // TODO 임시
+        내정보: {idx: 57, enable: false},
+
+        BOM_형식: {idx: 6, enable: false},
+        BOM_관리2: {idx: 7, enable: false},
+        BOM_조회: {idx: 8, enable: false},
+        생산계획_대비_재고현황_조회: {idx: 9, enable: false},
+        재고입고: {idx: 10, enable: false},
+        출고지시: {idx: 61, enable: false},
+        지시대비출고: {idx: 62, enable: false},
+        재고출고: {idx: 11, enable: false},
+        재고반입: {idx: 12, enable: false},
+        재고현황: {idx: 13, enable: false},
+        재고현황T: {idx: 59, enable: false},
+        재고조정: {idx: 14, enable: false},
+        공정관리2: {idx: 15, enable: false},
+        세부공정관리: {idx: 16, enable: false},
+        공정진행현황_등록: {idx: 17, enable: false},
+        공정진행현황_등록T: {idx: 58, enable: false},
+        공정진행현황_조회: {idx: 18, enable: false},
+        공정진행현황_조회_tv: {idx: 56, enable: false},
+        불량사유_등록: {idx: 63, enable: false},
+        불량사유_조회: {idx: 64, enable: false},
+        불량그래프_조회: {idx: 65, enable: false},
+        대여품목_관리: {idx: 19, enable: false},
+        대여_등록_회수_관리: {idx: 20, enable: false},
+        대여현황_조회: {idx: 21, enable: false},
+        온습도_모니터링_장비관리: {idx: 22, enable: false},
+        온습도_현황_조회_PC: {idx: 23, enable: false},
+        온습도_현황_조회_TV: {idx: 24, enable: false},
+
+        {% comment %}
+        실적관리2: {idx: 27, enable: false},
+        실적관리_세부공정관리: {idx: 27, enable: false},
+        실적관리_작업실적관리: {idx: 27, enable: false},
+        실적관리_공정진행현황_조회: {idx: 27, enable: false},
+        원부자재창고: {idx: 25, enable: false},
+        반제품창고: {idx: 25, enable: false},
+        공정창고: {idx: 25, enable: false},
+        외주창고: {idx: 25, enable: false},
+        완제품창고: {idx: 25, enable: false},
+        {% endcomment %}
+
+        온도전압_장비관리: {idx: 28, enable: false},
+        온도전압_현황조회: {idx: 29, enable: false},
+        온도전압_이력조회: {idx: 30, enable: false},
+        발주등록: {idx: 31, enable: false},
+        발주대비_입고등록: {idx: 32, enable: false},
+        발주대비_입고현황: {idx: 33, enable: false},
+        외주출고: { idx: 66, enable: false },
+        외주출고_입고등록: { idx: 67, enable: false },
+        외주제품_수불부: { idx: 68, enable: false },  // Todo last
+        스마트HACCP: {idx: 34, enable: false},
+        스마트HACCP2: {idx: 35, enable: false},
+
+        <!-- hjlim new-module -->
+        주문서등록: {idx: 36, enable: false},
+        주문현황조회: {idx: 37, enable: false},
+        주문량통계: {idx: 38, enable: false},
+
+        온습도_모니터링_장비관리_H2: {idx: 39, enable: false},
+        온습도_현황_조회_PC_H2: {idx: 40, enable: false},
+        온습도_현황_조회_TV_H2: {idx: 41, enable: false},
+        온습도_현황_조회_전광판_H2: {idx: 60, enable: false},
+
+        출하등록: {idx: 43, enable: false},
+        출하내역조회: {idx: 44, enable: false},
+        제품별원가: {idx: 45, enable: false},
+        주문대비원가: {idx: 46, enable: false},
+
+        의뢰서작성: {idx: 47, enable: false},
+        의뢰서조회: {idx: 48, enable: false},
+        견적서작성: {idx: 49, enable: false},
+        견적서조회: {idx: 50, enable: false},
+
+        UNBALANCE_등록: {idx: 51, enable: false},
+        UNBALANCE_조회: {idx: 52, enable: false},
+        회전자검사_관리: {idx: 53, enable: false},
+        고정자검사_관리: {idx: 55, enable: false},
+
+        매입관리 : {idx: 69, enable: false},
+        매출관리 : {idx: 70, enable: false},
+        생산설비장비관리 : {idx: 71, enable: false},
+        재고부족알림 : {idx: 72, enable: false},
+        거래처_단가관리 : {idx: 73, enable: false},
+    };
+
+    $(function () {
+        let permissions = get_userinfo().permissions;
+        for (let i = 0; i < AUTH_CNT_MAX; i++) {
+            let enabled = (permissions[i] == '1');
+            if (enabled === false) {
+                let target = null;
+                for (let [key, values] of Object.entries(auth_user_data)) {
+                    if (i === values.idx) {
+                        target = key;
+                    }
+                    if (target !== null) {
+                        let o = $(".auth-user-check-btn[value=" + target + "]");
+                        o.prev().remove();
+                        o.remove();
+                    }
+                }
+            }
+        }
+
+        // child 없는 heading remove 처리
+        [
+            "One",  // 기준정보
+            "Two",  // BOM 관리
+            "Three",  // 재고관리
+            "Four",  // 공정관리
+            "Five",  // 대여관리
+            "Six",  // 온습도 모니터링
+            // "Seven",  // 실적관리
+            // "Eight",  // 창고관리
+            "Nine",  // 온도전압 관리
+            "Ten",  // 발주관리
+            "Eleven",  // HACCP 관리
+            "Twelve",  // 주문관리
+            "TwentyTwo", // 매입매출
+            "TwentyOne", // 생산설비관리
+
+            "Thirteen",  // 출하관리
+            "Fourteen",  // 원가관리
+            "Fifteen",  // 의뢰서관리
+            "Sixteen",  // 견적서관리
+
+            "Seventeen", // 품질측정관리
+            "Eighteen", // 불량관리
+            "Nineteen", // 외주관리
+            "TwentyThree" // 재고정보 관리
+
+        ].forEach((key) => {
+            if (
+                $("#auth-collapse" + key + " .card-body").children().length === 0
+            ) {
+                $("#auth-heading" + key).remove();
+            }
+        });
+        init();
+    });
+
+    function clear_auth_user() {
+        $(".auth-user-mbtn .auth-user-check-btn").each((index, item) => {
+            if (item.style.backgroundColor == "rgb(58, 176, 216)") {
+                $(item).trigger("click");
+            }
+        });
+    }
+
+    $(".auth-user-check-btn").click(function () {
+        var div = $("#" + this.value);
+
+        // 상위 버튼 선택 시
+        if ($(this).prev().hasClass("auth-main-button") === true) {
+            var childbutton = $(this)
+                .parent(".auth-user-mbtn")
+                .parent(".collapsed")
+                .next(".collapse")
+                .find(".auth-user-check-btn");
+
+            if (this.style.backgroundColor == "rgb(58, 176, 216)") {
+                //선택해제할 시
+                this.style.backgroundColor = "#ffffff";
+                this.style.color = "black";
+                div.hide();
+                for (var i = 0; i < $(childbutton).length; i++) {
+                    childbutton[i].style.backgroundColor = "#ffffff";
+                    childbutton[i].style.color = "black";
+                    var subdiv = $("#" + childbutton[i].value);
+                    subdiv.hide();
+
+                    // console.log(childbutton[i].value);
+                    auth_user_data[childbutton[i].value].enable = false;
+                }
+            } else {
+                //선택할 시
+                this.style.backgroundColor = "#3ab0d8";
+                this.style.color = "white";
+                div.show();
+                for (var i = 0; i < $(childbutton).length; i++) {
+                    childbutton[i].style.backgroundColor = "#3ab0d8";
+                    childbutton[i].style.color = "white";
+                    var subdiv = $("#" + childbutton[i].value);
+                    subdiv.show();
+
+                    // console.log(childbutton[i].value);
+                    auth_user_data[childbutton[i].value].enable = true;
+                }
+            }
+        }
+
+        // 하위 버튼 선택 시
+        else {
+            var parentbtn = $(this)
+                .parent(".card-body")
+                .parent(".collapse")
+                .prev(".collapsed")
+                .find(".auth-user-check-btn");
+            var parentdiv = $("#" + parentbtn[0].value);
+            var siblingdiv = $(div).siblings(".select-sub-button");
+            var noblock = true;
+
+            if (this.style.backgroundColor == "rgb(58, 176, 216)") {
+                //선택해제할 시
+                this.style.backgroundColor = "#ffffff";
+                this.style.color = "black";
+                div.hide();
+
+                for (var i = 0; i < $(siblingdiv).length; i++) {
+                    if ($(siblingdiv[i]).css("display") == "block") {
+                        noblock = false;
+                    }
+                }
+
+                if (noblock == true) {
+                    parentdiv.hide();
+                    parentbtn[0].style.backgroundColor = "#ffffff";
+                    parentbtn[0].style.color = "black";
+                }
+
+                // console.log(noblock);
+
+                // console.log($(this).val());
+                auth_user_data[$(this).val()].enable = false;
+            } else {
+                //선택할 시
+                this.style.backgroundColor = "#3ab0d8";
+                this.style.color = "white";
+                div.show();
+                parentdiv.show();
+                parentbtn[0].style.backgroundColor = "#3ab0d8";
+                parentbtn[0].style.color = "white";
+                noblock = false;
+
+                console.log($(this).val());
+                auth_user_data[$(this).val()].enable = true;
+            }
+        }
+    });
+
+
+    var user = null;
+    $("#auth_user_search").click(() => {
+        clear_auth_user();
+        let code = $("#auth_user_search_code option:selected").text();
+        let name = $("#auth_user_search_name option:selected").text();
+        if (code == "선택 및 검색")
+            code = "";
+        if (name == "선택 및 검색")
+            name = "";
+        let query_params = "?code=" + code + "&username=" + name;
+        // console.log(query_params);
+        api_gp("/users_select/" + query_params, "GET", {}, (json) => {
+            if (json.length !== 1) {
+                alert(
+                    "정확한 입력값을 입력하세요. 리턴값(length):" +
+                    json.length
+                );
+                return;
+            }
+
+            let item = json[0];
+            user = item;
+
+            $("#auth_user_code").val(item.code);
+            $("#auth_user_name").val(item.username);
+
+            let permissions = item.permissions;
+            for (let i = 0; i < AUTH_CNT_MAX; i++) {
+                let enabled = (permissions[i] == '1');
+                for (let [key, value] of Object.entries(auth_user_data)) {
+                    if (value.idx === i) {
+                        if (enabled === true) {
+                            // console.log('value.idx : ' + value.idx);
+                            let s = $('#root button[value="' + key + '"]');
+                            s.css("background-color", "#3ab0d8");
+                            s.css("color", "white");
+
+                            let p = s
+                                .parent(".card-body")
+                                .parent(".collapse")
+                                .prev(".collapsed")
+                                .find(".auth-user-check-btn");
+                            // console.log('-----------');
+                            if (p[0] != null){  // 사용자의 권한 밖의 정보는 불러들일 수 없음
+                                p[0].style.backgroundColor = "#3ab0d8";
+                                p[0].style.color = "white";
+
+                                $("#" + key).show();
+                                let s2 = $("#" + p[0].value).show();
+                                // {#s2.show();#}
+
+                                auth_user_data[key].enable = true;
+                            }
+
+                        } else break;
+                    }
+                }
+            }
+        });
+    });
+
+    var replaceAt = function(input, index, character){
+        return input.substr(0, index) + character + input.substr(index+character.length);
+    }
+
+    function get_user_permission() {
+        // hjlim 퍼미션 Default 값 변경시 PERMISSION_DEFAULT 로 검색해서 전체 수정
+        let PERMISSION_DEFAULT = '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';  // 100자리
+        let permission = PERMISSION_DEFAULT;
+        for (let [key, value] of Object.entries(auth_user_data)) {
+            // console.log('key = ' + key + ', value.idx = ' + value.idx + ', value.enable = ' + value.enable);
+            if (value.enable === true)
+                permission = replaceAt(permission, value.idx, '1');
+        }
+        return permission;
+    }
+
+    $("#edit-btn-user").click(() => {
+        let data = { permissions: get_user_permission() };
+        let userinfo = get_userinfo();
+
+        {% comment %}
+        alert(userinfo.is_master);
+        if (userinfo.is_master == 'false'){
+            alert('string?');
+        }
+        {% endcomment %}
+
+        if (userinfo.code == user.code){  // 본인의 계정을 수정할 수 없음
+            alert('수정 권한이 없습니다.');
+        } else if (userinfo.is_superuser=='true') {  // 슈퍼 관리자일 경우는 업체 관리자 및 일반 사용자를 수정 가능
+            api_gp("/users/" + user.id + "/", "PATCH", data, (data) => {
+                alert("수정 완료되었습니다.");
+            });
+        } else if (user.is_master == 'true') {  // 일반 사용자는 업체 관리자를 수정할 수 없음
+            alert('수정 권한이 없습니다.');
+        } else {
+            api_gp("/users/" + user.id + "/", "PATCH", data, (data) => {
+                alert("수정 완료되었습니다.");
+            });
+        }
+    });
+
+    function init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택 및 검색</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if (selectors.includes(".auth_user-dropdown")) {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.code + "</option>";
+                } else {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.username + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        api_gp("/users_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".auth_user-dropdown");
+            make_dropdown(data, ".auth_username-dropdown");
+
+            $('#auth_user_search_code').on('select2:select', function (e) {  // 사번 선택시
+                let select2_data = e.params.data;
+                if (select2_data.id === '') {
+                    $("#auth_user_search_name").val(null).trigger('change');
+                } else {
+                    let id = $(this).val();
+                    $("#auth_user_search_name").val(id).trigger('change');
+                }
+            });
+            $('#auth_user_search_name').on('select2:select', function (e) {  // 사용자명 선택시
+                let select2_data = e.params.data;
+                if (select2_data.id === '') {
+                    $("#auth_user_search_code").val(null).trigger('change');
+                } else {
+                    let id = $(this).val();
+                    $("#auth_user_search_code").val(id).trigger('change');
+                }
+            });
+            spinner();
+
+        });
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+</script>
+
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

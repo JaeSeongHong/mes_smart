@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow: hidden;">
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+
+<!-- {#{% block title %}#}
+{#    <title>생산계획 대비 재고현황 조회</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <form
+                class="content-search row no-gutters align-items-center content-input-group"
+        >
+            <div class="content-title col-1 align-self-stretch">생산계획</div>
+            <div class="col-11" id="bom-top-inputs">
+                <div class="row no-gutters">
+                    <div class="content-input-group col-4 px-0">
+                        <div class="content-input-group-header">
+                            <label>생산제품명<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <select
+                                    name="product_name"
+                                    class="form-control bom-dropdown-product"
+                                    id="select_product"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-2 px-0">
+                        <div class="content-input-group-header">
+                            <label>생산수량<strong>*</strong></label>
+                        </div>
+                        <div class="content-input-group-input">
+                            <input
+                                    name="amount"
+                                    type="text"
+                                    class="form-control"
+                                    id="BOM_inventory_amount_input"
+                                    onkeyup="chkNumber(this)"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-1 px-0 ml-auto"></div>
+                    <div class="col-1 px-0 ml-auto-l">
+                        <button
+                                type="button"
+                                class="btn button-search rounded-0 w-100 h-100"
+                                onclick="req()"
+                        >
+                            생산추가
+                        </button>
+                    </div>
+{#                    <div class="col-1 px-0 ml-auto-l">#}
+{#                        <button#}
+{#                                type="button"#}
+{#                                class="btn button-search rounded-0 w-100 h-100"#}
+{#                                onclick="BOM_inventory_removeAll()"#}
+{#                        >#}
+{#                            초기화#}
+{#                        </button>#}
+{#                    </div>#}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 테이블 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        {# Todo hjlim : Table Line 수 지정 #}
+        <div class="content-table col-12" style="overflow-x:auto;">
+            <table
+                    id="BOM_inventory_data-table-down"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>품번</th>
+                    <th>품명</th>
+                    <th>품명상세</th>
+                    <th>단위</th>
+                    <th>소요량</th>
+                    <th>생산필요수량</th>
+                    <th>현재고</th>
+                    <th>생산후재고</th>
+                    <th>자재위치</th>
+                </tr>
+                </thead>
+                <tbody id="bom-status-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <div class="col-8 px-0 ml-auto"></div>
+{#        <div class="col-1 px-0 ml-auto">#}
+{#            <button#}
+{#                    type="button"#}
+{#                    class="btn button-search rounded-0 w-100 h-100"#}
+{#                    onclick="BOM_inventory_edit()"#}
+{#            >#}
+{#                수량조정#}
+{#            </button>#}
+{#        </div>#}
+{#        <div class="col-1 px-0 ml-auto">#}
+{#            <button#}
+{#                    type="button"#}
+{#                    class="btn button-search rounded-0 w-100 h-100"#}
+{#                    onclick="BOM_inventory_remove()"#}
+{#            >#}
+{#                항목삭제#}
+{#            </button>#}
+{#        </div>#}
+{#        <div class="col-1 px-0 ml-auto">#}
+{#            <button#}
+{#                    type="button"#}
+{#                    class="btn button-search rounded-0 w-100 h-100"#}
+{#                    onclick="req()"#}
+{#            >#}
+{#                소요량산출#}
+{#            </button>#}
+{#        </div>#}
+    </div>
+</div>
+
+{#<!-- 테이블 -->#}
+{#<div class="card m-2">#}
+{#    <div class="row no-gutters card-body p-2">#}
+{#        <!-- 본문 -->#}
+        {# Todo hjlim : Table Line 수 지정 #}
+{#        <div class="content-table col-12" style="overflow-x:auto; overflow-y:hidden; height: 251px">#}
+{#            <table#}
+{#                    id="BOM_inventory_data-table-up"#}
+{#                    class="table table-sm text-center"#}
+{#            >#}
+{#                <thead>#}
+{#                <tr>#}
+{#                    <th>순번</th>#}
+{#                    <!--<th>고객사</th>#}
+{#                            <th>생산일자</th>-->#}
+{#                    <th>생산제품명</th>#}
+{#                    <th>모델명</th>#}
+{#                    <th>버전</th>#}
+{#                    <th>생산수량</th>#}
+{#                </tr>#}
+{#                </thead>#}
+{#                <tbody id="bom_tbody"></tbody>#}
+{#            </table>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{#<div class="card m-2">#}
+{#    <div class="row no-gutters card-body p-2">#}
+{#        <div class="col-10 px-0 ml-auto"></div>#}
+{#        <div class="col-1 px-0 ml-auto">#}
+{#            <button#}
+{#                    type="button"#}
+{#                    class="btn button-search rounded-0 w-100 h-100"#}
+{#                    onclick="apply()"#}
+{#            >#}
+{#                자재출고 반영#}
+{#            </button>#}
+{#        </div>#}
+{##}
+{#        {% comment %}<div class="col-1 px-0 ml-auto">#}
+{#            <button#}
+{#                    type="button"#}
+{#                    class="btn button-search rounded-0 w-100 h-100"#}
+{#                    onclick="apply_cancel()"#}
+{#            >#}
+{#                반영취소#}
+{#            </button>#}
+{#        </div> {% endcomment %}#}
+{##}
+{#        <div class="col-1 px-0 ml-auto">#}
+{#            <button#}
+{#                    type="button"#}
+{#                    class="btn button-search rounded-0 w-100 h-100"#}
+{#                    onclick="save()"#}
+{#            >#}
+{#                저장#}
+{#            </button>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+<script
+        src="{% static 'js/api_process.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_customer.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_codemaster.js' %}"
+        type="text/javascript"
+></script>
+<script>
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+    });
+    $(".datepicker").datepicker("setDate", "today");
+    $(".input-daterange input").each(function () {
+        $(this).datepicker({
+            format: "yyyy-mm-dd",
+            language: "ko",
+        });
+    });
+    var bom_inventory_id;
+    var bom_res,
+        selected_bom_res = [];
+    var item_res,
+        toogle = false;
+
+    function BOM_inventory_detail_draw_table() {
+        let data = item_res;
+        console.table(data);
+        let detail_rows = "";
+        let detail_list_num = 1;
+        for (let i = 0; i < data.length; i++) {
+            let detail_item = data[i];
+
+            let overflow =
+                detail_item.current_amount - detail_item.required_amount;
+            // append it
+            let detail_row = "<tr style='cursor:pointer;'>";
+            detail_row += "<td>" + detail_list_num++ + "</td>"; //순번
+            detail_row += "<td name='code'>" + detail_item.item.code + "</td>"; // 품번
+            detail_row += "<td name='part'>" + detail_item.item.name + "</td>"; // 품명
+            detail_row +=
+                "<td name='part_No'>" + nullapply(detail_item.item.detail) + "</td>"; // 품명상세
+            detail_row += "<td name='standard'>" + (detail_item.item.unit ? detail_item.item.unit.name : "") + "</td>"; // 단위
+            detail_row += "<td name='required_amount'>" +
+                (detail_item.bom.required_amount ? detail_item.bom.required_amount : 0) +
+                "</td>"; // t
+            detail_row +=
+                "<td name='required_amount'>" +
+                (detail_item.required_amount ? detail_item.required_amount.toLocaleString() : 0) +
+                "</td>"; // 생산수량
+            detail_row +=
+                "<td name='current_amount'>" + (detail_item.current_amount ? detail_item.current_amount.toLocaleString() : 0) + "</td>"; // 단위
+            detail_row +=
+                "<td  name='overflow' style='" +
+                (overflow < 0 ? "background-color: #FFEEC7" : "") +
+                "'>" +
+                (overflow ? overflow.toLocaleString() : 0) +
+                "</td>"; // 일정
+            {% comment %}if (toogle === true) {
+                detail_row +=
+                    "<td name='remain'>" + (overflow < 0 ? 0 : overflow.toLocaleString()) + "</td>"; // 일정
+            } else {
+                detail_row +=
+                    "<td name='remain'>" + detail_item.current_amount.toLocaleString() + "</td>"; // 일정
+            }{% endcomment %}
+            detail_row +=
+                "<td name='warehouse_keep_location'>" +
+                (detail_item.item.warehouse_keep_location
+                    ? detail_item.item.warehouse_keep_location.name
+                    : "") +
+                "</td>"; // 기타
+            detail_row += "</tr>";
+
+            detail_rows += detail_row;
+        }
+        $("#bom-status-tbody").html(detail_rows);
+    }
+
+    $(function () {
+        refresh();
+
+        // Table Export
+        $(parent.document).find("#excel-export").click(() => {
+            init_excel_export($("#BOM_inventory_data-table-up"), "생산계획BOM");
+            init_excel_export(
+                $("#BOM_inventory_data-table-down"),
+                "생산계획재고"
+            );
+        });
+    });
+
+    function refresh() {
+        // 데이터 보여주기
+        BOM_inventory_init();
+    }
+
+    function BOM_inventory_init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                // {#if (selectors === '.user-dropdown') {#}
+                // {#    list += "<option value='" + item.id + "'>" + item.username + "</option>";#}
+                // {# } else #}
+                if (selectors === ".bom-dropdown-product") {
+                    list +=
+                        "<option value='" +
+                        item.id +
+                        "'>" +
+                        item.product_name +
+                        "</option>";
+                }
+                    // {#else if (selectors === '.bom-dropdown-model') {#}
+                    // {#    list += "<option value='" + item.id + "'>" + item.model_name + "</option>";#}
+                    // {# } else if (selectors === '.bom-dropdown-version') {#}
+                    // {#    list += "<option value='" + item.id + "'>" + item.version + "</option>";#}
+                    // {# }#}
+                else {
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list).select2({width: "100%"});
+        }
+
+        // api_gp("/customers/", "GET", {}, (data) => {
+        //     make_dropdown(data, ".customer-dropdown");
+        // });
+        // {#api_gp('/customers/', 'GET', {}, (data) => {#}
+        // {#    make_dropdown(data, '.customer-dropdown');#}
+        // {# }, handle_error, (xhr, status) => {});#}
+
+        api_gp("/bom/master_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".bom-dropdown-product");
+            // {#make_dropdown(data, '.bom-dropdown-model');#}
+            // {#make_dropdown(data, '.bom-dropdown-version');#}
+            bom_res = data;
+        });
+    }
+
+    {% comment %}//  {#function BOM_inventory_get_form_data() {#}
+    //  {#     return {#}
+    //  {#         process: parseInt(process_id),#}
+    //  {#         type: parseInt($("#detail_process [name='type']").val()), // 세부공정명#}
+    //  {#         workshop: parseInt($("#detail_process [name='workshop']").val()), // 작업장#}
+    //  {#         charge: $("#detail_process [name='charge']").val(), // 공정담당자#}
+    //  {#         unit: parseInt($("#detail_process [name='unit']").val()), // 단위#}
+    //  {#         amount: parseInt($("#detail_process [name='amount']").val()), // 생산수량#}
+    //  {#         by: $("#detail_process [name='by']").val(), // 생산날짜#}
+    //  {#         etc: $("#detail_process [name='etc']").val() // 기타#}
+    //  {#     };#}
+    //  {# }#}
+
+    {#var BOM_inventory_list_num = 1;#}
+    {##}
+    {#function BOM_inventory_add() {#}
+    {#    let bom_inventory_add_id = $("#select_product").val();#}
+    {#    let res = bom_res.filter(#}
+    {#        (obj) => obj.id === parseInt(bom_inventory_add_id)#}
+    {#    );#}
+    {#    if (res.length !== 1) {#}
+    {#        alert(#}
+    {#            "BOM 처리에 문제가 발생하였습니다. 관리자에게 전달바랍니다? : " +#}
+    {#            res#}
+    {#        );#}
+    {#        return false;#}
+    {#    }#}
+    {##}
+    {#    let amount_input = $("#BOM_inventory_amount_input").val();#}
+    {#    let item = res[0];#}
+    {#    res[0].amount = amount_input;#}
+    {#    selected_bom_res.push(res[0]);#}
+    {##}
+    {#    // append it#}
+    {#    let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";#}
+    {#    row += "<td>" + BOM_inventory_list_num++ + "</td>";#}
+    {#    // row += "<td name='customer_name'>" + "" + "</td>";#}
+    {#    // row += "<td name='at'>" + "" + "</td>";#}
+    {#    row +=#}
+    {#        "<td name='product_name' property='" +#}
+    {#        item.id +#}
+    {#        "'>" +#}
+    {#        item.product_name +#}
+    {#        "</td>";#}
+    {#    row += "<td name='model_name'>" + (item.model_name ? item.model_name.name : "") + "</td>";  // 모델#}
+    {#    row += "<td name='version'>" + (item.version ? item.version : "") + "</td>";  // 버전#}
+    {#    row += "<td name='amount'>" + (amount_input ? amount_input.toLocaleString() : 0) + "</td>";#}
+    {#    row += "</tr>";#}
+    {##}
+    {#    $("#bom_tbody").append(row);#}
+    {##}
+    {#    // register#}
+    {#    $("#bom_tbody > tr").on("click", function () {#}
+    {#        bom_inventory_id = $(this).attr("id");#}
+    {##}
+    {#        $("#bom-top-inputs [name='product_name']")#}
+    {#            .val($(this).find("[name='product_name']").attr("property"))#}
+    {#            .trigger("change");#}
+    {#        $("#bom-top-inputs [name='amount']").val(#}
+    {#            $(this).find("[name='amount']").text()#}
+    {#        ); // 생산수량#}
+    {##}
+    {#        // table click highlight#}
+    {#        $(this).parent().find("tr").removeClass("clicked");#}
+    {#        $(this).addClass("clicked");#}
+    {#    });#}
+    {##}
+
+    {#function BOM_inventory_edit() {#}
+    {#    let amount_input = $("#BOM_inventory_amount_input").val();#}
+    {#    for (let i = 0; i < selected_bom_res.length; i++) {#}
+    {#        let item = selected_bom_res[i];#}
+    {#        // {#console.log('item.id = ', item.id, ' parseInt(bom_inventory_id) = ', parseInt(bom_inventory_id));#}
+    {#        if (item.id === parseInt(bom_inventory_id)) {#}
+    {#            // TODO: IDK that assigning instance to new variable is ref copy or not in javascript#}
+    {#            selected_bom_res[i].amount = amount_input;#}
+    {#            $("#bom_tbody > #" + bom_inventory_id + " [name='amount']").text(#}
+    {#                amount_input#}
+    {#            );#}
+    {#            return true;#}
+    {#        }#}
+    {#    }#}
+    {##}
+    {#    return false;#}
+    {##}
+
+    {#function BOM_inventory_remove() {#}
+    {#    for (let i = 0; i < selected_bom_res.length; i++) {#}
+    {#        let item = selected_bom_res[i];#}
+    {#        if (item.id === parseInt(bom_inventory_id)) {#}
+    {#            // TODO: IDK that assigning instance to new variable is ref copy or not in javascript#}
+    {#            // {#console.log('item.id = ', item.id, ' parseInt(bom_inventory_id) = ', parseInt(bom_inventory_id));#}
+    {#            selected_bom_res.splice(i, 1);#}
+    {#            $("#bom_tbody > tr#" + bom_inventory_id).remove();#}
+    {#            return true;#}
+    {#        }#}
+    {#    }#}
+    {#}#}
+
+    {#function BOM_inventory_removeAll() {#}
+    {#    selected_bom_res = [];#}
+    {#    $("#bom-status-tbody").html("");#}
+    {#}#}{% endcomment %}
+
+    function req() {
+        let product = $("#select_product").val().replace(/[^0-9]/g,'');
+        if (product == '') {
+            alert('생산제품명을 선택하세요.');
+            return;
+        }
+
+        let amount = $("#BOM_inventory_amount_input").val().replace(/[^0-9]/g,'');
+        if (amount == '') {
+            alert('생산수량을 입력하세요.');
+            return;
+        }
+        amount = amount.replace(/,/g, "");
+
+        let bom_list = [];
+        let amount_list = [];
+
+        bom_list.push(product);
+        amount_list.push(amount);
+
+
+        let query_param =
+            "?bom_list=" +
+            bom_list.join(",") +
+            "&amount_list=" +
+            amount_list.join(",");
+
+        api_gp("/bom/items/" + query_param, "GET", {}, (data) => {
+            item_res = data;
+            BOM_inventory_detail_draw_table();
+        });
+    }
+
+    {#function apply_cancel() {#}
+    {#    toogle = false;#}
+    {#    BOM_inventory_detail_draw_table();#}
+    {##}
+    {##}
+    {#function apply() {#}
+    {#    toogle = true;#}
+    {#    BOM_inventory_detail_draw_table();#}
+    {##}
+    {##}
+    {#function save() {#}
+    {#    let bom_list = [];#}
+    {#    let amount_list = [];#}
+    {#    selected_bom_res.forEach((x) => {#}
+    {#        bom_list.push(x.id);#}
+    {#        amount_list.push(x.amount);#}
+    {#    });#}
+    {##}
+    {#    // {#let query_param = "?bom_list=" + bom_list.join(',') + "&amount_list=" + amount_list.join(',');#}
+    {#    api_gp(#}
+    {#        "/bom/items/",#}
+    {#        "POST",#}
+    {#        {#}
+    {#            bom_list: bom_list.join(","),#}
+    {#            amount_list: amount_list.join(","),#}
+    {#        },#}
+    {#        (data) => {#}
+    {#            alert("성공적으로 반영되었습니다.");#}
+    {#            bom_inventory_id = null;#}
+    {#            $("#bom-status-tbody").html("");#}
+    {#            $("#bom_tbody").html("");#}
+    {#        },#}
+    {#        handle_error,#}
+    {#        (xhr, status) => {#}
+    {#        }#}
+    {#    );#}
+    {##}
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

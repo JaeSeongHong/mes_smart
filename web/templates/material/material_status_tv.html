@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+{% load static %}
+
+<div class="card m-2">
+    <div class="card-body p-2 pb-2 d-flex" style="height:5vh; line-height:5vh;">
+        <div class="col-11" style="margin-left:5px; height:4vh; line-height:4vh;">재고현황 TV</div>
+        <div class="col-1 d-flex justify-content-end">
+            <div class="btn btn-outline-dark p-0"
+                 style="font-size: 15px; height:3.5vh; line-height:3.5vh; width: 80%;"
+                 onclick="settings();"> 설정 </div>
+        </div>
+    </div>
+</div>
+
+<div class="row col-12 no-gutters mt-3 d-flex" id="main_table">
+    <div class="col-3 mb-2">
+        <div class="no-gutters text-center" id="item_name01"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock01"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -1px;">
+        <div class="no-gutters text-center" id="item_name02"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock02"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -2px;">
+        <div class="no-gutters text-center" id="item_name03"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock03"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -3px;">
+        <div class="no-gutters text-center" id="item_name04"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock04"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+
+    <div class="col-3 mb-2">
+        <div class="no-gutters text-center" id="item_name05"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock05"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -1px;">
+        <div class="no-gutters text-center" id="item_name06"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock06"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -2px;">
+        <div class="no-gutters text-center" id="item_name07"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock07"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -3px;">
+        <div class="no-gutters text-center" id="item_name08"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock08"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+
+    <div class="col-3 mb-2">
+        <div class="no-gutters text-center" id="item_name09"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock09"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -1px;">
+        <div class="no-gutters text-center" id="item_name10"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock10"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -2px;">
+        <div class="no-gutters text-center" id="item_name11"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock11"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+    <div class="col-3 mb-2" style="left: -3px;">
+        <div class="no-gutters text-center" id="item_name12"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold">
+
+        </div>
+        <div class="no-gutters text-center" id="item_stock12"
+             style="height:15vh; line-height:15vh; background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold; margin-top:-1px;">
+
+        </div>
+    </div>
+
+
+</div>
+
+<script
+        src="{% static 'js/api_materials.js' %}"
+        type="text/javascript"
+></script>
+<script
+        src="{% static 'js/api_codemaster.js' %}"
+        type="text/javascript"
+></script>
+<script>
+    refresh();
+
+    function refresh() {
+        setInterval(function () {
+            main_search();
+        }, 60000)
+
+
+        main_search();
+    }
+
+
+    function main_search() {
+
+        api_gp("/items_led/", "GET", {}, (done) => {
+            console.table(done);
+
+            $("#item_name01").css("fontSize", done[0].font_size); $("#item_stock01").css("fontSize", done[0].font_size);
+            $("#item_name02").css("fontSize", done[0].font_size); $("#item_stock02").css("fontSize", done[0].font_size);
+            $("#item_name03").css("fontSize", done[0].font_size); $("#item_stock03").css("fontSize", done[0].font_size);
+            $("#item_name04").css("fontSize", done[0].font_size); $("#item_stock04").css("fontSize", done[0].font_size);
+            $("#item_name05").css("fontSize", done[0].font_size); $("#item_stock05").css("fontSize", done[0].font_size);
+            $("#item_name06").css("fontSize", done[0].font_size); $("#item_stock06").css("fontSize", done[0].font_size);
+            $("#item_name07").css("fontSize", done[0].font_size); $("#item_stock07").css("fontSize", done[0].font_size);
+            $("#item_name08").css("fontSize", done[0].font_size); $("#item_stock08").css("fontSize", done[0].font_size);
+            $("#item_name09").css("fontSize", done[0].font_size); $("#item_stock09").css("fontSize", done[0].font_size);
+            $("#item_name10").css("fontSize", done[0].font_size); $("#item_stock10").css("fontSize", done[0].font_size);
+            $("#item_name11").css("fontSize", done[0].font_size); $("#item_stock11").css("fontSize", done[0].font_size);
+            $("#item_name12").css("fontSize", done[0].font_size); $("#item_stock12").css("fontSize", done[0].font_size);
+
+
+            if (done[0].code01) { $("#item_name01").text(done[0].code01.name); $("#item_stock01").text(done[0].code01.stock) }
+            else { $("#item_name01").text(''); $("#item_stock01").text('') }
+
+            if (done[0].code02) { $("#item_name02").text(done[0].code02.name); $("#item_stock02").text(done[0].code02.stock) }
+            else { $("#item_name02").text(''); $("#item_stock02").text('') }
+
+            if (done[0].code03) { $("#item_name03").text(done[0].code03.name); $("#item_stock03").text(done[0].code03.stock) }
+            else { $("#item_name03").text(''); $("#item_stock03").text('') }
+
+            if (done[0].code04) { $("#item_name04").text(done[0].code04.name); $("#item_stock04").text(done[0].code04.stock) }
+            else { $("#item_name04").text(''); $("#item_stock04").text('') }
+
+            if (done[0].code05) { $("#item_name05").text(done[0].code05.name); $("#item_stock05").text(done[0].code05.stock) }
+            else { $("#item_name05").text(''); $("#item_stock05").text('') }
+
+            if (done[0].code06) { $("#item_name06").text(done[0].code06.name); $("#item_stock06").text(done[0].code06.stock) }
+            else { $("#item_name06").text(''); $("#item_stock06").text('') }
+
+            if (done[0].code07) { $("#item_name07").text(done[0].code07.name); $("#item_stock07").text(done[0].code07.stock) }
+            else { $("#item_name07").text(''); $("#item_stock07").text('') }
+
+            if (done[0].code08) { $("#item_name08").text(done[0].code08.name); $("#item_stock08").text(done[0].code08.stock) }
+            else { $("#item_name08").text(''); $("#item_stock08").text('') }
+
+            if (done[0].code09) { $("#item_name09").text(done[0].code09.name); $("#item_stock09").text(done[0].code09.stock) }
+            else { $("#item_name09").text(''); $("#item_stock09").text('') }
+
+            if (done[0].code10) { $("#item_name10").text(done[0].code10.name); $("#item_stock10").text(done[0].code10.stock) }
+            else { $("#item_name10").text(''); $("#item_stock10").text('') }
+
+            if (done[0].code11) { $("#item_name11").text(done[0].code11.name); $("#item_stock11").text(done[0].code11.stock) }
+            else { $("#item_name11").text(''); $("#item_stock11").text('') }
+
+            if (done[0].code12) { $("#item_name12").text(done[0].code12.name); $("#item_stock12").text(done[0].code12.stock) }
+            else { $("#item_name12").text(''); $("#item_stock12").text('') }
+        });
+    }
+
+
+    function settings(){
+        let url = "/material/status/tv/pop";
+        let name = "재고현황 TV";
+        let option = "width=1400, height=450, location=no";
+        popupWindow = window.open(url, name, option);
+    }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+{% include 'header.html' %}
+{% load static %}
+
+{% comment %}<div class="row m-3 justify-content-end" style="height:4vh; line-height:4vh;">
+    <div class="col-1 btn btn-outline-secondary mr-2" style="line-height:3vh;">설정</div>
+</div>{% endcomment %}
+
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2" style="height:4vh; line-height:4vh;">
+        <label class="mb-0 ml-1" style="height:4vh; line-height:3vh;">온습도 현황 조회 전광판</label>
+    </div>
+</div>
+
+<div class="row col-12 no-gutters mt-3 d-flex" id="main_table">
+    {% comment %}    <div class="col-3 mb-2">
+        <div class="no-gutters text-center"
+             style="height:10vh; line-height:10vh; background-color: #dae3f3; border:1px white solid;padding:3px; font-size: 48px; font-weight: bold">
+            외부완제품창고
+        </div>
+
+        <div class="no-gutters d-flex" style="height:10vh;">
+            <div class="col-3 text-center"
+                 style="background-color: #dae3f3; border:1px white solid;padding:3px; font-size: 48px; font-weight: normal; line-height: 9vh;">
+                온도
+            </div>
+            <div class="col-9 text-center"
+                 style="background-color: #dae3f3; border:1px white solid;padding:3px; font-size: 48px; font-weight: normal; line-height: 9vh;">
+                1.57
+            </div>
+        </div>
+
+        <div class="no-gutters d-flex" style="height:10vh;">
+            <div class="col-3 text-center"
+                 style="background-color: #dae3f3; border:1px white solid;padding:3px; font-size: 48px; font-weight: normal; line-height: 9vh;">
+                습도
+            </div>
+            <div class="col-9 text-center"
+                 style="background-color: #dae3f3; border:1px white solid;padding:3px; font-size: 48px; font-weight: normal; line-height: 9vh;">
+                20
+            </div>
+        </div>
+    </div>{% endcomment %}
+</div>
+
+<script>
+    $(function () {
+        refresh();
+    });
+
+
+    function refresh() {
+        setInterval(function () {
+            main_search();
+        }, 60000)
+
+
+        main_search();
+    }
+
+
+    function main_search() {
+        api_gp("/sensors_h2/", "GET", {}, (done) => {
+            {#console.table(done);#}
+            load_table(done);
+        });
+    }
+
+    function load_table(data) {
+        let row = "";
+        console.table(data);
+
+        $("#main_table").empty();
+        for (let i = 0; i < data.length; i++) {
+            row = "";
+            row += "<div class='col-3 mb-2'>";
+            row += "<div class='no-gutters text-center'";
+            row += "style='height:10vh; line-height:10vh; background-color: #e2efda; border:1px black solid;padding:3px; font-size: 48px; font-weight: bold'>";
+            row += data[i].device;
+            row += "</div>";
+            row += "<div class='no-gutters d-flex' style='height:10vh;'>";
+            row += "<div class='col-3 text-center'";
+            row += "style='background-color: #ddebf7; border:1px black solid;padding:3px; font-size: 36px; font-weight: normal; line-height: 9vh;'>";
+            row += "온도";
+            row += "</div>";
+            row += "<div class='col-9 text-center'";
+            row += "style='background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: normal; line-height: 9vh;'>";
+            row += data[i].temp;
+            row += "</div>";
+            row += "</div>";
+            row += "<div class='no-gutters d-flex';"
+            row += "style='height:10vh;'>";
+            row += "<div class='col-3 text-center'";
+            row += "style='background-color: #ddebf7; border:1px black solid;padding:3px; font-size: 36px; font-weight: normal; line-height: 9vh;'>";
+            row += "습도";
+            row += "</div>";
+            row += "<div class='col-9 text-center'";
+            row += "style='background-color: white; border:1px black solid;padding:3px; font-size: 48px; font-weight: normal; line-height: 9vh;'>";
+            row += data[i].hue;
+            row += "</div>";
+            row += "</div>";
+            row += "</div>";
+
+            $("#main_table").append(row);
+        }
+    }
+
+</script>
+
+</html>

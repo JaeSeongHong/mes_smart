@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+
+<body style="overflow: hidden;">
+{% load static %}
+
+{{ it.media }}
+
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label class="col-form-label">입고기간</label>
+                                        <div class="input-group input-daterange">
+                                        <input type="text"
+                                            class="form-control created_at_after datepicker form-control-sm"
+                                            id="fr_date"
+                                            autocomplete="off"
+                                        />
+                                        <div class="input-group-addon px-3">~</div>
+                                        <input type="text"
+                                            class="form-control created_at_before datepicker form-control-sm"
+                                            id="to_date"
+                                            autocomplete="off"
+                                        />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">거래처</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.cu_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">품명</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.it_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <table id="material_input_data-table" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in column %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="material_input_tbody"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#ma_input_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="ma_input_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="material_input_main-form">
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3" id="id_it_code_form_div">
+                                    <label><strong>*</strong>품번</label>
+                                    <div class="input-group">
+                                        {{ it.it_code_form }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="id_it_name_form_div">
+                                    <label><strong>*</strong>품명</label>
+                                    <div class="input-group">
+                                        {{ it.it_name_form }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="id_it_division_add_div">
+                                    <label>자재분류</label>
+                                    <div>
+                                    {{ it.it_division_add }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="id_cu_name_form_div">
+                                    <label>거래처</label>
+                                    <div>
+                                    {{ cu.cu_name_form }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="id_it_model_add_div">
+                                    <label>모델</label>
+                                    <div>
+                                    {{ it.it_model_add }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="id_it_unit_add_div">
+                                    <label>단위</label>
+                                    <div>
+                                    {{ it.it_unit_add }}
+                                    </div>
+                                </div>
+                                {% for item in column %}
+                                    {% if item.edit_flag %}
+
+
+                                        {% if item.tag == "input" %}
+                                    <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="text" class="{{ item.class_name|safe }}"
+                                           name="{{ item.label_en|safe }}"
+                                           autocomplete="off"
+                                            {% if item.attr != None %} {{ item.attr|safe }} {% endif %}
+                                            {% if item.event != None %} {{ item.event|safe }} {% endif %}/>
+                                     </div>
+                                        {% elif item.tag == "btn" %}
+                                            <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="button" class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" onclick="{{ item.event|safe }}" {{ item.attr }}/>
+                                     </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="col-md-6 mb-3" id="id_it_location_add_div">
+                                    <label for="">창고구분</label>
+                                    <div>
+                                    {{ it.it_location_add }}
+                                    </div>
+                                </div>
+                                {% comment %}<div class="col-md-6 mb-3">
+                                    <label for="">QR</label>
+
+                                    <input type="button"  class="btn btn-secondary form-control form-control-sm" id="qr" onclick="show_qr_print($(this).val())"/>
+
+                                </div>{% endcomment %}
+
+                            <div class="col-md-6 mb-3">
+                                    <label for="item_file">첨부파일</label>
+                                    <div class="mb-3">
+                                        <input class="form-control form-control-sm" type="file" id="item_file" name="file"/>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+
+                            <div class="btn btn-primary mr-3" onclick="form_blank()"> 초기화 </div>
+                            <div class="btn btn-primary mr-3" onclick="material_input_add()"> 입고등록 </div>
+                            <div class="btn btn-primary mr-3" onclick="material_input_edit()"> 입고수정 </div>
+                            <div class="btn btn-primary mr-3" onclick="material_input_remove()"> 입고삭제 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/api_materials.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_item.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+
+<script>
+    let main_table = null;
+    let re_column = []
+    let re_invisual_col = []
+    let re_name = []
+    let hidden_name = []
+    let material_input_id_idx = null;
+    {% for item in column %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                re_name.push("{{ item.label_en|safe }}")
+                {% comment %}re_name.push({
+                    name: "{{ item.label_en|safe }}",
+                    index: {{ forloop.counter }}
+                });{% endcomment %}
+
+            {% elif item.tag == "select" %}
+
+                {% comment %}hidden_name.push({
+                    "{{ item.type|safe }}":
+                     {{ forloop.counter }}
+                }){% endcomment %}
+                hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+
+
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            re_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+    {% endfor %}
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    $(function () {
+
+        main_table = $('#material_input_data-table').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                    {
+                        targets: 0,
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                ],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+                        // 클릭 로우 색상
+                        setRowColor(this, 'M');
+                        // 데이터 셋팅
+
+
+                        setInput_api(data,re_column, re_name, hidden_name);
+
+                        //readonly 셋팅
+                        $('#id_cu_name_form').attr("disabled",true);
+                        $('#id_it_code_form').attr("disabled",true);
+                        $('#id_it_name_form').attr("disabled",true);
+                        $('#id_it_model_add').attr("disabled",true);
+                        $('#id_it_division_add').attr("disabled",true);
+                        $('#id_it_unit_add').attr("disabled",true);
+
+
+                        material_input_id_idx = data[data.length-1];
+                        //console.log(data);
+                    });
+                }
+        })
+
+        //offset Setting
+        re_invisual_col.forEach(function (item){
+            let itemid = item + "_div"
+            let divElement = document.getElementById(itemid);
+            if (divElement) {
+              divElement.style.display = "none";
+            }
+        })
+
+        let option = new Option('입고창고', 12, true, true);
+        $('#id_it_location_add').append(option).trigger('change');
+
+        refresh();
+    });
+
+    function refresh() {
+        $("#in-at").datepicker("setDate", "today");
+         // material_input_init();
+        search();
+    }
+
+    let order = ""
+    function search(ordering){
+
+        let customer_search = $('#id_cu_name_sch').val();
+
+        let fr_date = $("#fr_date").val();
+        let to_date = $("#to_date").val();
+
+        let item_name = ($('#id_it_name_sch :selected').val() ? $('#id_it_name_sch :selected').val() : "");
+
+        let query = "?page=1&";
+        if (customer_search === '' || customer_search == null){
+        } else {
+            query += "customer=" + customer_search + "&";
+        }
+        {#if (item_name == '' || item_name == null){} else {#}
+        {#    query += "item=" + item_name + "&";}#}
+          if (ordering === '' || ordering === null || ordering=== undefined ){
+        } else {
+              order === ordering ? order = "-" +ordering : order = ordering
+        }
+
+           query += "ordering=" + order + "&";
+
+
+        if (fr_date !== '') query += "fr_date=" + fr_date + "&";
+        if (to_date !== '') query += "to_date=" + to_date + "&";
+
+        if (item_name !== '') query += "item_name=" + item_name + "&";
+
+
+        //console.log(query);
+
+        api_gp("/items/in/" + query + "/", "GET", {}, (done) => {
+            console.log(done);
+
+            material_input_draw_in_table(done);
+        });
+    }
+
+    // ANCHOR material_input_draw_in_table
+    function material_input_draw_in_table(done) {
+
+        let data = done.results;
+
+        main_table.rows().remove().draw();
+        main_table.rows.add(formatDataArray(data, re_column)).draw();
+        spinner();
+
+    }
+
+    function add_item_in(_data) {
+        api_gp("/items/in/", "POST", _data, (done) => {
+            nation1.page = 1;
+            material_input_id_idx = null;
+
+            if (done.qr_path){
+                $("[name=qr]").val(done.qr_path);
+            }
+
+            alert("등록하였습니다.");
+
+            search();
+
+        }, () => {
+            alert("실패했습니다.");
+        });
+    }
+
+    function validation_check(type, formdata){
+        let valid = true;
+
+        let item_code_id = $('#id_it_code_form').val();
+        let item_name_id = $('#id_it_name_form').val();
+
+        let customer_id = $('#id_cu_name_form').val();
+        let location = $('#id_it_location_add').val();
+
+        if (type === "A"){
+            if(item_code_id == null){
+                alert("품목을 선택해주세요");
+                valid = false;
+            }else if(customer_id == null){
+                alert("거래처를 선택해주세요");
+                valid = false;
+            }
+        }else{
+
+        }
+
+
+        return valid;
+    }
+
+    function material_input_add() {
+
+        let item_code_id = $('#id_it_code_form').val();
+        let item_name_id = $('#id_it_name_form').val();
+
+        let customer_id = $('#id_cu_name_form').val();
+        let location = $('#id_it_location_add').val();
+        let formData =$('#material_input_main-form').serializeArray();
+
+        formData.push({name:'csrfmiddlewaretoken', value: '{{ csrf_token }}'})
+        formData.push({name:'item', value: item_code_id})
+        formData.push({name:'customer', value: customer_id})
+        formData.push({name:'location', value: location})
+
+        let valid = validation_check("A", formData);
+
+        if(valid){
+            api_gp("/items/in/", "POST", formData, (done) => {
+
+            material_input_id_idx = null;
+
+            if (done.qr_path){
+                $("[name=qr]").val(done.qr_path);
+            }
+
+            alert("등록하였습니다.");
+
+            search();
+            form_blank()
+            }, () => {
+                alert("실패했습니다.");
+            });
+            }
+
+    }
+
+    // Todo : 입고 수정시, 만약 품번을 변경 가능하도록 한다면, 현재고값이 틀어짐 >> 품번 변경 못하도록 함 (기획 요청)
+    function material_input_edit() {
+        let formData =$('#material_input_main-form').serializeArray();
+
+        // 업데이트 컬럼 제외
+        let excludedKeys = ['num'];
+        let filteredData = formData.filter(item => !excludedKeys.includes(item.name));
+
+        // key name 변경
+        let renamedKey = {'it_location_add': 'location'};
+        let transformedData = filteredData.map(item => {
+              let key = renamedKey[item.name] || item.name; // 기존 key가 새로운 key로 매핑되었는지 확인하고 적용
+              return {
+                ...item,
+                name: key // 새로운 key로 변경
+              };
+            });
+        
+
+        let valid = validation_check("E", transformedData);
+
+        if (valid) {
+            api_gp("/items/in/" + material_input_id_idx + "/", "PATCH", transformedData, (done) => {
+                            search();
+                            alert("수정하였습니다.");
+                        }
+                    );
+            return true;
+        }
+    }
+
+    function material_input_remove() {
+        if(material_input_id_idx == null){
+            alert("삭제할 데이터를 선택해주세요.");
+            return;
+        }
+
+        let data = {}
+        data.qr = $('input[name="qr_path"]').val();
+        api_gp("/items/in/" + material_input_id_idx + "/", "DELETE", data, (data) => {
+
+                form_blank();
+                search();
+                alert("삭제하였습니다.");
+            }
+        );
+    }
+
+    function in_amount_calc() {
+
+        let sum = _numberWithCommas(
+            parseFloat($("input[name=receive_amount]").val().replace(/[\{\}\[\]\/?,;:|\)*~`!^\+_<>@\#$%&\\\=\(\'\"]/g, '')) -
+            parseFloat($("input[name=in_faulty_amount]").val().replace(/[\{\}\[\]\/?,;:|\)*~`!^\+_<>@\#$%&\\\=\(\'\"]/g, ''))
+        );
+        sum = parseFloat(sum.replace(/[\{\}\[\]\/?,;:|\)*~`!^\+_<>@\#$%&\\\=\(\'\"]/g, '')).toFixed(12);
+        $("input[name=in_amount]").val(parseFloat(sum).toLocaleString());
+    }
+
+    // ANCHOR  input_submit
+    function input_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+        material_input_id_idx = null;
+        order= ""
+        search();
+        return false;
+    }
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+    function show_qr_print(_imgurl){
+
+        var url = "/material/qr_print/?param1=";
+        url = url + _imgurl;
+        var name = "QR Print";
+        var option = "width=1000px, height=1000px, location=no";
+        window.open(url, name, option);
+
+    }
+
+    //품번, 거래처 선택시 수수료율과 단가 셋팅
+    $('#id_cu_name_form').on('select2:select', function (e) {
+        let cu_id = e.params.data.id;
+        let it_code = $('#id_it_code_form').val();
+
+        if (it_code != null) {
+            get_feeRate(cu_id, it_code);
+        }
+    });
+
+    $('#id_it_code_form').on('select2:select', function (e) {
+        let it_code = e.params.data.id;
+        let cu_id = $('#id_cu_name_form').val();
+
+        if (cu_id != null) {
+            get_feeRate(cu_id, it_code);
+        }
+
+        if (it_code != null){
+            get_itemmaster_info(it_code, "C")
+        }
+
+    });
+
+    $('#id_it_name_form').on('select2:select', function (e) {
+        let it_code = e.params.data.id;
+        if (it_code != null){
+            get_itemmaster_info(it_code, "N")
+        }
+
+    });
+
+    function get_feeRate(cuId, itCode) {
+        let postData = {};
+        postData["customer_id"] = cuId;
+        postData["item_id"] = itCode;
+        postData["division_id"] = '10';
+        postData["type"] = 's';
+
+        api_gp("/unitprice/sub/", "get", postData, (done) => {
+
+            if (done.count == 0){
+                alert("거래처별 단가관리에서 단가와 수수료를 등록해주세요");
+                $('#material_output_main-form [name="fee_rate"]').val("");
+                $('#material_output_main-form [name="in_price"]').val("");
+            }else {
+
+                $('input[name="fee_rate"]').val(done.results[0].fee_rate);
+                $('input[name="in_price"]').val(done.results[0].unit_price);
+
+            }
+
+            })
+    }
+
+    function get_itemmaster_info(id, type) {
+        if (id == null){
+            console.log("선택된 품번, 품명이 존재하지 않습니다.")
+        }else{
+            api_gp(`/items/?id=${id}`, 'get', {},(done)=>{
+                done = done.results[0]
+                console.log(done);
+                let option = new Option(done.division_name, done.division_id, true, true);
+                $("#id_it_division_add").append(option).trigger('change');
+                option = new Option(done.model_name, done.model_id, true, true);
+                $("#id_it_model_add").append(option).trigger('change');
+
+                option = new Option(done.unit_name, done.unit_id, true, true);
+                $("#id_it_unit_add").append(option).trigger("change")
+
+                if (type == "C"){
+                    option = new Option(done.name, done.id, true, true);
+                    $("#id_it_name_form").append(option).trigger("change")
+                }else{
+                    option = new Option(done.code, done.id, true, true);
+                    $("#id_it_code_form").append(option).trigger("change")
+                }
+            })
+        }
+    }
+
+    function form_blank() {
+        $('#material_input_main-form input').val('');
+
+        $('#material_input_main-form select').val(null).trigger('change');
+        $('#material_input_main-form select').attr("disabled",false);
+
+        $('#material_input_tbody').find('tr').siblings().css('background-color', '');
+    }
+
+</script>
+</script>
+<!-- {#{% endblock %}#} -->
+</body>
+</html>

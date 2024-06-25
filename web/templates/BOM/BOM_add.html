@@ -1,0 +1,74 @@
+{% include 'header.html' %}
+{% load static %}
+<div class="card m-2">
+    <div class="card-body p-2 mh-100">
+        <div class="row no-gutters mb-2">
+            <h4>BOM 등록</h4>
+        </div>
+        <form class="row no-gutters">
+            <div class="col-12 d-flex mb-2">
+                <div class="content-input-group col-4 px-0">
+                    <div class="content-input-group-header">
+                        <label>BOM 코드</label>
+                    </div>
+                    <div class="content-input-group-input">
+                        <input class="form-control" name="bom_code">
+                    </div>
+                </div>
+                <div class="content-input-group col-4 px-0">
+                    <div class="content-input-group-header">
+                        <label>고객사</label>
+                    </div>
+                    <div class="content-input-group-input">
+                        <select class="form-control customer-dropdown" name="customer">
+                        </select>
+                    </div>
+                </div>
+                <div class="content-input-group col-4 px-0">
+                    <div class="content-input-group-header">
+                        <label>BOM 명</label>
+                    </div>
+                    <div class="content-input-group-input">
+                        <input class="form-control" name="bom_name">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end mb-2">
+                <div class="col-3 d-flex px-0">
+                    <div class="col-6 pl-0 pr-1">
+                        <a class="btn button-custom w-100" role="button">취소</a>
+                    </div>
+                    <div class="col-6 pl-1 pr-0">
+                        <a class="btn button-custom w-100" role="button">저장</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="{% static 'js/api_adapter.js' %}" type="text/javascript"></script>
+<script>
+    $(function () {
+        init();
+    })
+
+    function init() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                list += "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+            $(selectors).html(list);
+            $(selectors).select2({
+                width: '100%',
+            });
+        }
+
+        api_gp('/customers/', 'GET', {}, (data) => {
+           make_dropdown(data, '.customer-dropdown');
+        });
+
+    }
+</script>

@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+{# 발주등록 #}
+
+{% comment %}<link rel="stylesheet" href="https://cdn.datatables.net/select/1.6.2/css/select.dataTables.min.css">{% endcomment %}
+{% comment %}<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">{% endcomment %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+
+
+{% load static %}
+{{ it.media }}
+<body style="">
+
+{% comment %}<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>{% endcomment %}
+
+<!-- 검색 -->
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">거래처</label>
+                                        <div class="content-input-group-input">
+                                         {{ it.cu_name_sch }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">마감여부</label>
+                                        <div class="content-input-group-input">
+                                         <select class="form-control form-control-sm" id="option_finish_chk">
+                                            <option value="">전체</option>
+                                            <option value="1">마감완료</option>
+                                            <option selected value="0">미완료</option>
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label class="col-form-label">발주일자</label>
+                                        <div class="input-group input-daterange">
+                                        <input type="text"
+                                            class="form-control created_at_after datepicker form-control-sm"
+                                            id="make_from"
+                                            autocomplete="off"
+                                        />
+                                        <div class="input-group-addon px-3">~</div>
+                                        <input type="text"
+                                            class="form-control created_at_before datepicker form-control-sm"
+                                            id="make_to"
+                                            autocomplete="off"
+                                        />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                <div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+                <div class="col-sm-6">
+                    <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="order_manage_data_table" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr><th><input type="checkbox" id="parentCheckbox"/></th>
+                                        {% for item in column %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% comment %}<th></th>
+                                        <th>순번</th>
+                                        <th>발주번호</th>
+                                        <th>거래처</th>
+                                        <th>합계</th>
+                                        <th>마감일자</th>
+                                        <th>마감여부</th>
+                                        <th>작성일자</th>
+
+                                        <th>작성자</th>
+                                        <th>비고</th>
+                                        <th>아이디</th>{% endcomment %}
+                                    </tr>
+                                </thead>
+                                <tbody id="order_manage_tbody">
+                                    {% comment %}{% for item in data %}
+                                        <tr>
+                                            <td><input type="checkbox" name="check[]" /></td>
+                                            <td></td>
+                                            <td style="word-wrap: break-word;">{{ item.po_no }}</td>
+                                            <td style="word-wrap: break-word;">{{ item.customer__name }}</td>
+                                            <td style="word-wrap: break-word;">{{ item.item_supply_total }}</td>
+                                            <td style="word-wrap: break-word;">{{ item.finish_date }}</td>
+                                            <td style="word-wrap: break-word;">{{ item.finish_chk }}</td>
+                                            <td style="word-wrap: break-word;">{{ item.created_at }}</td>
+
+                                            <td style="word-wrap: break-word;">{{ item.created_by__username }}</td>
+                                            <td style="word-wrap: break-word;">{{ item.etc }}</td>
+                                            <td style="word-wrap: break-word;">{{ item.id }}</td>
+                                        </tr>
+                                    {% endfor %}{% endcomment %}
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+            <div class="col-sm-6">
+            <div class="card m-1">
+                        <div class="card-body">
+
+                            <table id="order_manage_data_table_sub" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        {% for item in subcolumn %}
+                                            {% if item.visual_flag %}
+                                            <th>{{ item.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody id="order_manage_tbody_sub"></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#or_manage_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="or_manage_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="order_manage_form">
+                            <div class="form-row">
+                                <div class="col-md-6 mb-3" id="id_it_code_form_div">
+                                    <label><strong>*</strong>품번</label>
+                                    <div class="input-group">
+                                        {{ it.it_code_form }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="id_it_name_form_div">
+                                    <label><strong>*</strong>품명</label>
+                                    <div class="input-group">
+                                        {{ it.it_name_form }}
+                                    </div>
+                                </div>
+                            <div class="col-md-6 mb-3" id="id_it_name_form_div">
+                                    <label><strong>*</strong>거래처</label>
+                                    <div class="input-group">
+                                        {{ it.it_customer_add }}
+                                    </div>
+                                </div>
+
+                                {% for item in subcolumn %}
+                                    {% if item.edit_flag %}
+
+
+                                        {% if item.tag == "input" %}
+                                    <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="text" class="{{ item.class_name|safe }}"
+                                           name="{{ item.label_en|safe }}"
+                                           autocomplete="off"
+                                            {% if item.attr != None %} {{ item.attr|safe }} {% endif %}
+                                            {% if item.event != None %} {{ item.event|safe }} {% endif %}/>
+                                     </div>
+                                        {% elif item.tag == "btn" %}
+                                            <div class="col-md-6 mb-3">
+                                    <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                    <input type="button" class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" onclick="{{ item.event|safe }}" {{ item.attr }}/>
+                                     </div>
+
+                                        {% endif %}
+
+                                    {% endif %}
+                                {% endfor %}
+
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                        {% for item in subcolumn %}
+                            {% if item.tag == "button" %}
+                                <div class="{{ item.class_name|safe }}" onclick="{{ item.event|safe }}">{{ item.label }}</div>
+                            {% endif %}
+                        {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="{% static 'js/html2canvas.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/jspdf.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+{% comment %}<script src="https://code.jquery.com/jquery-3.5.1.js"></script>{% endcomment %}
+{% comment %}<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>{% endcomment %}
+{% comment %}<script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>{% endcomment %}
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+<script>
+    let maintable = null;
+    let subtable = null;
+    let re_column = []
+    let sub_column = []
+    let re_invisual_col = []
+    let sub_re_invisual_col = []
+    let re_name = []
+    let sub_re_name = []
+    let hidden_name = []
+    let sub_hidden_name = []
+    let list_id = null;
+    let order_item_list_id = null;
+
+    {% for item in column %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            re_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+
+
+    {% for item in subcolumn %}
+            {% if item.tag == "input" or item.tag == "btn" %}
+                sub_re_name.push("{{ item.label_en|safe }}")
+
+            {% elif item.tag == "select" %}
+
+                sub_hidden_name.push({
+                    "{{ item.label_en|safe }}":
+                     "{{ item.type|safe }}"
+                })
+            {% endif %}
+        {% if not item.visual_flag and item.edit_flag %}
+            sub_re_invisual_col.push("{{ item.type|safe }}")
+            {% else %}
+            sub_column.push("{{ item.label_en|safe }}")
+        {% endif %}
+
+    {% endfor %}
+        sub_column.push("id");
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+
+    function isNumber(value) {
+        return typeof value === 'number' && isFinite(value);
+    }
+
+
+    function check_unexpected_value(param) {
+        if (param === undefined || param === '' || param === 'null' || param === 'undefined') {
+            param = null;
+        }
+
+        return param;
+    }
+
+    function print(){
+        if (list_id == null) {
+            alert("발주서를 먼저 선택해 주세요");
+            return;
+        }
+        if (myinfo_id == null || myinfo_id === "") {
+            alert("사업장을 선택해 주세요");
+            return;
+        }
+            window.open('/basic_information/print_page/', 'print_page', 'width=1600, height=900');
+    }
+
+
+    $(function () {
+        let now = new Date();
+        let first_date = new Date(now.getFullYear(), now.getMonth(), 1);
+
+
+        $('[data-toggle="tooltip"]').tooltip()
+        $("#make_from").datepicker("setDate", first_date);
+        $("#make_to").datepicker("setDate", new Date());
+
+        main_table = $('#order_manage_data_table').DataTable({
+            scrollX: true,
+            "columnDefs": [
+                    {
+                        orderable: false,
+                        //className: 'select-checkbox',
+                        targets: 0
+                    },{
+                        targets: [1],
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                },{
+                        targets: [4],
+                        render: function(data, type, row) {
+                            data = parseInt(data);
+                            if (type === 'display' && typeof data === 'number') {
+                              return '₩' + data.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                            }
+                        return data;
+                      }
+                },{
+                        targets: [5, 8],
+                        render: function(data, type, row) {
+
+                            if (data = "None") {
+                              return "";
+                            }
+                        return data;
+                      }
+                },{
+                        targets: [6],
+                        render: function(data, type, row) {
+
+                            if (!data){
+                                data ="미완료";
+                            }else{
+                                data = "마감완료";
+                            }
+
+                        return data;
+                      }
+                },{
+                        targets: [10],
+                        visible: false
+                },
+                    {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                ],
+            "select": {
+                style: 'multi',
+                selector: 'td:first-child'
+            },
+            "order": [[ 1, 'asc' ]],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+
+                        list_id=data[data.length-1]
+                        set_item();
+                        setRowColor(this, 'M');
+                    });
+                },
+            dom: 'Bfrtip',
+            buttons: [
+
+              {
+                text: '발주마감',
+                action: function(e, dt, node, conf) {
+
+                    let del = confirm(`발주서를 마감하시겠습니까?`);
+                    if (!del) return;
+
+                    let today = new Date();
+                    let year = today.getFullYear();
+                    let month = today.getMonth() + 1; // 0부터 시작하므로 +1 해줍니다.
+                    let day = today.getDate();
+                    let formatted_date = `${year}-${month}-${day}`;
+
+                    let ordersList = [];
+                    let orders_item_list = null;
+                    let hasFinishedOrder = false;
+
+                    $('#order_manage_tbody td input[type="checkbox"]').each(function () {
+                        if ($(this).prop('checked')) {
+                            ordersList.push($(this).val());
+                            orders_item_list = $(this).val();
+                            let finish_idx = re_column.indexOf('finish_chk');
+
+                            let finish_chk = $(this).closest('tr').find('td').eq(finish_idx+1).text();
+
+                            if (finish_chk === '마감완료') {
+                                hasFinishedOrder = true;
+                                return false; // 반복문을 빠져나옴
+                            }
+                        }
+                    });
+
+                    if (hasFinishedOrder) {
+                        alert("마감이 완료된 발주서가 포함되어 있습니다")
+                        return; // 함수를 빠져나옴
+                    }
+
+                    if (ordersList.length <= 0) {
+                        alert("마감할 발주서를 먼저 선택해 주세요.")
+                        return;
+                    }
+
+                    let allData = {
+                        'in_status': 'U',
+                        'finish_chk': 'True',
+                        'finish_date': formatted_date,
+                        'order_id_list': ordersList
+                    }
+
+
+                    if (allData == null) {
+                        return;
+                    }
+
+                    api_gp(`/order_s_updateBylist/` + orders_item_list + "/", "PATCH", allData, (done) => {
+
+                        search();
+                    })
+                }
+              },{
+                    text: '발주삭제',
+                    action: function(e, dt, node, conf) {
+                        let del = confirm(`발주서를 삭제하시겠습니까?`);
+                        if (!del) return;
+
+                        let ordersList = [];
+                        let orders_item_list = null;
+                        let hasFinishedOrder = false;
+
+                        $('#order_manage_tbody td input[type="checkbox"]').each(function () {
+                            if ($(this).prop('checked')) {
+                                ordersList.push($(this).val());
+                                orders_item_list = $(this).val();
+                                let finish_idx = re_column.indexOf('finish_chk');
+
+                                let finish_chk = $(this).closest('tr').find('td').eq(finish_idx+1).text();
+
+                                if (finish_chk === '마감완료') {
+                                    hasFinishedOrder = true;
+                                    return false; // 반복문을 빠져나옴
+                                }
+                            }
+                        });
+
+                        if (hasFinishedOrder) {
+                            alert("마감이 완료된 발주서가 포함되어 있습니다")
+                            return; // 함수를 빠져나옴
+                        }
+
+                        if (ordersList.length <= 0) {
+                            alert("삭제할 발주서를 먼저 선택해 주세요.")
+                            return;
+                        }
+
+                        let allData = {
+                            'order_id_list': ordersList
+                        }
+
+
+                        if (allData == null) {
+                            return;
+                        }
+
+                        api_gp(`/order_s_updateBylist/` + orders_item_list + "/", "DELETE", allData, (done) => {
+                            alert(done.msg);
+                        })
+                    }
+                }
+            ]
+
+                });
+
+        let quan_idx = sub_column.indexOf('quantity');
+        let item_price_idx = sub_column.indexOf('item_price');
+        let supply_price_idx = sub_column.indexOf("supply_price");
+        let surtax_idx = sub_column.indexOf('surtax');
+        let item_supply_total_idx = sub_column.indexOf('item_supply_total');
+        sub_table = $('#order_manage_data_table_sub').DataTable({
+                scrollX: true,
+             "columnDefs": [
+                    {
+                        targets: [0],
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                },{
+                        targets: [supply_price_idx],
+                        render: function(data, type, row, meta) {
+                            let supply_price = row[quan_idx] * row[item_price_idx];
+                            supply_price = '₩' + supply_price.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                            return supply_price;
+                        }
+                },{
+                        targets: [surtax_idx],
+                        render: function(data, type, row, meta) {
+                            let surtax = row[quan_idx] * row[item_price_idx] * 0.1;
+                            surtax = '₩' + surtax.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                            return surtax;
+                        }
+                },{
+                        targets: [item_supply_total_idx],
+                        render: function(data, type, row, meta) {
+                            let item_supply_total = (row[quan_idx] * row[item_price_idx]) + (row[quan_idx] * row[item_price_idx] * 0.1);
+                            item_supply_total = '₩' + item_supply_total.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+                            return item_supply_total;
+                        }
+                },
+                {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                  ],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+                        console.log(data);
+                        order_item_list_id=data[data.length-1];
+
+                        setRowColor(this, 'S');
+                        setInput_api(data,sub_column, sub_re_name, sub_hidden_name);
+                    });
+                }
+         });
+
+        // 상위 체크박스의 이벤트 리스너를 등록합니다.
+      $('#parentCheckbox').change(function() {
+        // 상위 체크박스의 상태를 가져옵니다.
+        let isChecked = $(this).prop('checked');
+
+        // 하위 체크박스들을 전부 선택 또는 선택 해제합니다.
+        $('.childCheckbox').prop('checked', isChecked);
+      });
+
+      // 하위 체크박스 중 하나라도 체크 해제되면 상위 체크박스도 체크를 해제합니다.
+      // 하위 체크박스의 이벤트 리스너를 등록합니다.
+      $(document).on('change', '.childCheckbox', function() {
+            if ($('.childCheckbox:checked').length === $('.childCheckbox').length) {
+              $('#parentCheckbox').prop('checked', true);
+            } else {
+              $('#parentCheckbox').prop('checked', false);
+            }
+          });
+
+        refresh()
+
+    });
+
+
+    function refresh()
+    {
+        search();
+
+    }
+
+
+    function search(){
+        let customer_search = $('#id_cu_name_sch').val();
+
+
+        let make_from = $("#make_from").val();
+        let make_to = $("#make_to").val();
+
+        let finish_chk = $("#option_finish_chk").val();
+
+        let query = "?page=1&";
+
+        if (finish_chk === '') {
+        } else query += "finish_chk=" + finish_chk + "&";
+
+        if (customer_search === undefined || customer_search === null) {customer_search = ''
+        } else query += "customer_id=" + customer_search + "&";
+
+        if (make_from === '') {
+        } else query += "make_from=" + make_from + "&";
+        if (make_to === '') {
+        } else query += "make_to=" + make_to + "&";
+
+
+        api_gp("/order_s/read" + query + "/", "GET", {}, (done) => {
+            load_list_table(done);
+        });
+    }
+
+
+    function load_list_table(done) {
+
+        let data = done.results;
+        console.log(data);
+
+        main_table.rows().remove().draw();
+        main_table.rows.add(exformatData(data, re_column)).draw();
+
+        sub_table.rows().remove().draw();
+    }
+
+
+    function load_detail_table(data) {
+        console.log(data);
+
+        sub_table.rows().remove().draw();
+        sub_table.rows.add(formatDataArray(data, sub_column)).draw();
+
+    }
+
+
+
+    function set_item(order_id) {
+        if (!list_id) return;
+
+        // 거래처 코드
+        api_gp('/order_s_items/?orders_id=' + list_id + "&", 'GET', {}, (done) => {
+            load_detail_table(done);
+
+        });
+    }
+
+
+
+    function refresh_data() {  // 초기화 (
+
+        $('#order_manage_form input').val('');
+
+        $('#order_manage_form select').val(null).trigger('change');
+        $('#order_manage_form select').attr("disabled",false);
+
+        $('#order_manage_tbody').find('tr').siblings().css('background-color', '');
+        $('#order_manage_tbody_sub').find('tr').siblings().css('background-color', '');
+        //list_id=null;
+        order_item_list_id = null;
+
+    }
+
+    function remove() {
+        if (!selected_tr) return;
+
+        selected_tr.remove();
+
+        let table = $('#detail_tbody tr');
+        for (let i = 0; i < table.length; i++) {
+            let tr = table.eq(i);
+            tr.find("td:eq(0)").text(i + 1);  // 순번
+        }
+
+        list_number = table.length + 1;
+        reset_item_info();
+        count_total();
+
+        selected_tr = null;
+
+        // 첨부파일
+        let item_id = $('#item_code option:selected').val();
+    }
+
+
+    function submit() {
+
+        let item_id = $('#id_it_code_form').val();
+        item_id = item_id ? item_id : $('#id_it_name_form').val();
+        let cu_id = $('#id_it_customer_add').val();
+        let quantity = $('#order_manage_form [name=quantity]').val();
+        let item_price = $('#order_manage_form [name=item_price]').val();
+
+        let form = new FormData();
+        form.append("item", item_id);
+        form.append("customer", cu_id);
+        form.append("quantity", quantity);
+        form.append("item_price", item_price);
+        form.append("in_status", "U");
+
+        let valid = true;
+
+        if(item_id == null){
+            alert("품목을 선택해주세요");
+            valid = false;
+        }else if(cu_id == null){
+            alert("거래처를 선택해주세요");
+            valid = false;
+        }else if(quantity == null){
+            alert("수량을 입력해주세요");
+            valid = false;
+        }else if(item_price == null){
+            alert("단가를 입력해주세요");
+            valid = false;
+        }
+
+        if (valid){
+            api_orders_post(form, (e) => {
+
+                alert("등록하였습니다.");
+                search();
+                set_item();
+
+            refresh_data();
+
+        }, (e1) => {
+
+                alert("예외가 발생했습니다.");
+        });
+        }
+
+    }
+
+    function orders_modify(order) {
+        if (order_item_list_id == null) {
+            alert("항목을 먼저 선택해 주세요");
+            return;
+        }else {
+            let quantity = $('#order_manage_form [name=quantity]').val();
+            let item_price = $('#order_manage_form [name=item_price]').val();
+
+
+            api_gp("/order_s_items/"+order_item_list_id+"/?orders_id=" +list_id, "PATCH", { quantity: quantity, item_price: item_price}, (done) => {
+
+                alert("등록하였습니다.");
+
+                search();
+                set_item();
+
+                refresh_data()
+            }, () => {
+                alert("실패했습니다.");
+            });
+        }
+
+    }
+
+    function orders_delete(){
+        if (order_item_list_id == null) {
+            alert("항목을 먼저 선택해 주세요");
+            return;
+        }else{
+            api_gp("/order_s_items/"+order_item_list_id+"/?orders_id=" +list_id, "DELETE", "", (done) => {
+
+            alert("삭제하였습니다.");
+            search();
+            set_item();
+
+            refresh_data()
+        }, () => {
+            alert("실패했습니다.");
+        });
+        }
+
+
+    }
+
+
+    function craete_pdf(){
+        if (list_id == null) {
+            alert("발주서를 먼저 선택해 주세요");
+            return;
+        }
+        if (myinfo_id == null || myinfo_id === "") {
+            alert("사업장을 선택해 주세요");
+            return;
+        }
+        html2canvas($('#print')[0], {scrollX: -8.5, scrollY: -window.scrollY, onclone: function (clonedDoc) {
+                $(clonedDoc).find('#print').css('visibility', 'visible');
+            }}).then(function (canvas) { //저장 영역 div id
+
+            // 캔버스를 이미지로 변환
+            var imgData = canvas.toDataURL('image/png');
+
+            var imgWidth = 200; // 이미지 가로 길이(mm) / A4 기준 210mm
+            var pageHeight = imgWidth * 1.414;  // 출력 페이지 세로 길이 계산 A4 기준
+            var imgHeight = canvas.height * imgWidth / canvas.width;
+            var heightLeft = imgHeight;
+            var margin = 4; // 출력 페이지 여백설정
+            var doc = new jsPDF('p', 'mm');
+            var position = 10;
+
+            // 첫 페이지 출력
+            doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            // 한 페이지 이상일 경우 루프 돌면서 출력
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            let pdf = new Blob([doc.output('blob')], {type: 'application/pdf'});
+            let customer_email = $('#email').val();
+            let enterprise_name = $('#ordering_enterprise_name').text();
+
+            let form = new FormData();
+            form.append("file", pdf);
+            form.append("customer_email", customer_email);
+            form.append("enter_email", enter_email);
+            form.append("enter_fax", enter_fax);
+            form.append("enter_call", enter_call);
+            form.append("logo_img", logo_img)
+            form.append("enterprise_name", enterprise_name);
+
+            if (form == null) {
+                return;
+            }
+
+            api_send_email(form, (done) => {
+                alert('메일 전송 완료');
+
+                // 메일 전송 완료시 리스트 Update
+                let upload_data = {
+                    send_chk: true,
+                    send_try: true,
+                }
+
+                api_gp("/order_s/" + list_id + "/", "PATCH", upload_data, (done) => {
+                    let ret = done.send_chk;
+                    let send_date = done.send_date;
+
+                    if (ret == true) {
+                        $("#list_tbody").find(".clicked").find("[name='send_chk']").text('발송');
+                        $("#list_tbody").find(".clicked").find("[name='send_date']").text(send_date);
+                    } else {
+                        alert('예외가 발생했습니다. 관리자에게 문의 하세요.');
+                    }
+                });
+            });
+        });
+    }
+
+
+    function craete_pdf_download(){
+        if (list_id == null) {
+            alert("발주서를 먼저 선택해 주세요");
+            return;
+        }
+        if (myinfo_id == null || myinfo_id === "") {
+            alert("사업장을 선택해 주세요");
+            return;
+        }
+        html2canvas($('#print')[0], {scrollX: -8.5, scrollY: -window.scrollY, onclone: function (clonedDoc) {
+                $(clonedDoc).find('#print').css('visibility', 'visible');
+            }}).then(function (canvas) { //저장 영역 div id
+
+            // 캔버스를 이미지로 변환
+            var imgData = canvas.toDataURL('image/png');
+
+            var imgWidth = 200; // 이미지 가로 길이(mm) / A4 기준 210mm
+            var pageHeight = imgWidth * 1.414;  // 출력 페이지 세로 길이 계산 A4 기준
+            var imgHeight = canvas.height * imgWidth / canvas.width;
+            var heightLeft = imgHeight;
+            var margin = 4; // 출력 페이지 여백설정
+            var doc = new jsPDF('p', 'mm');
+            var position = 10;
+
+            // 첫 페이지 출력
+            doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            // 한 페이지 이상일 경우 루프 돌면서 출력
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            doc.save('발주서-' + order_code + '.pdf')
+        });
+    }
+
+
+    // 메일 전송
+    function send_email() {
+
+        if (list_id == null) {
+            alert("리스트를 선택해 주세요.");
+            return;
+        }
+        if (myinfo_id === null || myinfo_id === "") {
+            alert("사업장을 선택해 주세요.");
+            return;
+        }
+
+        {#let checked_value = $("input[id=mail_checkbox]:checked")#}
+        let send_checked = $("#list_tbody").find(".clicked").find("[name='send_chk']").text();
+
+        if (send_checked == '발송') {
+            if (!confirm('메일을 다시 전송하시겠습니까?')) return;
+        } else if (send_checked == '미발송') {
+            if (!confirm('메일을 전송하시겠습니까?')) return;
+        }
+
+        craete_pdf()
+    }
+
+
+    function spinner() {
+        $("#spinner").remove();
+    }
+
+
+    function api_orders_post(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/order_s/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+
+    function api_send_email(allData, done_callback) {
+        $.ajax({
+            type: "POST",
+            url: "/order_s/sendmail_pdf/",
+            headers: {
+                "Authorization": get_token()
+            },
+            processData: false,
+            contentType: false,
+            data: allData
+        })
+            .done(function () {
+                done_callback();
+            })
+            .fail(handle_error);
+    }
+
+
+    function get_fname(_url) {
+        let url = decodeURI(_url);
+        let arSplitUrl = url.split("/");    //   "/" 로 전체 url 을 나눈다
+        let nArLength = arSplitUrl.length - 1;
+
+        if (nArLength == undefined || nArLength == null || nArLength == -1){
+            return '';
+        }
+
+        let sFileName = arSplitUrl[nArLength];   // 나누어진 배열의 맨 끝이 파일명이다
+        {#console.log('sFileName', sFileName);#}
+
+        if (sFileName == 'undefined'){
+            return '';
+        }
+
+
+        return sFileName;
+    }
+
+
+    function fileCheck(file) {
+        // 사이즈체크
+        var maxSize = 1 * 1024 * 1024 //1MB
+        var fileSize = 0;
+
+        fileSize = file.files[0].size;
+        if (fileSize > maxSize) {
+            alert("파일 사이즈는 1MB 이내로 등록 가능합니다.");
+            return false;
+        }
+        return true;
+    }
+    //품번, 거래처 선택시 수수료율과 단가 셋팅
+    $('#id_it_customer_add').on('select2:select', function (e) {
+        let cu_id = e.params.data.id;
+        let it_code = $('#id_it_code_form').val();
+
+        if (it_code != null) {
+            get_feeRate(cu_id, it_code);
+        }
+    });
+
+    $('#id_it_code_form').on('select2:select', function (e) {
+        let it_code = e.params.data.id;
+        let cu_id = $('#id_cu_name_form').val();
+
+        if (cu_id != null) {
+            get_feeRate(cu_id, it_code);
+        }
+
+        if (it_code != null){
+            get_itemmaster_info(it_code, "C")
+        }
+
+    });
+
+    $('#id_it_name_form').on('select2:select', function (e) {
+        let it_code = e.params.data.id;
+        if (it_code != null){
+            get_itemmaster_info(it_code, "N")
+        }
+
+    });
+
+    function get_feeRate(cuId, itCode) {
+        let postData = {};
+        postData["customer_id"] = cuId;
+        postData["item_id"] = itCode;
+        postData["division_id"] = '10';
+        postData["type"] = 's';
+
+        api_gp("/unitprice/sub/", "get", postData, (done) => {
+
+            if (done.count == 0){
+                alert("거래처별 단가관리에서 단가와 수수료를 등록해주세요");
+
+                $('#order_manage_form [name="item_price"]').val("");
+            }else {
+
+                $('#order_manage_form [name="item_price"]').val(done.results[0].unit_price);
+
+            }
+
+            })
+    }
+
+    function get_itemmaster_info(id, type) {
+        if (id == null){
+            console.log("선택된 품번, 품명이 존재하지 않습니다.")
+        }else{
+            api_gp(`/items/?id=${id}`, 'get', {},(done)=>{
+                done = done.results[0]
+                console.log(done);
+
+                $('#order_manage_form [name="detail"]').val(done.detail);
+                $('#order_manage_form [name="model"]').val(done.model);
+                $('#order_manage_form [name="division_name"]').val(done.division_name);
+
+                let option;
+
+                if (type == "C"){
+                    option = new Option(done.name, done.id, true, true);
+                    $("#id_it_name_form").append(option).trigger("change")
+                }else{
+                    option = new Option(done.code, done.id, true, true);
+                    $("#id_it_code_form").append(option).trigger("change")
+                }
+            })
+        }
+    }
+
+    function exformatData(results) {
+
+          return results.map(result => [
+            "<input type='checkbox' class='childCheckbox' value='"+result.id+"' />",
+            null,
+            result.po_no,
+            result.customer_name,
+            result.item_supply_total,
+            result.finish_date,
+              result.finish_chk,
+              result.created_at,
+              result.updated_at,
+              result.username,
+              //result.etc,
+              result.id
+          ]);
+        }
+</script>
+

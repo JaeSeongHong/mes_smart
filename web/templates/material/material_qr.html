@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<header>{% include "header.html" %}</header>
+<body>
+<!-- {#{% extends 'index.html' %}#} -->
+{% load static %}
+
+<!-- {#{% block title %}#}
+{#    <title>자재현황 조회</title>#}
+{#{% endblock title %}#}
+{##}
+{#{% block content %}#} -->
+
+<div class="row no-gutters justify-content-center d-lg-flex d-md-flex d-sm-flex m-2">
+    <h2 class="font-weight-bold my-2">재고현황 조회</h2>
+</div>
+
+<!-- 검색 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+                class="row no-gutters "
+        >
+            <div class="col-2"> </div>
+
+            {# hjlim : 추후 CSS 에 넣는 것으로 #}
+            <div class="col-8 mt-4">
+                <div class="row no-gutters d-none">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>입고단가</label>
+                    </div>
+                    <input class="col-6 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                           id="in_price"
+                    />
+                </div>
+
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>입고일자</label>
+                    </div>
+                    <input class="col-6 w-100 text-center form-control m-0 p-0"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white;" disabled
+                           id="in_at"
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>품번</label>
+                    </div>
+                    <input class="col-6 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                           name="item-code"
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>품명</label>
+                    </div>
+                    <input
+                            class="col-6 w-100 text-center form-control"
+                            name="item-name"
+                            style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>품명상세</label>
+                    </div>
+                    <input
+                            class="col-6 w-100 text-center form-control"
+                            id="item-detail"
+                            style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>자재분류</label>
+                    </div>
+                    <input
+                            class="col-6 w-100 text-center form-control"
+                            id="item-division"
+                            style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                    />
+
+
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>단위</label>
+                    </div>
+                    <input
+                            class="col-6 w-100 text-center form-control"
+                            id="item-unit"
+                            style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>입고일 입고수량</label>
+                    </div>
+                    <input
+                            class="col-6 w-100 text-center form-control"
+                            id="receive-amount"
+                            style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                    />
+                </div>
+                <div class="row no-gutters">
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>총수량 (재고)</label>
+                    </div>
+                    <input
+                            class="col-6 w-100 text-center form-control"
+                            id="all-amount"
+                            style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                    />
+                </div>
+                <div class="row no-gutters">
+
+                    <div class="col-6 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                        <label>거래처</label>
+                    </div>
+                    <input
+                            class="col-6 w-100 text-center form-control"
+                            id="purchase_from"
+                            style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white" readonly
+                    />
+                </div>
+            </div>
+        </div>
+
+        <div
+                class="row no-gutters mt-5"
+        >
+            <div class="col-2"> </div>
+            <div class="col-8 mt-5">
+
+                <ul class="nav nav-tabs col-12" id="myTab" role="tablist">
+                    <li class="nav-item col-6 pr-0 text-center">
+                        <a class="nav-link active" id="tab-material-in" data-toggle="tab" href="#material_in"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;"
+                           role="tab" aria-controls="search" aria-selected="true">입고</a>
+                    </li>
+
+                    <li class="nav-item col-6 pl-0 text-center">
+                        <a class="nav-link" id="tab-material-out" data-toggle="tab" href="#material_out"
+                           style="font-weight: bold;font-size:20px;height:70px;line-height:70px;"
+                           role="tab" aria-controls="code" aria-selected="true">출고</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content col-12 mt-5 p-0" id="myTabContent">
+                    <!-- 입고 tab content -->
+                    <div class="tab-pane show active" id="material_in" role="tabpanel"
+                         aria-labelledby="tab-material-in">
+                        <div class="row no-gutters">
+                            <div class="col-3 text-right form-control m-0 p-0"
+                                 style="font-weight: bold;font-size:20px;height:70px;line-height:70px;border-style:hidden">
+                                <label>품번 : &nbsp</label>
+                            </div>
+                            <input class="col-3 w-100 form-control item-code"
+                                   style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white;border-style:hidden"
+                                   readonly
+                                   name="item-code"
+                            />
+                            <div class="col-3 text-right form-control m-0 p-0"
+                                 style="font-weight: bold;font-size:20px;height:70px;line-height:70px;border-style:hidden">
+                                <label>품명 : &nbsp</label>
+                            </div>
+                            <input
+                                    class="col-3 w-100 form-control item-name"
+                                    name="item-name"
+                                    style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white;border-style:hidden"
+                                    readonly
+                            />
+                        </div>
+
+                        <div class="row no-gutters mt-3">
+                            <div class="col-6 text-center form-control m-0 p-0"
+                                 style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                                <label>입고수량</label>
+                            </div>
+                            <input
+                                    class="col-6 w-100 text-center form-control item-name"
+                                    id="item-receive" onkeyup="_chkNumber(this, 3)"
+                                    style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white"
+                            />
+                        </div>
+
+                        <div class="row no-gutters mt-5 mb-3 justify-content-end">
+                            <button
+                                    class="col-4 btn btn-primary m-0 p-0"
+                                    style="font-weight: bold;font-size:20px;height:70px;line-height:70px;"
+                                    type="button"
+                                    onclick="material_input()"
+                            >
+                                입고등록
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 출고 tab content -->
+                    <div class="tab-pane fade" id="material_out" role="tabpanel" aria-labelledby="tab-material-out">
+                        <div class="row no-gutters">
+                            <div class="col-3 text-right form-control m-0 p-0"
+                                 style="font-weight: bold;font-size:20px;height:70px;line-height:70px;border-style:hidden">
+                                <label>품번 : &nbsp</label>
+                            </div>
+                            <input class="col-3 w-100 form-control item-code"
+                                   style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white;border-style:hidden"
+                                   readonly
+                                   name="item-code"
+                            />
+                            <div class="col-3 text-right form-control m-0 p-0"
+                                 style="font-weight: bold;font-size:20px;height:70px;line-height:70px;border-style:hidden">
+                                <label>품명 : &nbsp</label>
+                            </div>
+                            <input
+                                    class="col-3 w-100 form-control item-name"
+                                    name="item-name"
+                                    style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white;border-style:hidden"
+                                    readonly
+                            />
+                        </div>
+
+                        <div class="row no-gutters mt-3">
+                            <div class="col-6 text-center form-control m-0 p-0"
+                                 style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:#e7f9ff">
+                                <label>출고수량</label>
+                            </div>
+                            <input
+                                    class="col-6 w-100 text-center form-control item-name"
+                                    id="item-out" onkeyup="_chkNumber(this, 3)"
+                                    style="font-weight: bold;font-size:20px;height:70px;line-height:70px;background:white"
+                            />
+                        </div>
+
+                        <div class="row no-gutters mt-5 mb-3 justify-content-end">
+                            <button
+                                    class="col-4 btn btn-primary m-0 p-0"
+                                    style="font-weight: bold;font-size:20px;height:70px;line-height:70px;"
+                                    type="button"
+                                    onclick="material_output()"
+                            >
+                                출고등록
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/api_materials.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_codemaster.js' %}" type="text/javascript"></script>
+<script>
+
+    let _id = null;
+    let item_id = null;
+    let item_today = null;
+
+    $(function () {
+        _id = getParam("id");
+        let _code = getParam("code");
+
+        refresh();
+    });
+
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = "" + (d.getMonth() + 1),
+            day = "" + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("-");
+    }
+
+
+    function refresh() {
+        let today = new Date();
+        today.setDate(today.getDate());
+        item_today = formatDate(today);
+
+        {#alert(_id);#}
+        api_gp("/items/mobile/?id=" + _id, "GET", {}, (done) => {
+            console.table(done);
+
+            $("#in_at").val(done[0].in_at);  // 입고날짜
+            $("#in_price").val(done[0].in_price);  // 입고단가
+
+            item_id = done[0].item.id;  // 품번 ID
+            $("[name=item-code]").val(done[0].item.code);  // 품번
+            $("[name=item-name]").val(done[0].item.name);  // 품명
+            $("#item-detail").val(done[0].item.detail);  // 품명상세
+
+            $("#item-division").val((done[0].item.item_division ? done[0].item.item_division.name : ""));  // 자재분류
+            $("#item-unit").val((done[0].item.unit ? done[0].item.unit.name : ""));  // 단위
+
+            $("#receive-amount").val(done[0].in_amount_by_in_at);  // 오늘 입고수량
+            $("#all-amount").val(done[0].item.stock);  // 총수량
+            $("#purchase_from").val((done[0].item.purchase_from ? done[0].item.purchase_from.name : ""));  // 거래처
+
+        });
+    }
+
+
+    function getParam(sname) {
+
+        var params = location.search.substr(location.search.indexOf("?") + 1);
+        var sval = "";
+        params = params.split("&");
+
+        for (var i = 0; i < params.length; i++) {
+
+            temp = params[i].split("=");
+
+            if ([temp[0]] == sname) {
+                sval = temp[1];
+            }
+        }
+        return sval;
+    }
+
+
+    function material_input(){
+        let in_price = $("#in_price").val();
+        let item_receive = $("#item-receive").val().replace(/,/g, "");
+
+        if (item_receive == ""){
+            return alert("입고수량을 넣어주세요.");
+        }
+
+        let data = {
+            item:item_id,
+            in_at:item_today,
+            item_created_at:item_today,
+            check_at:item_today,
+            in_price:in_price,
+            receive_amount:item_receive,
+            in_faulty_amount:0,
+        }
+
+        api_gp("/items/in/", "POST", data, (done) => {
+            {#console.log('--');#}
+            {#console.table(done);#}
+            _id = done.id;
+            alert("성공적으로 입고하였습니다.");
+            $("#item-receive").val("");
+            refresh();
+
+        }, () => {
+            alert("실패했습니다.");
+        });
+    }
+
+
+    function material_output(){
+        let item_out = $("#item-out").val().replace(/,/g, "");
+
+        if (item_out == ""){
+            return alert("출고수량을 넣어주세요.");
+        }
+
+        let data = {
+            item:item_id,
+            out_at:item_today,
+            out_amount:item_out,
+            purpose:"QR 출고",
+        }
+
+        api_gp("/items/out/", "POST", data, () => {
+            alert("성공적으로 출고하였습니다.");
+            $("#item-out").val("");
+            refresh();
+
+        }, () => {
+            alert("실패했습니다.");
+        });
+    }
+
+
+
+</script>
+</body>
+</html>

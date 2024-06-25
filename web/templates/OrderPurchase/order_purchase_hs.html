@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+  <header>{% include "header.html" %}</header>
+  <body style="overflow: hidden">
+    {% load static %}
+    <div class="card m-2">
+      <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+          class="content-search row no-gutters align-items-center content-input-group"
+        >
+          <div class="content-title col-1 align-self-stretch">매입관리</div>
+          <form id="search_form" class="col-10">
+            <div class="row no-gutters">
+              <div class="content-input-group col-4 px-0">
+                <div class="content-input-group-header">
+                  <label>입고일자</label>
+                </div>
+                <div class="content-input-group-input">
+                  <div class="input-group input-daterange h-100">
+                    <input
+                      type="text"
+                      class="form-control datepicker"
+                      id="make_from"
+                      autocomplete="off"
+                    />
+                    <div
+                      class="col-2 border d-flex justify-content-center align-items-center"
+                    >
+                      ~
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control datepicker"
+                      id="make_to"
+                      autocomplete="off"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="content-input-group col-3 px-0">
+                <div class="content-input-group-header">
+                  <label>거래처</label>
+                </div>
+                <div class="content-input-group-input">
+                  <div class="input-group input-daterange h-100">
+                        <select
+                    type="text"
+                    class=" form-control customer_search w-100"
+                    id="customer_search"
+                    autocomplete="off"
+                  >
+                  </select>
+                  </div>
+                </div>
+              </div>
+              <div class="content-input-group col-2 px-0">
+                <div class="content-input-group-header">
+                  <label>품번</label>
+                </div>
+                <div class="d-flex align-items-stretch content-input-group-input">
+                  <select
+                    type="text"
+                    class=" form-control item_code w-100"
+                    id="item_code"
+                    autocomplete="off"
+                  >
+                  </select>
+                </div>
+              </div>
+              <div class="content-input-group col-2 px-0">
+                <div class="content-input-group-header">
+                  <label>품명</label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    type="text"
+                    class=" form-control item_name w-100"
+                    id="item_name"
+                    autocomplete="off"
+                  >
+                  </select>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="col-1 px-0">
+            <button
+              class="btn button-search rounded-0 w-100 h-100"
+              type="button"
+              onclick="search_click();"
+            >
+              검색
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="domestic_table" class="card m-2">
+        <div class="row no-gutters card-body p-2">
+          <!-- 본문 -->
+          <div
+            class="content-table col-12"
+            style="overflow-y: hidden; height: 500px"
+          >
+            <table id="list_table" class="table table-sm text-center">
+              <colgroup>
+                <col style="width: 3%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="col-0.5">NO</th>
+                  <th class="col-1">거래처</th>
+                  <th class="col-1">출고일</th>
+                  <th class="col-1">품번</th>
+                  <th class="col-1">품명</th>
+                  <th class="col-1">수량</th>
+                  <th class="col-1">단가</th>
+                  <th class="col-1">공급가액</th>
+                  <th class="col-1">부가세액</th>
+                  <th class="col-1">합계금액</th>
+                  <th class="col-1">수금일자</th>
+                  <th class="col-1">수금액</th>
+                  <th class="col-1">미수금액</th>
+                  <th class="col-1">미수구분</th>
+                  <th class="col-1">비고</th>
+                </tr>
+              </thead>
+              <tbody id="order_purchase_tbody"></tbody>
+            </table>
+            <div
+              class="row no-gutters d-flex justify-content-center"
+              id="item_nation1"
+              style="margin-top: -20px"
+            ></div>
+          </div>
+        </div>
+      </div>
+        <div class="card-body p-2">
+    <div class="row no-gutters card-body">
+        <!-- 본문 -->
+
+        <div class="content-table col-12" style="overflow-x: hidden; overflow-y:hidden;height:251px">
+            <table id="order_purchase_payment" class="table table-sm text-center" >
+                <thead>
+                <tr>
+                    <th class="col-0.5">순번</th>
+                    <th class="col-2">지급일자</th>
+                    <th class="col-2">지급액</th>
+                    <th class="col-6">비고</th>
+                </tr>
+                </thead>
+                <tbody id="order_purchase_payment_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation2" style="margin-top: -20px;"></div>
+
+        </div>
+    </div>
+</div>
+        <div class="card-body p-2">
+        <!-- 본문 -->
+        <div class="content-search row no-gutters align-items-center content-input-group">
+          <div class="content-title col-1 align-self-stretch">매입관리 입력</div>
+          <form id="order_purchase_form" class="col-11">
+            <div class="row no-gutters">
+              <div class="content-input-group col-4 px-0">
+                <div class="content-input-group-header">
+                  <label>지급일자</label>
+                </div>
+                <div class="content-input-group-input">
+                  <div class="input-group input-daterange h-100">
+                    <input type="text" class="form-control datepicker" id="payedWhen" autocomplete="off">
+                  </div>
+                </div>
+              </div>
+              <div class="content-input-group col-3 px-0">
+                <div class="content-input-group-header">
+                  <label>지급액</label>
+                </div>
+                <div class="content-input-group-input">
+                  <div class="input-group input-daterange h-100">
+                      <input type="text" class="form-control" id="payedPrice" autocomplete="off">
+                        </div>
+                </div>
+              </div>
+              <div class="content-input-group col-5 px-0">
+                <div class="content-input-group-header">
+                  <label>비고</label>
+                </div>
+                <div class="d-flex align-items-stretch content-input-group-input">
+                    <input type="text" class="form-control" id="payedNote" autocomplete="off">
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    <div class="row no-gutters card-body p-2">
+        <div class="row no-gutters w-100 justify-content-end">
+            <div class="col-1 px-0 mr-2">
+                <button class="btn button-custom2 w-100" type="button" onclick="order_purchase_add();">
+                    지급등록
+                </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+                <button class="btn button-custom2 w-100" type="button" onclick="order_purchase_modify();">
+                    지급수정
+                </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+                <button class="btn button-custom2 w-100" type="button" onclick="order_purchase_delete();">
+                    지급삭제
+                </button>
+            </div>
+    </div>
+</div>
+    </div>
+  </body>
+  <script
+    src="{% static 'js/api_adapter.js' %}"
+    type="text/javascript"
+  ></script>
+  <script
+    src="{% static 'js/api_paginations.js' %}"
+    type="text/javascript"
+  ></script>
+  <script>
+      let VAT = 0.1  {#  수수료 게산 #}
+      let purchase_id = 0;
+      let purchase_payment_id = 0;
+      let api_order_get = (done_callback)=>{
+             $.ajax({
+        type: "get",
+        url: `` + searchQuery(),
+        headers: {
+          Authorization: get_token(),
+        },
+        processData: false,
+        contentType: false
+      })
+        .done(function (json) {
+          done_callback(json);
+        })
+        .fail(handle_error);
+      }
+      let api_order_purchase_get = (id, done_callback) =>{
+         $.ajax({
+        type: "get",
+        url: `/${id}/`,
+        headers: {
+          Authorization: get_token(),
+        },
+        processData: false,
+        contentType: false
+      })
+        .done(function (json) {
+          done_callback(json);
+        })
+        .fail(handle_error);
+     }
+      let api_order_purchase_add = (id, done_callback) => {
+          $.ajax({
+        type: "post",
+              data: get_data(),
+        url: `/${id}/`,
+        headers: {
+          Authorization: get_token(),
+        },
+        processData: false,
+        contentType: false
+      })
+        .done(function (json) {
+          done_callback(json);
+        })
+        .fail(handle_error);
+      }
+      let api_order_purchase_modify = (purchase_id, done_callback) => {
+          $.ajax({
+        type: "patch",
+              data: get_data(),
+        url: `/${purchase_id}/` ,
+        headers: {
+          Authorization: get_token(),
+        },
+        processData: false,
+        contentType: false
+      })
+        .done(function (json) {
+          done_callback(json);
+        })
+        .fail(handle_error);
+     }
+      let api_order_purchase_delete = (purchase_id, done_callback) => {
+          $.ajax({
+        type: "patch",
+        url: `/${purchase_id}/` ,
+        headers: {
+          Authorization: get_token(),
+        },
+        processData: false,
+        contentType: false
+      })
+        .done(function (json) {
+          done_callback(json);
+        })
+        .fail(handle_error);
+     }
+      $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: true,
+      })
+      let nation_data1 = {
+        cname: 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation1',
+        range: 5,
+        page_size: 10,
+    };
+      let data = {
+          count: 5,
+         next: null,
+         previous: null,
+      }
+      data.result = [{
+          id: 1,
+        company: "hyeon3051",
+        orderdate: "2021-05-12",
+        item: {code: "e001", name: "e001"},
+        count: 100,
+        unit_price: 12000,
+        supply_price: 1200000,
+        payment: [{
+              id: 1,
+            price: 15000,
+            payedWhen: "2021-05-21"
+        },
+            {id: 2,
+                price: 25000,
+            payedWhen: "2021-05-23"}],
+        note:"hello world"
+     }, {
+          id: 2,
+        company: "hyeon3051",
+        orderdate: "2021-05-12",
+        item: {code: "e001", name: "e001"},
+        count: 100,
+        unit_price: 12000,
+        supply_price: 1200000,
+        payment: [{
+              id:3,
+            price: 15000,
+            payedWhen: "2021-05-23"
+        }],
+        note:"hello world"
+     }, {
+          id: 1,
+          company: "hyeon3053",
+          orderdate: "2021-05-12",
+          item: {code: "e001", name: "e001"},
+          count: 100,
+          unit_price: 12000,
+          supply_price: 1200000,
+          payment: [{
+              id: 1,
+              price: 15000,
+              payedWhen: "2021-05-21"
+          }],
+          note: "goodbye",
+      }]
+        let make_from = document.querySelector("#make_from")
+     let make_to = document.querySelector("#make_to")
+     let customer_search = document.querySelector("#customer_search")
+
+     let searchQuery = ()=>{
+         return (
+         `?${make_from.value !== "" ? `make_from=${make_from.value}&` : ""}${
+             make_to.value !== "" ? `make_to=${make_to.value}&` : ""}${
+             $("#item_name :selected").val() !== "" ? `item_id=${$("#item_name :selected").val()}&` : ""}${customer_search
+             .value !== "" ? `customer=${customer_search.value}` : ""}`
+         )
+     }
+
+      let nation1 = new Pnations(nation_data1, api_order_get());  // 인스턴스 명
+       function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택</option>";
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+                if(selectors === ".customer_search"){
+                    list +=
+                        "<option value='" + item.id + "'>" + item.name + "</option>";
+                }else if(selectors === ".item_code") {
+                    list +="<option value='" + item.id + "'>" + item.code + "</option>";
+                }else{
+                    list+= "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+
+            $(selectors).select2({width: "100%"});
+
+        }
+
+        // 거래선 코드
+      api_gp('/customers/', 'GET', {}, (done) => {
+            make_dropdown(done.results, ".customer_search");
+        });
+
+      api_gp("/items_part/", "GET", {}, (done) => {
+            make_dropdown(done, ".item_code");
+            make_dropdown(done, ".item_name");
+
+            $('.item_code').on('select2:select', function (e) {  // 품번 선택시
+                let id = $(this).val();
+                 $(".item_name").val(id).trigger('change');
+            });
+
+            $('.item_name').on('select2:select', function (e) {
+                let id = $(this).val();
+                $(".item_code").val(id).trigger('change');
+            });
+
+        });
+
+
+     let get_data = ()=>{
+         let data = {}
+         data.payedWhen = document.querySelector("#payedWhen").value
+         data.price = document.querySelector("#payedPrice").value
+         data.note = document.querySelector("#payedNote").value
+         return data
+     }
+     let reset_data = ()=>{
+         document.querySelector("#payedWhen").value = ""
+         document.querySelector("#payedPrice").value = ""
+        document.querySelector("#payedNote").value= ""
+     }
+
+     let order_purchase_table = document.querySelector("#order_purchase_tbody")
+     let makeTableData = (datas, table)=> {
+         nation1.nation_display(datas, "item_nation1");
+         table.innerHTML = ""
+         let order_purchase_payment_tbody = document.getElementById("order_purchase_payment_tbody")
+         order_purchase_payment_tbody.innerHTML = ""
+         purchase_id = 0;
+         purchase_payment_id = 0;
+         let companyDatas = {}
+         let company= {
+             name: "",
+             itemCount: 0,
+             payedPrice: 0,
+             supplyPrice : 0,
+         }
+         let totalCompany= {
+             itemCount: 0,
+             supplyPrice: 0,
+             payedPrice : 0
+         }
+         let getTotalPayedPrice = (datas)=>{
+             let totalPrice =0
+                for(let i =0; i<datas.length; i++){
+                    totalPrice +=datas[i].price
+                }
+                 return totalPrice
+             }
+         let itemElement =(data, turn) =>{
+             let tr = document.createElement("tr")
+             let getRecentPayedDate = (datas)=>{
+               let recentpayedDate = {
+                   date: Date(),
+                   dateTotime: Infinity,
+               };
+               datas.forEach(data=>{
+                   let payedWhen = Date.parse(data.payedWhen)
+                   if(recentpayedDate.dateTotime >payedWhen){
+                       recentpayedDate.date = data.payedWhen
+                       recentpayedDate.dateTotime = payedWhen
+                   }
+               })
+                 console.log(recentpayedDate.date)
+                 return recentpayedDate.date
+             }
+             let isAllpayed = (supplyPrice , payedPrice)=>{
+                if(supplyPrice>payedPrice){
+                   if(payedPrice===0){
+                       return "미지급"
+                   }else{
+                       return "부분지급"
+                   }
+                }else if(supplyPrice === payedPrice){
+                    return "지급 완료"
+                }else{
+                    return "오류"
+                }
+             }
+             tr.innerHTML = `<td class="col-0.5">${turn}</td>
+                  <td class="col-1">${data.company}</td>
+                  <td class="col-1">${data.orderdate}</td>
+                  <td class="col-1">${data.item.code}</td>
+                  <td class="col-1">${data.item.name}</td>
+                  <td class="col-1">${data.count}</td>
+                  <td class="col-1">${data.unit_price}</td>
+                  <td class="col-1">${data.supply_price}</td>
+                  <td class="col-1">${data.supply_price * VAT}</td>
+                  <td class="col-1">${data.supply_price *(1+VAT)}</td>
+                  <td class="col-1">${getRecentPayedDate(data.payment)}</td>
+                  <td class="col-1">${getTotalPayedPrice(data.payment)}</td>
+                  <td class="col-1">${data.supply_price *(1+VAT) - getTotalPayedPrice(data.payment)}</td>
+                  <td class="col-1">${isAllpayed(data.supply_price *(1+VAT),getTotalPayedPrice(data.payment))}</td>
+                  <td class="col-1">${(data.note !== undefined ? data.note: "")}</td>`
+             tr.addEventListener("click",()=>{
+                 purchase_id = data.id
+                 table.querySelectorAll("tr").forEach(trElement =>{
+                         trElement.classList.remove("clicked")
+                     })
+                 tr.classList.add("clicked")
+                 reset_data()
+                 make_purchase_payment_table(data)
+             })
+           table.appendChild(tr)
+         }
+         let ordersElement = (company)=> {
+           let tr = document.createElement("tr")
+           tr.innerHTML = `<td class="" colspan="5">소계/${company.name}</td>
+                   <td class="col-1">${company.itemCount}</td>
+                   <td class="col-1"></td>
+                   <td class="col-1">${company.supplyPrice}</td>
+                   <td class="col-1">${company.supplyPrice * VAT}</td>
+                   <td class="col-6">${company.supplyPrice * (1+VAT)}</td>
+                   <td class="col-1"></td>
+                   <td class="col-1">${company.payedPrice}</td>
+                   <td class="col-1">${company.supplyPrice * (1+VAT) - company.payedPrice}</td>
+                   <td class="col-1"></td>
+                   <td class="col-1"></td>`
+           table.appendChild(tr)
+         }
+         let totalElement = ()=> {
+           let tr = document.createElement("tr")
+             tr.classList.add("bg-light")
+           tr.innerHTML = `<td class="" colspan="5">전체</td>
+                   <td class="col-1">${totalCompany.itemCount}</td>
+                   <td class="col-1"></td>
+                   <td class="col-1">${totalCompany.supplyPrice}</td>
+                   <td class="col-1">${totalCompany.supplyPrice * VAT}</td>
+                   <td class="col-6">${(totalCompany.supplyPrice * (1+VAT)).toFixed(0)}</td>
+                   <td class="col-1"></td>
+                   <td class="col-1">${totalCompany.payedPrice}</td>
+                   <td class="col-1">${(totalCompany.supplyPrice *(1+VAT) - totalCompany.payedPrice).toFixed(0)}</td>
+                   <td class="col-1"></td>
+                   <td class="col-1"></td>`
+           table.appendChild(tr)
+         }
+         for (let data1 of datas.result) {
+             if (companyDatas[data1.company] === undefined) {
+                 companyDatas[data1.company] = [data1]
+             } else {
+                 companyDatas[data1.company].push(data1)
+             }
+         }
+         let preturn = 0;
+         for (let key in companyDatas) {
+             let companyData = companyDatas[key]
+             let dataArr = []
+             companyData.forEach((data) => {
+                 console.log(data)
+                     dataArr.push(data)
+             })
+             console.log(dataArr)
+             company['name'] = dataArr[0]['company']
+             dataArr.forEach(data => {
+                 preturn = preturn+1
+                 itemElement(data, preturn)
+                 company.supplyPrice +=data.supply_price
+                 company.payedPrice +=getTotalPayedPrice(data.payment)
+                 company.itemCount +=data.count
+             })
+             ordersElement(company)
+             totalCompany.itemCount += company.itemCount
+             totalCompany.supplyPrice += company.supplyPrice
+             totalCompany.payedPrice +=company.payedPrice
+             company= {
+             name: "",
+             itemCount: 0,
+             payedPrice: 0,
+             supplyPrice : 0,
+            }
+         }
+     {# 총계 element 추가 #}
+         totalElement()
+     }
+     let make_purchase_payment_table =(data)=>{
+                 purchase_payment_id=0
+                 let order_purchase_payment_tbody = document.getElementById("order_purchase_payment_tbody")
+                 order_purchase_payment_tbody.innerHTML = ""
+                purchase_payment_id = 0;
+                 data.payment.forEach((payment,turn)=>{
+                    let paymentData = document.createElement("tr")
+                     paymentData.innerHTML = `
+                    <td class="col-0.5">${turn+1}</td>
+                    <td class="col-2">${payment.payedWhen}</td>
+                    <td class="col-2">${payment.price}</td>
+                    <td class="col-6">${(payment.note !== undefined ? payment.note: "")}</td>
+                     `
+                     paymentData.addEventListener("click", ()=>{
+                         order_purchase_payment_tbody.querySelectorAll("tr").forEach(
+                             paymentDataElement => paymentDataElement.classList.remove("clicked")
+                         )
+                         purchase_payment_id = payment.id
+                         paymentData.classList.add("clicked")
+                         document.querySelector("#payedWhen").value = payment.payedWhen
+                         document.querySelector("#payedPrice").value = payment.price
+                         document.querySelector("#payedNote").value = (payment.note !== undefined ? payment.note: "")
+
+                     })
+                     order_purchase_payment_tbody.appendChild(paymentData)
+                 })
+             }
+     let search_click = ()=>{
+         makeTableData(data, order_purchase_table)
+         api_order_get()
+     }
+     let order_purchase_add = ()=>{
+          if(purchase_id===0){
+             alert("선택해주세요")
+              return
+         }
+          api_order_purchase_add(purchase_id,data =>make_purchase_payment_table(data))
+
+      }
+      let order_purchase_modify = ()=>{
+         if(purchase_payment_id===0){
+             alert("선택해주세요")
+              return
+         }
+         api_order_purchase_modify(purchase_payment_id, data =>make_purchase_payment_table(data))
+
+      }
+      let order_purchase_delete = ()=>{
+          if(purchase_payment_id===0){
+             alert("선택해주세요")
+              return
+         }
+          api_order_purchase_delete(purchase_payment_id, data =>make_purchase_payment_table(data))
+      }
+
+  </script>
+</html>

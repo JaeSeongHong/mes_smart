@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+<body style="overflow-y: hidden;">
+
+<!-- spinner -->
+<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>
+
+<!-- 검색 -->
+<form class="no-gutters" id="order_search">
+    <div class="card m-2">
+        <div class="card-body p-2">
+            <!-- 본문 -->
+            <div
+                    class="content-search row no-gutters align-items-center content-input-group"
+            >
+                <div class="content-title col-1 align-self-stretch">조회</div>
+                <div class="row no-gutters col-11">
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>거래처</label>
+                        </div>
+
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control customer-name-dropdown"
+                                    id="customer_search"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="content-input-group col-3 px-0">
+                        <div class="content-input-group-header">
+                            <label>출하현황</label>
+                        </div>
+
+                        <div class="content-input-group-input">
+                            <select
+                                    class="form-control work-status-dropdown"
+                                    id="export_status"
+                            >
+                                <option value="">전체</option>
+                                <option value="미출하">미출하</option>
+                                <option value="일부출하">일부출하</option>
+                                <option value="출하완료">출하완료</option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="content-input-group col-5 px-0">
+                        <div class="content-input-group-header">
+                            <label>납기예정일</label>
+                        </div>
+                        <div class="input-group input-daterange">
+                            <input
+                                    type="text"
+                                    class="form-control h-100 created_at_after datepicker"
+                                    id="startdate"
+                                    autocomplete="off"
+                            />
+                            <div class="input-group-addon px-3">~</div>
+                            <input
+                                    type="text"
+                                    class="form-control h-100 created_at_before datepicker"
+                                    id="enddate"
+                                    autocomplete="off"
+                            />
+                        </div>
+                        <div class="col-2 px-0">
+                            <a
+                                    class="btn button-custom2 w-100"
+                                    role="button"
+                                    onclick="main_search()"
+                            >검색</a
+                            >
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<!-- 주문정보 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x: auto; overflow-y: hidden; height:251px;">
+            <table
+                    id="ordering_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th style="width:70px;">순번</th>
+                    <th>주문번호</th>
+                    <th>거래처</th>
+                    <th>거래처담당자</th>
+                    <th>담당자연락처</th>
+                    <th>합계</th>
+                    <th>출하현황</th>
+                    <th>납기예정일</th>
+                    <th>작성자</th>
+                </tr>
+                </thead>
+                <tbody id="ordering_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 출하내용 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <form class="content-content w-100" id="material_output_detail-form">
+            <div class="row no-gutters w-100 mb-2">
+                <div class="col-1 content-title">출하등록</div>
+                <div class="col-11">
+                    <div class="row no-gutters">
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>출하일자<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control datepicker" autocomplete="off" type="text" id="export_date"/>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>출하할 수량<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="export_quantity" onkeyup="_chkNumber(this, 3)"/>
+                            </div>
+                        </div>
+                           <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>출하창고위치<strong>*</strong></label>
+                            </div>
+                            <div class="content-input-group-input">
+                               <select class="storage-dropdown" id="location">
+
+                               </select>
+                            </div>
+                        </div>
+                        <div class="content-input-group col-3">
+                            <div class="content-input-group-header">
+                                <label>출하주소</label>
+                            </div>
+                            <div class="content-input-group-input">
+                                <input class="form-control" id="export_address"/>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="row no-gutters w-100 justify-content-end">
+
+                <div class="col-1 px-0 mr-2">
+                    <button
+                            class="btn button-custom2 w-100"
+                            type="button"
+                            onclick="modify()"
+                    >
+                        수정
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 주문내역 상세 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x:auto; height:253px;">
+            <table
+                    id="detail_table"
+                    class="table table-sm text-center"
+                    style="min-width: 100px"
+            >
+                <thead>
+                <tr>
+                    <th style="width:70px;">순번</th>
+                    <th style="width:50px;"><input type="checkbox" id="detail_chk_all" onclick="detail_all_chk()"></th>
+                    <th style="width:150px;">브랜드</th>
+                    <th style="width:150px;">제품군</th>
+                    <th style="width:150px;">품명</th>
+                    <th style="width:150px;">품번</th>
+                    <th style="width:150px;">나이스번호</th>
+                    <th style="width:150px;">품명상세</th>
+                    <th style="width:150px;">형태</th>
+
+                    <th>현재재고</th>
+                    <th>주문수량</th>
+                    <th>출하한 수량</th>
+                    <th>출하할 수량</th>
+                    <th>출하일자</th>
+                    <th style="width:300px;">출하주소</th>
+                    <th>출하창고</th>
+                </tr>
+                </thead>
+                <tbody id="detail_table_body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 출하 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <div class="row no-gutters w-100 justify-content-end">
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="export_add();"
+                >
+                    출하
+                </button>
+            </div>
+            <div class="col-1 px-0 mr-2">
+                <button
+                        class="btn button-custom2 w-100"
+                        type="button"
+                        onclick="export_cancel();"
+                >
+                    출하취소
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 출하내역 상세 -->
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-x:auto; height:253px;">
+            <table
+                    id="export_table"
+                    class="table table-sm text-center"
+            >
+                <thead>
+                <tr>
+                    <th style="width:70px;">순번</th>
+                    <th style="width:50px;"><input type="checkbox" id="export_chk_all" onclick="export_all_chk()"></th>
+                    <th style="width:150px;">브랜드</th>
+                    <th style="width:150px;">제품군</th>
+                    <th style="width:150px;">품명</th>
+                    <th style="width:150px;">품번</th>
+                    <th style="width:150px;">나이스번호</th>
+                    <th style="width:150px;">품명상세</th>
+                    <th style="width:150px;">형태</th>
+                    <th >출하수량</th>
+                    <th >출하일자</th>
+                    <th style="width:300px;">출하주소</th>
+                    <th style="width:300px;">출하창고</th>
+                    <th>작성자</th>
+                </tr>
+                </thead>
+                <tbody id="export_table_body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+<script src="{% static 'js/api_ordering.js' %}" type="text/javascript"></script>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 5,
+    };
+    let nation1 = new Pnations(nation_data1, ordering_search);  // 인스턴스 명
+
+    let ordering_id = null;
+    let order_item_id = null;
+    let ordering_ex_item = null;
+    let msg = "";
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+    function isNumber(value) {
+        return typeof value === 'number' && isFinite(value);
+    }
+
+    $('[name="office_post_code"]').on("click", function () {
+        addrPostCodeFinder(
+            document.querySelector('[name="office_post_code"]'),
+            document.querySelector('[name="office_address"]')
+        );
+    });
+
+
+    $(function () {
+        refresh();
+    });
+
+
+    function refresh() {
+        init_drop_down();
+
+        let now = new Date();
+        let first_date = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        $("#startdate").datepicker("setDate", first_date);
+        $("#enddate").datepicker("setDate", "today");
+
+        ordering_search();
+    }
+
+
+    function init_drop_down() {
+        function make_dropdown(data, selectors) {
+            let list = "<option value=''>선택 및 검색</option>";
+
+            for (let i = 0; i < data.length; i++) {
+                let item = data[i];
+
+                if (selectors === '.customer-name-dropdown') {
+                    let a = "<option value='" + item.id + "'" +
+                        " data-name='" + (item.charge_name ? item.charge_name : '') + "'" +
+                        " data-level='" + (item.charge_level ? item.charge_level : '') + "'" +
+                        " data-phone='" + (item.charge_phone ? item.charge_phone : '') + "'" +
+                        " data-email='" + (item.email ? item.email : '') + "'" + "'>" +
+                        item.name + "</option>";
+                    list += "<option value='" + item.id + "'" +
+                        " data-name='" + (item.charge_name ? item.charge_name : '') + "'" +
+                        " data-level='" + (item.charge_level ? item.charge_level : '') + "'" +
+                        " data-phone='" + (item.charge_phone ? item.charge_phone : '') + "'" +
+                        " data-email='" + (item.email ? item.email : '') + "'" + "'>" +
+                        item.name + "</option>";
+                }else{
+                    list += "<option value='" + item.id + "'>" + item.name + "</option>";
+                }
+            }
+            $(selectors).html(list);
+            $(selectors).select2({width: "100%"});
+        }
+
+        api_gp("/customers_select/", "GET", {}, (data) => {
+            make_dropdown(data, ".customer-name-dropdown"); // 거래처
+        });
+        api_gp("/codes/?group=107&enable=true", "GET", {}, (data) => {
+            make_dropdown(data.results, "#location");
+        });
+
+    }
+
+
+    function init_input(){
+        $("#export_date").val("");
+        $("#export_quantity").val("");
+        $("#export_address").val("");
+        $("#location").val("").trigger("change");
+    }
+
+
+    function main_search(){
+        nation1.page = 1;
+        ordering_id = null;
+        order_item_id = null;
+        ordering_ex_item = null;
+
+        ordering_search();
+
+        $("#detail_table_body").empty();
+        $("#export_table_body").empty();
+
+        reset_other_data();
+    }
+
+    function ordering_search(){
+        let customer = $('#customer_search :selected').val();
+        let export_status = $("#export_status").val();
+        let startdate = $("#startdate").val();
+        let enddate = $("#enddate").val();
+
+        // 주문관리 필터링
+        let query = "?page=" + nation1.page;
+
+        if (customer == '' || customer == null || customer == '선택 및 검색'){
+        } else { query += "&code_id=" + customer; }
+        if (export_status == '' || export_status == null || export_status == '선택 및 검색'){
+        } else { query += "&export_status=" + export_status; }
+        if (startdate == '' || startdate == null || startdate == '선택 및 검색'){
+        } else { query += "&fr_due_date=" + startdate; }
+        if (enddate == '' || enddate == null || enddate == '선택 및 검색'){
+        } else { query += "&to_due_date=" + enddate; }
+
+        console.log(query);
+        api_gp("/ordering_input/" + query, "GET", {}, (done) => {
+            draw_ordering_table(done);
+        });
+    }
+
+    function draw_ordering_table(done) {
+        let data = done.results;
+        let num = (((nation1.page*1) - 1) * nation_data1["page_size"]) + 1 ;
+        let rows = "";
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            if (item.customer_code != 0) {
+                // append it
+                let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                row += "<td>" + (num + i) + "</td>";
+                row += "<td>" + item.ordering_code + "</td>";  // 주문번호
+                row += "<td name='customer_name'>" + (item.code_name ? item.code_name : "") + "</td>";  // 거래처
+                row +=
+                    "<td name='person_in_charge'>" +
+                    (item.charge_name ? item.charge_name : "") +
+                    "</td>";  // 거래처담당자
+                row += "<td>" + (item.charge_phone ? item.charge_phone : "") + "</td>";  // 담당자연락처
+                row += "<td>" + (item.provide_sum ? item.provide_sum.toLocaleString() : "") + "</td>";  // 합계
+                row += "<td>" + (item.export_status ? item.export_status : "") + "</td>";  // 출하현황
+                row += "<td>" + (item.due_date ? item.due_date : "") + "</td>";  // 납기예정일
+                row += "<td>" + item.username + "</td>";  // 작성자
+                row += "</tr>";
+
+                rows += row;
+            }
+        }
+
+        nation1.nation_display(done);
+        $("#ordering_tbody").html(rows);
+        
+        // click check
+        if (ordering_id != null){
+            $("#ordering_tbody #" + ordering_id).addClass('clicked');
+        }
+        
+        $("#ordering_tbody > tr").on("click", function () {
+
+            // table click highlight
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+
+            ordering_id = $(this).attr("id");
+            load_detail_table();
+            load_export_table();
+        });
+        spinner();
+    }
+
+    // 주문 상세 내역
+    function load_detail_table() {
+        let query = "?";
+        if (ordering_id) query += "ordering_id=" + ordering_id + "&";
+
+        api_gp("/ordering_items_input_part/" + query, "GET", {}, (done) => {
+            draw_detail_table(done);
+        });
+    }
+
+
+    function draw_detail_table(done) {
+        console.table(done);
+
+        let rows = "";
+        let list_num = 1;
+        for (let i = 0; i < done.length; i++) {
+            let item = done[i];
+
+            let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+            row += "<td>" + list_num++ + "</td>";
+            row += "<td>" + "<input name='detail_checkbox' type='checkbox' onclick='detail_is_chk()'>" + "</td>";  // Checked
+            row += "<td name='ordering' class='d-none'>" + item.ordering + "</td>";  // 주문서 ID
+            row += "<td name='ordering_item' class='d-none'>" + item.id + "</td>";  // 주문항목 ID
+            row += "<td name='item_id' class='d-none'>" + item.item.id + "</td>";  // 품번 ID
+            row += "<td name='brand'>" + (item.item.brand_name ? item.item.brand_name : "") + "</td>";  // 품번
+            row += "<td name='item_group'>" + (item.item.item_group_name  ? item.item.item_group_name : "") + "</td>";  // 품번
+            row += "<td class='d-none' name='name'>" + item.item.name + "</td>"   // 품명
+            row += `<td data-toggle='tooltip' name='name_tooltip' title='${item.item.name}'>` + (item.item.name ? item.item.name.length > 10 ?  item.item.name.slice(0,10) + '...' : item.item.name: "") + "</td>"  // 품명
+            row += "<td class='d-none' name='code'>" + item.item.code + "</td>"   // 품번
+            row += `<td data-toggle='tooltip' name='code_tooltip' title='${item.item.code}'>` + (item.item.code ? item.item.code.length > 10 ?  item.item.code.slice(0,10) + '...' : item.item.code: "") + "</td>"   // 품번
+            row += "<td class='d-none' name='nice'>" + item.item.nice_number + "</td>"   // 품명
+            row += `<td data-toggle='tooltip' name='nice_tooltip' title='${item.item.nice_number}'>` + (item.item.nice_number ? item.item.nice_number.length > 10 ?  item.item.nice_number.slice(0,10) + '...' : item.item.nice_number: "") + "</td>"   // 품명
+            row += "<td class='d-none' name='detail'>" + item.item.detail + "</td>"   // 품명상세
+            row += `<td data-toggle='tooltip' name='detail_tooltip' title='${item.item.detail}'>` + (item.item.detail ?item.item.detail.length > 10 ?  item.item.detail.slice(0,10) + '...' : item.item.detail: "") + "</td>"  // 품명상세
+
+            row += "<td name='shape'>" + (item.item.shape  ? item.item.shape : "") + "</td>";  // 형태
+            row += "<td name='item_price' class='d-none'>" + item.item_price + "</td>";  // 단가
+
+            row += "<td name='stock'>" + (item.stock ? item.stock.toLocaleString() : "") + "</td>";  // 현재재고
+            row += "<td name='quantity'>" + (item.quantity ? item.quantity.toLocaleString() : "") + "</td>";  // 주문수량
+            row += "<td name='export_now_quantity'>" + (item.export_now_quantity ? item.export_now_quantity.toLocaleString() : 0) + "</td>";  // 출하한 수량
+            row += "<td name='export_quantity'>" + (item.export_quantity ? item.export_quantity.toLocaleString() : "") + "</td>";  // 출하할 수량
+
+
+            row += "<td name='supply_price' class='d-none'>" + (item.supply_price ? item.supply_price.toLocaleString() : "") + "</td>";  // 공급가
+            row += "<td name='surtax' class='d-none'>" + (item.surtax ? item.surtax.toLocaleString() : "") + "</td>";  // 부가세
+            row += "<td name='item_supply_total' class='d-none'>" + (item.item_supply_total ? item.item_supply_total.toLocaleString() : "") + "</td>";  // 합계
+
+            row += "<td name='produce_status' class='d-none'>" + (item.produce_status ? item.produce_status : "") + "</td>";  // 생산현황
+            row += "<td name='export_date'>" + (item.export_date ? item.export_date : "") + "</td>";  // 출하일자
+            row += "<td name='export_address'>" + (item.export_address ? item.export_address : "") + "</td>";  // 출하주소
+            row += "<td name='location_name'>" + (item.location ? item.location?.name : "입고창고") + "</td>";  // 출하주소
+            row += "<td name='location' class='d-none'>" + (item.location ? item.location?.id : "") + "</td>";  // 출하주소
+            row += "</tr>";
+
+            rows += row;
+        }
+
+        $("#detail_table_body").html(rows);
+
+        // table click highlight
+        $("#detail_table_body tr").on("click", function () {
+
+            order_item_id = $(this).find("[name='ordering_item']").text();
+
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+
+            $("#export_date").val(
+                $(this).find("[name='export_date']").text()
+            );
+
+            $("#export_quantity").val(
+                $(this).find("[name='export_quantity']").text()
+            );
+
+            $("#export_address").val(
+                $(this).find("[name='export_address']").text()
+            );
+            $("#location").val(
+                $(this).find("[name='location']").text()
+            ).trigger("change")
+            ordering_ex_item = null
+        });
+    }
+
+    // 출하 내역
+    function load_export_table() {
+        let query = "?";
+        if (ordering_id) query += "ordering_id=" + ordering_id + "&";
+
+        api_gp("/ordering_ex_items_input/" + query, "GET", {}, (done) => {
+            draw_export_table(done);
+        });
+    }
+
+
+    function draw_export_table(done) {
+        console.table(done)
+        let rows = "";
+        let list_num = 1;
+        for (let i = 0; i < done.length; i++) {
+            let item = done[i];
+
+            if (item.out) {
+                let row = "<tr id='" + item.id + "' style='cursor:pointer;'>";
+                row += "<td>" + list_num++ + "</td>";
+                row += "<td>" + "<input name='export_checkbox' type='checkbox' onclick='export_is_chk()'>" + "</td>";  // Checked
+                row += "<td name='ordering' class='d-none'>" + item.ordering + "</td>";  // 주문서 ID
+                row += "<td name='ordering_item' class='d-none'>" + item.ordering_item + "</td>";  // 주문항목 ID
+                row += "<td name='ordering_ex_item' class='d-none'>" + item.id + "</td>";  // 출하항목 ID
+                row += "<td name='item_num' class='d-none'>" + item.num + "</td>";  // 출하번호
+                row += "<td name='item_id' class='d-none'>" + item.item.id + "</td>";  // 품번 ID
+                row += "<td name='brand'>" + (item.item.brand_name ? item.item.brand_name : "") + "</td>";  // 브랜드
+                row += "<td name='item_group'>" + (item.item.item_group_name ? item.item.item_group_name : "") + "</td>";  // 제품군
+                row += "<td class='d-none' name='name'>" + item.item.name + "</td>"   // 품명
+                row += `<td data-toggle='tooltip' name='name_tooltip' title='${item.item.name}'>` + (item.item.name ? item.item.name.length > 10 ?  item.item.name.slice(0,10) + '...' : item.item.name: "") + "</td>"  // 품명
+                row += "<td class='d-none' name='code'>" + item.item.code + "</td>"   // 품번
+                row += `<td data-toggle='tooltip' name='code_tooltip' title='${item.item.code}'>` + (item.item.code ? item.item.code.length > 10 ?  item.item.code.slice(0,10) + '...' : item.item.code: "") + "</td>"   // 품번
+                row += "<td class='d-none' name='nice'>" + item.item.nice_number + "</td>"   // 품명
+                row += `<td data-toggle='tooltip' name='nice_tooltip' title='${item.item.nice_number}'>` + (item.item.nice_number ? item.item.nice_number.length > 10 ?  item.item.nice_number.slice(0,10) + '...' : item.item.nice_number: "") + "</td>"   // 품명
+                row += "<td class='d-none' name='detail'>" + item.item.detail + "</td>"   // 품명상세
+                row += `<td data-toggle='tooltip' name='detail_tooltip' title='${item.item.detail}'>` + (item.item.detail ?item.item.detail.length > 10 ?  item.item.detail.slice(0,10) + '...' : item.item.detail: "") + "</td>"  // 품명상세
+
+                row += "<td name='shape'>" + (item.item.shape ? item.item.shape : "") + "</td>";  // 형태
+
+
+                row += "<td name='export_quantity'>" + (item.export_quantity ? item.export_quantity.toLocaleString() : "") + "</td>";  // 출하수량
+
+                row += "<td name='export_date'>" + (item.export_date ? item.export_date : "") + "</td>";  // 출하일자
+                row += "<td name='export_address'>" + (item.export_address ? item.export_address : "") + "</td>";  // 출하주소
+                row += "<td name='location'>" + (item.location ? item.location.name : "입고창고") + "</td>";  // 출하창고
+                row += "<td name='manager'>" + (item.manager ? item.manager : "") + "</td>";  // 작성자
+                row += "</tr>";
+
+                rows += row;
+            }
+        }
+
+        $("#export_table_body").html(rows);
+
+        $("#export_table_body > tr").on("click", function () {
+
+            // table click highlight
+            $(this).parent().find("tr").removeClass("clicked");
+            $(this).addClass("clicked");
+            ordering_ex_item = $(this).attr("id");
+        });
+    }
+
+    // 검색
+    {% comment %}function ordering_search() {
+        order_item_id = null;
+        draw_ordering_table();
+        reset_other_data();
+
+        $("#detail_table_body").html("");
+        $("#export_table_body").html("");
+
+    }{% endcomment %}
+
+
+    function modify(){
+        if (order_item_id == null){
+            alert("출하등록 리스트를 먼저 선택해 주세요.");
+            return;
+        }
+
+        let export_date = $("#export_date").val();
+        if (export_date == null || export_date == '') {
+            alert("출하일자를 선택해 주세요.");
+            return;
+        }
+
+        let export_quantity = $("#export_quantity").val();
+        if (export_quantity == null || export_quantity == '') {
+            alert("출하수량를 선택해 주세요.");
+            return;
+        }
+
+        let data = get_export_data();
+        api_gp("/ordering_items_input_part/" + order_item_id + "/", "PATCH", data, (done1) => {
+            alert("수정하였습니다.");
+
+            // 초기화
+            order_item_id = null;
+            init_input();
+            load_detail_table();
+        });
+    }
+
+
+    function export_add(){
+        let sub_data = get_sub_data();
+        if (msg !== ""){
+            alert(msg);
+            msg = "";
+            return;
+        }
+
+        if (sub_data.length == 0){
+            alert("출하할 항목을 선택하세요.");
+            return;
+        }
+
+        let del = confirm("출하를 진행하시겠습니까?");
+        if (!del) return;
+
+        let mainData = get_main_data(sub_data);
+        console.table(mainData);
+
+        api_gp("/ordering_ex_items_input/", "POST", mainData, (done) => {
+
+            alert("출하 되었습니다.");
+
+            load_detail_table();
+            load_export_table();
+            reset_other_data();
+        });
+    }
+
+
+    function export_cancel(){
+        let cancel_sub_data = get_cancel_sub_data();
+
+        if (cancel_sub_data.length == 0){
+            alert("취소할 리스트를 선택하세요.");
+            return;
+        }
+
+        let del = confirm("출하 취소하시겠습니까?");
+        if (!del) return;
+
+        let cancelMainData = get_cancel_main_data(cancel_sub_data);
+        console.table(cancelMainData);
+
+        api_gp("/ordering_ex_items_input/" + `${ordering_ex_item}/`, "DELETE", cancelMainData, (done) => {
+            alert("출하 취소 되었습니다.");
+
+            load_detail_table();
+            load_export_table();
+            reset_other_data();
+            ordering_ex_item = null;
+        });
+    }
+
+
+    function get_export_data() {
+        return {
+            export_date: $("#export_date").val(),
+            export_quantity: $("#export_quantity").val().replace(/,/g, ""),
+            export_address: $("#export_address").val(),
+            location : $("#location option:selected").val()
+        };
+    }
+
+
+    function get_main_data(sub_data) {
+        return{
+            itemData: sub_data,
+            dataLength: sub_data.length,
+        }
+    }
+
+
+    function get_sub_data() {
+        let data_set = [];
+
+        $('#detail_table > tbody > tr').each(function (index, tr){
+            tr = $(this);
+            let checked = tr.find("input[name=detail_checkbox]").is(":checked");
+            console.log('index : ', index);
+            console.log('checked : ', checked);
+
+            if (checked == true) {
+                let code = tr.find("td[name=code]").text();  // 품번
+                let quantity = tr.find("td[name=quantity]").text().replace(/,/g, "");  // 주문수량
+                let export_quantity = tr.find("td[name=export_quantity]").text().replace(/,/g, "");  // 출하수량
+                let export_now_quantity = tr.find("td[name=export_now_quantity]").text().replace(/,/g, "");  // 출하된수량
+
+                if (export_quantity == ''){
+                    let to_export = quantity - export_now_quantity;
+                    if (to_export > 0){
+                        export_quantity = to_export;
+                    }else{
+                        msg = "순번"+ (index+1)  + " 품번 "+ code + "는 모두 출하되었습니다. \n추가로 출하 하실려면, 출하수량을 입력해 주세요.";
+                        return;
+                    }
+                }
+                data_set.push({
+                    ordering: tr.find("td[name=ordering]").text(),  // 주문서 ID
+                    ordering_item: tr.find("td[name=ordering_item]").text(),  // 주문항목 ID
+                    item: tr.find("td[name=item_id]").text(),  // 품번 ID
+                    item_detail: tr.find("td[name=detail]").text(),  // 품명상세
+                    item_unit: tr.find("td[name=item_unit]").text(),  // 품명단위
+                    item_price: tr.find("td[name=item_price]").text().replace(/,/g, ""),  // 단가
+
+                    quantity: quantity,  // 주문수량
+                    supply_price: tr.find("td[name=supply_price]").text().replace(/,/g, ""),  // 공급가
+                    surtax: tr.find("td[name=surtax]").text().replace(/,/g, ""),  // 부가세
+                    item_supply_total: tr.find("td[name=item_supply_total]").text().replace(/,/g, ""),  // 합계
+
+                    export_quantity: export_quantity,  // 출하수량
+                    export_date: tr.find("td[name=export_date]").text(),  // 출하일자
+                    export_address: tr.find("td[name=export_address]").text(),  // 출하주소
+                    location: tr.find("td[name=location]").text(),  // 출하주소
+                })
+            }
+        });
+
+        return data_set;
+    }
+
+
+    function get_cancel_main_data(cancel_sub_data) {
+        return{
+            itemData: cancel_sub_data,
+            dataLength: cancel_sub_data.length,
+        }
+    }
+
+
+    function get_cancel_sub_data() {
+        let data_set = [];
+
+        $('#export_table > tbody > tr').each(function (index, tr){
+            tr = $(this);
+            let checked = tr.find("input[name=export_checkbox]").is(":checked");
+            console.log('index : ', index);
+            console.log('checked : ', checked);
+
+            if (checked == true) {
+                data_set.push({
+                    ordering: tr.find("td[name=ordering]").text(),  // 주문서 ID
+                    ordering_item: tr.find("td[name=ordering_item]").text(),  // 출하항목 ID
+                    ordering_ex_item: tr.find("td[name=ordering_ex_item]").text(),  // 출하항목 ID
+                    item_num: tr.find("td[name=item_num]").text(),  // 출하번호
+                    item: tr.find("td[name=item_id]").text(),  // 품번 ID
+                    item_detail: tr.find("td[name=item_detail]").text(),  // 품명상세
+                    item_unit: tr.find("td[name=item_unit]").text(),  // 품명단위
+                    item_price: tr.find("td[name=item_price]").text().replace(/,/g, ""),  // 단가
+
+                    quantity: tr.find("td[name=quantity]").text().replace(/,/g, ""),  // 주문수량
+                    supply_price: tr.find("td[name=supply_price]").text().replace(/,/g, ""),  // 공급가
+                    surtax: tr.find("td[name=surtax]").text().replace(/,/g, ""),  // 부가세
+                    item_supply_total: tr.find("td[name=item_supply_total]").text().replace(/,/g, ""),  // 합계
+
+                    export_date: tr.find("td[name=export_date]").text(),  // 출하일자
+                    export_address: tr.find("td[name=export_address]").text(),  // 출하주소
+                    export_quantity: tr.find("td[name=export_quantity]").text().replace(/,/g, ""),  // 출하수량
+                    location: tr.find("td[name=location]").text(),  // 출하주소
+                })
+            }
+        });
+
+        return data_set;
+    }
+
+
+    function detail_is_chk(){
+        let max = $('#detail_table > tbody > tr').length;
+        let cnt = 0;
+
+        $('#detail_table > tbody > tr').each(function (index, tr){
+            tr = $(this);
+            let checked = tr.find("input[name=detail_checkbox]").is(":checked");
+            if (checked == true) {
+                cnt = ++cnt;
+            }
+        });
+
+        if (cnt == max){
+            $('#detail_chk_all').prop("checked", true);
+        }else{
+            $('#detail_chk_all').prop("checked", false);
+        }
+    }
+
+
+    function detail_all_chk(){
+        let checked = $("#detail_chk_all").is(":checked");
+        if (checked == true) {
+            $('input[name=detail_checkbox]').prop("checked", true);
+        }else{
+            $('input[name=detail_checkbox]').prop("checked", false);
+        }
+    }
+
+
+    function export_is_chk(){
+        let max = $('#export_table > tbody > tr').length;
+        let cnt = 0;
+
+        $('#export_table > tbody > tr').each(function (index, tr){
+            tr = $(this);
+            let checked = tr.find("input[name=export_checkbox]").is(":checked");
+            if (checked == true) {
+                cnt = ++cnt;
+            }
+        });
+
+        if (cnt == max){
+            $('#export_chk_all').prop("checked", true);
+        }else{
+            $('#export_chk_all').prop("checked", false);
+        }
+    }
+
+
+    function export_all_chk(){
+        let checked = $("#export_chk_all").is(":checked");
+        if (checked == true) {
+            $('input[name=export_checkbox]').prop("checked", true);
+        }else{
+            $('input[name=export_checkbox]').prop("checked", false);
+        }
+    }
+
+
+    function reset_other_data(){
+        $('#detail_chk_all').prop("checked", false);
+        $('#export_chk_all').prop("checked", false);
+        init_input();
+    }
+
+
+    function spinner() {
+        $("#spinner").hide();
+    }
+
+</script>

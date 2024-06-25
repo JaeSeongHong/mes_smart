@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<header>{% include "header.html" %}</header>
+<!-- UNBALANCE 조회 -->
+
+<body style="overflow: hidden;">
+
+<!-- spinner -->
+{% comment %}<div class="spinner" id="spinner">
+    <img src="../../../static/img/spinner.gif" width="150px" height="150px"/>
+</div>{% endcomment %}
+
+<!-- 조회 -->
+<div class="card m-2">
+    <div class="card-body p-2">
+        <!-- 본문 -->
+        <div class="row no-gutters">
+            <div class="content-title col-1 align-self-stretch d-flex"
+                 style="font-weight: bold;font-size:15px;height:50px;line-height:50px;"
+            >조회
+            </div>
+            <div class="col-11">
+                <div class="row no-gutters">
+
+                    <div class="col-1 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:15px;height:50px;line-height:50px;background:#e7f9ff">
+                        <label>제품명</label>
+                    </div>
+                    <input class="col-3 w-100 text-center form-control"
+                           style="font-weight: bold;font-size:15px;height:50px;line-height:50px;background:white"
+                           id="item_name" placeholder="직접입력" autocomplete='off'
+                    />
+
+                    <div class="col-1 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:15px;height:50px;line-height:50px;background:#e7f9ff">
+                        <label>테스트 일자</label>
+                    </div>
+                    <input class="col-2 w-100 text-center form-control datepicker"
+                           style="font-weight: bold;font-size:15px;height:50px;line-height:50px;background:white"
+                           id="fr_date" autocomplete='off'
+                    />
+                    <div class="col-1 text-center form-control m-0 p-0"
+                         style="font-weight: bold;font-size:15px;height:50px;line-height:50px;background:#e7f9ff">
+                        <label>~</label>
+                    </div>
+                    <input class="col-2 w-100 text-center form-control datepicker"
+                           style="font-weight: bold;font-size:15px;height:50px;line-height:50px;background:white"
+                           id="to_date" autocomplete='off'
+                    />
+                    <button
+                            class="col-2 btn rounded-0 m-0 p-0"
+                            style="font-weight:bold;font-size:15px;height:50px;line-height:50px;background:#d9d9d9"
+                            type="button" autocomplete='off'
+                            onclick="return search_submit(event);"
+                    >
+                        검색
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card m-2">
+    <div class="row no-gutters card-body p-2">
+
+        <!-- 본문 -->
+        <div class="content-table col-12" style="overflow-y: scroll; height:506px;">
+            <table
+                    id="detail_table"
+                    class="table table-sm text-center"
+            >
+                <thead id="detail_thead">
+                <tr>
+                    <th rowspan="2" width="5%">
+                        <input type="checkbox" id="detail_chk_all" onclick="detail_all_chk()"
+                        style="width:15px;height:15px;">
+                    </th>
+                    <th rowspan="2">관리번호</th>
+                    <th rowspan="2">테스트일자</th>
+                    <th rowspan="2">제품명</th>
+                    <th rowspan="1" colspan="4">INITIAL UNBALANCE</th>
+                    <th rowspan="1" colspan="4">CORRECT UNBALANCE</th>
+                </tr>
+                <tr>
+                    <th rowspan="1">UNBALANCE</th>
+                    <th rowspan="1">ANGLE</th>
+                    <th rowspan="1">UNBALANCE</th>
+                    <th rowspan="1">ANGLE</th>
+                    <th rowspan="1">UNBALANCE</th>
+                    <th rowspan="1">ANGLE</th>
+                    <th rowspan="1">UNBALANCE</th>
+                    <th rowspan="1">ANGLE</th>
+                </tr>
+                </thead>
+                <tbody id="detail_tbody"></tbody>
+            </table>
+
+            <div class="row no-gutters d-flex justify-content-center" id="item_nation"
+                 style="margin-top: -20px;">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/api_paginations.js' %}" type="text/javascript"></script>
+<script>
+    let nation_data1 = {
+        cname : 'nation1',  // 인스턴스 명과 일치해야함
+        table_id: 'item_nation',
+        range: 5,
+        page_size: 10,
+    };
+
+    let nation1 = new Pnations(nation_data1, search);  // 인스턴스 명
+
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+        todayHighlight: 'true',
+    });
+
+
+    $(function () {
+        refresh();
+
+    });
+
+
+    function refresh() {
+        let item_name = $("#item_name").val();
+        let fr_date = $("#fr_date").val();
+        let to_date = $("#to_date").val();
+        nation1.page = 1;
+
+        let query = "?page=" + nation1.page + "&complete=1&";
+        if (item_name === null || item_name === ''){} else query += "item_name=" + item_name + "&";
+        if (fr_date === null || fr_date === ''){} else query += "fr_date=" + fr_date + "&";
+        if (to_date === null || to_date === ''){} else query += "to_date=" + to_date + "&";
+
+        api_gp("/Unbalance/" + query + "/", "GET", {}, (done) => {
+            console.table(done);
+            load_detail_table(done);
+
+        });
+    }
+
+
+    function search() {
+        let item_name = $("#item_name").val();
+        let fr_date = $("#fr_date").val();
+        let to_date = $("#to_date").val();
+
+        let query = "?page=" + nation1.page + "&complete=1&";
+        if (item_name === null || item_name === ''){} else query += "item_name=" + item_name + "&";
+        if (fr_date === null || fr_date === ''){} else query += "fr_date=" + fr_date + "&";
+        if (to_date === null || to_date === ''){} else query += "to_date=" + to_date + "&";
+
+        api_gp("/Unbalance/" + query + "/", "GET", {}, (done) => {
+            console.table(done);
+            load_detail_table(done);
+
+        });
+    }
+
+
+    function load_detail_table(done) {
+        let rows = "";
+        let data = done.results;
+
+        for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+
+            // append it
+            let row = "<tr id='" + item.id + "'>";
+            row += "<td>" + "<input name='detail_checkbox' type='checkbox' onclick='detail_is_chk()'>" + "</td>";  // Checked
+            row += "<td class='d-none' name='detail_id'>" + item.id + "</td>";  // id
+
+            row += "<td name='code'>" + item.code + "</td>";  // 관리번호
+            row += "<td name='test_date'>" + item.test_date + "</td>";  // 테스트일자
+            row += "<td name='item_name'>" + item.item_name + "</td>";  // 품명
+
+            row += "<td name='first_unbalance1'>" + item.first_unbalance1.toLocaleString() + "</td>";  // UNBALANCE
+            row += "<td name='first_angle1'>" + item.first_angle1.toLocaleString() + "</td>";  // ANGLE
+            row += "<td name='first_unbalance2'>" + item.first_unbalance2.toLocaleString() + "</td>";  // UNBALANCE
+            row += "<td name='first_angle2'>" + item.first_angle2.toLocaleString() + "</td>";  // ANGLE
+
+            row += "<td name='last_unbalance1' style='font-weight:bold;'>" + item.last_unbalance1.toLocaleString() + "</td>";  // UNBALANCE
+            row += "<td name='last_angle1' style='font-weight:bold;'>" + item.last_angle1.toLocaleString() + "</td>";  // ANGLE
+            row += "<td name='last_unbalance2' style='font-weight:bold;'>" + item.last_unbalance2.toLocaleString() + "</td>";  // UNBALANCE
+            row += "<td name='last_angle2' style='font-weight:bold;'>" + item.last_angle2.toLocaleString() + "</td>";  // ANGLE
+
+            row += "</tr>";
+            rows += row;
+        }
+
+        nation1.nation_display(done);
+
+        $('#detail_tbody').html(rows);
+
+    }
+
+
+    function detail_all_chk(){
+        let checked = $("#detail_chk_all").is(":checked");
+        if (checked == true) {
+            $('input[name=detail_checkbox]').prop("checked", true);
+        }else{
+            $('input[name=detail_checkbox]').prop("checked", false);
+        }
+    }
+
+
+    function detail_is_chk(){
+        let max = $('#detail_table > tbody > tr').length;
+        let cnt = 0;
+
+        $('#detail_table > tbody > tr').each(function (index, tr){
+            tr = $(this);
+            let checked = tr.find("input[name=detail_checkbox]").is(":checked");
+            if (checked == true) {
+                cnt = ++cnt;
+            }
+        });
+
+        if (cnt == max){
+            $('#detail_chk_all').prop("checked", true);
+        }else{
+            $('#detail_chk_all').prop("checked", false);
+        }
+    }
+
+    function search_submit(e) {
+        e.preventDefault();
+        nation1.page = 1;
+
+        search();
+        return false;
+    }
+
+</script>
+
+</body>

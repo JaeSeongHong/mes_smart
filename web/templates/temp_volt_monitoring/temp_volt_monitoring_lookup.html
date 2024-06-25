@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+  <header>{% include "header.html" %}</header>
+
+  <body>
+    <div
+      class="row no-gutters justify-content-center d-lg-none d-md-flex d-sm-flex"
+    >
+      <h2 class="font-weight-bold my-2">온도전압 이력조회</h2>
+    </div>
+
+    <!-- 검색 -->
+    <form class="card m-2" id="temp_volt_monitoring_search-form">
+      <div class="card-body p-2">
+        <!-- 본문 -->
+        <div
+          class="content-search row no-gutters align-items-center content-input-group"
+        >
+          <div
+            class="content-title col-lg-1 align-self-stretch d-lg-flex d-md-none d-sm-none"
+          >
+            조회
+          </div>
+          <div class="col-lg-11 col-md-12">
+            <div class="row no-gutters">
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>기업명<strong>*</strong></label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control "
+                    name="company__id"
+                    id="company_select"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-3 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>공장명<strong>*</strong></label>
+                </div>
+                <div class="content-input-group-input">
+                  <select
+                    class="form-control"
+                    name="factory__id"
+                    id="factory_select"
+                  ></select>
+                </div>
+              </div>
+              <div
+                class="content-input-group col-lg-5 col-md-12 px-0 mb-lg-0 mb-md-2 mb-sm-2"
+              >
+                <div class="content-input-group-header">
+                  <label>기간<strong>*</strong></label>
+                </div>
+                <div class="content-input-group-input">
+                  <div class="input-group input-daterange">
+                    <input
+                      type="text"
+                      class="form-control datepicker col-4"
+                      id="created_at_after"
+                      autocomplete="off"
+                      name="created_at_after"
+                    />
+                    <div class="input-group-addon px-3">~</div>
+                    <input
+                      type="text"
+                      class="form-control datepicker col-4"
+                      id="created_at_before"
+                      autocomplete="off"
+                      name="created_at_before"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-1 col-md-12 ml-auto px-0">
+                <button
+                  class="btn button-search rounded-0 w-100 h-100"
+                  type="button"
+                  onclick="monitoring_load_table(true);return false;"
+                >
+                  검색
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- 차트 제목 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-content w-100">
+          <label class="mb-0">기업명 : </label
+          ><strong id="enterprise_label"></strong>
+          <label class="mb-0">공장명 : </label
+          ><strong id="factory_label"></strong>
+          <label class="mb-0">기간 : </label>
+          <strong id="fetch_datetime_after_label"></strong>
+          ~
+          <strong id="fetch_datetime_before_label"></strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="card m-2">
+      <div class="row no-gutters card-body p-2">
+        <!-- 본문 -->
+        <div class="content-table col-12">
+          <table
+            id="temp_volt_monitoring_lookup_data-table"
+            class="table table-sm text-center"
+            style="min-width: 1300px"
+          >
+            <thead id="temp_volt_monitoring_main-thead"></thead>
+            <tbody id="temp_volt_monitoring_main-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    />
+{#    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>#}
+{#    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>#}
+    <script>
+      var temp_volt_monitoring_filters = ["company__id", "factory__id"]; // TODO Type PC로 변경
+      var temp_volt_monitoring_lookup_filters = [
+        "master__company__id",
+        "master__factory__id",
+        "created_at_after",
+        "created_at_before",
+      ];
+      var sensor = null;
+
+      function process(data, values) {
+        // 데이터 전처리
+        let res = [];
+        for (let i = 0; i < data.length; i++) {
+          let obj = {
+            name: data[i].name,
+            temp_thres: [
+              data[i].temp_threshold_low,
+              data[i].temp_threshold_high,
+            ],
+            voltage_thres: [
+              data[i].voltage_threshold_low,
+              data[i].voltage_threshold_high,
+              data[i].voltage_3v_threshold_low,
+              data[i].voltage_3v_threshold_high,
+              data[i].voltage_5v_threshold_low,
+              data[i].voltage_5v_threshold_high,
+              data[i].voltage_12v_threshold_low,
+              data[i].voltage_12v_threshold_high,
+            ],
+            temp: {},
+            voltage: {},
+            voltage3: {},
+            voltage5: {},
+            voltage12: {},
+          };
+
+          for (let j = 0; j < values.length; j++) {
+            if (data[i].id === values[j].master) {
+              let date = formatDate(Date.parse(values[j].created_at));
+              obj.temp[date] = values[j].temp;
+              obj.voltage[date] = values[j].voltage;
+              obj.voltage3[date] = values[j].voltage3;
+              obj.voltage5[date] = values[j].voltage5;
+              obj.voltage12[date] = values[j].voltage12;
+            }
+          }
+          res.push(obj);
+        }
+        return res; // 성능은 고려하지 않음.
+      }
+
+      function render_table(data, date) {
+        let header = "<thead><th colspan='2'>구분</th>";
+        let body = "<tbody>";
+
+        let dateList = [];
+        let targetDate = date[0];
+        while (targetDate - date[1] !== 0) {
+          header += "<th>" + formatDate(targetDate) + "</th>";
+          dateList.push(targetDate);
+          targetDate = new Date(targetDate);
+          targetDate.setDate(targetDate.getDate() + 1);
+          targetDate = targetDate.getTime();
+        }
+        header += "<th>" + formatDate(targetDate) + "</th>";
+        dateList.push(targetDate);
+
+        for (let i = 0; i < data.length; i++) {
+          console.log(data[i]);
+          let row = "<tr ><td class='sensor_table_sticky' rowspan='5' >" + data[i].name + "</td>";
+          let temp = "<td>온도</td>";
+          let vol = "<td>전압</td>";
+          let vol3 = "<td>3.3V</td>";
+          let vol5 = "<td>5V</td>";
+          let vol12 = "<td>12V</td>";
+          for (let j = 0; j < dateList.length; j++) {
+            let lDate = formatDate(dateList[j]);
+            if (lDate in data[i].temp) {
+              temp += "<td>" + data[i].temp[lDate] + "</td>";
+              vol += "<td>" + data[i].voltage[lDate] + "</td>";
+              vol3 += "<td>" + data[i].voltage3[lDate] + "</td>";
+              vol5 += "<td>" + data[i].voltage5[lDate] + "</td>";
+              vol12 += "<td>" + data[i].voltage12[lDate] + "</td>";
+            } else {
+              temp += "<td>부팅내역 없음</td>";
+              vol += "<td>부팅내역 없음</td>";
+              vol3 += "<td>부팅내역 없음</td>";
+              vol5 += "<td>부팅내역 없음</td>";
+              vol12 += "<td>부팅내역 없음</td>";
+            }
+          }
+          row += temp + "</tr><tr>" + vol + "</tr><tr>" + vol3 + "</tr><tr>" + vol5 + "</tr><tr>" + vol12 + "</tr>";
+          body += row;
+        }
+
+        header += "</thead>";
+        body += "</tbody>";
+        $("#temp_volt_monitoring_lookup_data-table").html(header + body);
+      }
+
+      //내부함수 7 그래프그리기
+      function mock(data1, data2, date) {
+        let data = process(data1, data2);
+        render_table(data, date);
+      }
+
+      function monitoring_load_table() {
+        // filter
+        let query_params = "?";
+        let query_params2 = "?";
+        let success = true;
+        let realtime = true;
+
+        // 내부함수 5 쿼리문 생성
+        temp_volt_monitoring_filters.forEach((item) => {
+          let val = $(
+            "#temp_volt_monitoring_search-form [name='" + item + "']"
+          ).val();
+          
+          if (val !== "") {
+            query_params += "&" + item + "=" + val;
+            query_params2 += "&master__" + item + "=" + val;
+          }
+        });
+
+        let date_range = [];
+        let date_range_text = [];
+        let val_after = $(
+          "#temp_volt_monitoring_search-form [name='created_at_after']"
+        ).val();
+        let val_before = $(
+          "#temp_volt_monitoring_search-form [name='created_at_before']"
+        ).val();
+        if (val_after !== "" && val_before !== "") {
+          query_params2 +=
+            "&created_at_after=" +
+            val_after +
+            "&created_at_before=" +
+            val_before;
+          date_range = [Date.parse(val_after), Date.parse(val_before)];
+          date_range_text = [
+            formatDate(Date.parse(val_after)),
+            formatDate(Date.parse(val_before)),
+          ];
+        } else {
+          var today = new Date();
+          let before = formatDate(today);
+          query_params2 += "&created_at_before=" + before;
+          today.setDate(today.getDate() - 7);
+          query_params2 += "&created_at_after=" + formatDate(today);
+          date_range = [Date.parse(formatDate(today)), Date.parse(before)];
+          date_range_text = [formatDate(today), formatDate(Date.parse(before))];
+        }
+
+        if (success === true) {
+          // {#$("#enterprise_label").text($("#company_select").select2('data')[0].text);#}
+          // {#$("#factory_label").text($("#factory_select").select2('data')[0].text);#}
+          $("#factory_label").text($("#factory_select option:selected").text());
+          $("#enterprise_label").text(
+            $("#company_select option:selected").text()
+          );
+          $("#created_at_label").text(
+            $("#temp_volt_monitoring_search-form [name='created_at']").val()
+          );
+
+          $("#fetch_datetime_after_label").text(date_range_text[0]);
+          $("#fetch_datetime_before_label").text(date_range_text[1]);
+
+          // 내부함수 6 그래프 데이터 불러오기
+          api_gp("/sensor_pc/" + query_params, "GET", {}, (data1) => {
+            api_gp("/sensor_pc/values/" + query_params2, "GET", {}, (data2) => {
+              mock(data1, data2, date_range);
+            });
+          });
+        } else alert("공정명, 설비명, 일자 선택하시기 바랍니다.");
+      }
+
+      function formatDate(date) {
+        var d = new Date(date),
+          month = "" + (d.getMonth() + 1),
+          day = "" + d.getDate(),
+          year = d.getFullYear();
+
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("-");
+      }
+
+      function temp_volt_monitoring_lookup_init() {
+        function make_dropdown(data, selectors) {
+          let list = "<option value=''>선택</option>";
+          for (let i = 0; i < data.length; i++) {
+            let item = data[i];
+            if (selectors === "#factory_select") {
+              list +=
+                "<option value='" + item.id + "'>" + item.name + "</option>";
+            } else if (selectors === "#company_select") {
+              list +=
+                "<option value='" + item.id + "'>" + item.name + "</option>";
+            }
+          }
+          $(selectors).html(list);
+          // {#$(selectors).select2({ width: "100%" });#}
+        }
+
+        // factory dropdown
+        api_gp("/codes_select/?group=104&enable=true", "GET", {}, (data) => {
+          make_dropdown(data, "#factory_select");
+        });
+
+        // facilities dropdown
+        api_gp("/facilities/", "GET", {}, (data) => {
+          make_dropdown(data, "#facilities_select");
+        });
+
+        // order_company dropdown
+        api_gp("/order/company/", "GET", {}, (data) => {
+            console.log(data)
+          make_dropdown(data, "#company_select");
+        });
+      }
+
+      $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
+        minViewMode: 0,
+        maxViewMode: 2,
+        autoclose: true,
+        language: "ko",
+      });
+      $(".datepicker").datepicker("setDate", "today");
+
+      $(() => {
+        refresh();
+        // Table export
+        $(parent.document).find("#excel-export").click(() =>
+          init_excel_export(
+            $("#temp_volt_monitoring_lookup_data-table"),
+            "온도전압"
+          )
+        );
+      });
+
+      function refresh() {
+        temp_volt_monitoring_lookup_init();
+      }
+    </script>
+  </body>
+</html>

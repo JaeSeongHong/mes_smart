@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<header>
+    {% include "header.html" %}
+</header>
+
+
+<body style="overflow: hidden;">
+
+{% load static %}
+{{ ep.media }}
+<div class="col-12">
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- 검색  -->
+            <div class="row align-items-center">
+                <div class="col-lg-12 col-ml-12 mt-3">
+                    <div class="card">
+
+                            <div class="row ml-3">
+                                <div class="col-md-3 clearfix">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="col-form-label">메뉴목록</label>
+                                        <div class="content-input-group-input">
+                                        {{ ep.menulist_name_ac }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-1 clearfix">
+                    <div class="gradient-buttons ml-1 col-md-3 mt-3">
+                        <button type="button" class="btn btn-primary" onclick="search_click();"><i class="ti-search"></i>  검색</button>
+                    </div>
+                </div>
+                                <div class="col-md-6 mt-4 ml-3"></div>
+<div class="col-md-1 mt-4">
+                    <ul class="notification-area pull-right">
+                        <li class="settings-btn">
+                            <i class="ti-settings"></i>
+                        </li>
+                    </ul>
+                </div>
+                            </div>
+
+                    </div>
+
+                </div>
+                </div>
+            </div>
+            <!-- 테이블  -->
+            <div class="row no-gutters ml-4 mr-4">
+
+                    <div class="card">
+                        <div class="card-body" style="width: 100%">
+
+                            <table id="main_table_sm-112" class="table table-hover table-striped table-bordered display nowrap" style="width: 100%; table-layout: fixed;">
+                                <thead>
+                                    <tr class="table-active">
+
+                                        {% for item in column %}
+                                            <th>{{ item.label }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% comment %}{% for item in column %}
+                                    <tr>
+                                        <th></th>
+                                        <th class="th-sm" style="word-wrap: break-word;"  >{{ item.label|default_if_none:'' }}</th>
+                                        <th class="th-sm"  >{{ item.pre_label|default_if_none:'' }}</th>
+                                    <th class="th-sm"  >{{ item.tag|default_if_none:'' }}</th>
+                                    <th class="th-sm"  >{{ item.type|default_if_none:'' }}</th>
+                                    <th class="th-sm"  >{{ item.class_name|default_if_none:'' }}</th>
+                                    <th class="th-sm"  >{{ item.event|default_if_none:'' }}</th>
+                                    <th class="th-sm"  >{{ item.position }}</th>
+                                    <th class="th-sm"  >{{ item.use_flag }}</th>
+                                    <th class="th-sm"  >{{ item.visual_flag }}</th>
+                                    <th class="th-sm"  >{{ item.excel_flag }}</th>
+
+                                    </tr>
+                                        {% endfor %}{% endcomment %}
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- offset area start -->
+<div class="offset-area">
+    <div class="offset-close"><i class="ti-close"></i></div>
+    <ul class="nav offset-menu-tab">
+        <li><a class="active" data-toggle="tab" href="#detail_item">편집</a></li>
+        <li></li>
+    </ul>
+    <div class="offset-content tab-content">
+        <div id="detail_item" class="tab-pane fade in show active">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form class="needs-validation" id="column_form">
+                            <div class="form-row">
+                                {% for item in column %}
+                                    {% if item.edit_flag %}
+                                        <div class="col-md-6 mb-3">
+                                        <label><strong>{{ item.pre_label|default_if_none:'' }}</strong>{{ item.label }}</label>
+                                        {% if item.tag == "input" %}
+
+
+                                    <input type="text" class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" autocomplete="off" {{ item.type }}/>
+
+                                        {% elif item.tag == "select" %}
+
+                                            <select class="{{ item.class_name|safe }}" name="{{ item.label_en|safe }}" {{ item.type }}>
+                                            <option value="1">사용</option>
+                                            <option value="0">미사용</option>
+                                            </select>
+                                        {% elif item.tag == "select2" %}
+
+                                            <div class="content-input-group-input">
+
+                                        </div>
+                                    {% endif %}
+                                        </div>
+                                    {% endif %}
+                                        {% endfor %}
+                            </div>
+                        </form>
+                        <div class="gradient-buttons pull-right">
+                            <div class="btn btn-primary mr-3" id="reset-btn-sm-112"> 초기화 </div>
+                            {% comment %}<div class="btn btn-primary mr-3" id="add-btn-sm-112"> 등 록 </div>{% endcomment %}
+                            <div class="btn btn-primary mr-3" id="edit-btn-sm-112"> 수 정 </div>
+                            {% comment %}<div class="btn btn-primary mr-3" id="delete-btn-sm-112"> 삭 제 </div>{% endcomment %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script src="{% static 'srtdash/assets/js/scripts.js' %}" type="text/javascript"></script>
+<script>
+    let main_table = null;
+    let re_column = []
+    let re_name = []
+    let select_id = null;
+    let page1_size = 10000;
+
+    {% for item in column %}
+
+        re_column.push("{{ item.label_en }}")
+        {% if item.edit_flag %}
+            re_name.push("{{ item.label_en|safe }}")
+        {% endif %}
+    {% endfor %}
+    re_column.push("id");
+
+    $(document).ready(function() {
+
+        main_table = $('#main_table_sm-112').DataTable({
+
+            "columnDefs": [
+                    {
+                        targets: 0,
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
+                    "targets": "_all",
+                    "className": "ellipsis"
+                  }
+                ],
+            "rowCallback": function(row, data) {
+                    $(row).on('click', function() {
+                        setRowColor(this, 'M');
+
+                        setInput(data);
+
+                        select_id = data[data.length-1];
+                        console.log(select_id);
+                    });
+                }
+        })
+
+
+
+    });
+
+    function search_click() {
+
+        let menu_id = $('#id_menulist_name_ac').val()
+        let query = "?page_size=" + page1_size;
+         query += "&menu_id=" + menu_id
+
+        api_gp("/basic_information/columnview/" + query, "GET", {}, (done) => {
+
+            draw_column_table(done);
+        });
+    }
+
+    function draw_column_table(done) {
+        main_table.rows().remove().draw();
+        main_table.rows.add(formatData(done.results, re_column)).draw();
+
+    }
+
+    function setInput(data) {
+
+        re_name.forEach((item, index) => {
+            let tmp = "input[name=" + item + "]"
+            $(tmp).val(data[index+1]);
+        })
+
+    }
+
+    function get_data(type){
+        // form 데이터 가져오기
+      let formData =$('#column_form').serializeArray();
+      formData.push({name:'csrfmiddlewaretoken', value: '{{ csrf_token }}'})
+
+      if (type != 'A'){
+
+          formData.push({name:'pk', value: select_id})
+      }
+
+      return formData
+    }
+
+    $('#reset-btn-sm-112').click(function() {
+        re_name.forEach((item, index) => {
+            let tmp = "input[name=" + item + "]"
+            $(tmp).val("");
+        })
+    })
+
+    $('#add-btn-sm-112').click(function() {
+
+      let allData = get_data('A')
+
+      let val_check = true
+      if (val_check){
+          api_gp("/basic_information/columnview/", "POST", allData, (done) => {
+            alert('추가되었습니다.')
+
+            });
+      }
+    });
+
+    $('#edit-btn-sm-112').click(function() {
+
+      let allData = get_data('E')
+        console.table("allData  : "  + allData)
+      let menu_id = $('#id_menulist_name_ac').val()
+      let query = "?menu_id=" + menu_id
+
+      let val_check = true
+      if (val_check){
+          api_gp("/basic_information/columnview/" + select_id + "/" + query, "PATCH", allData, (done) => {
+            alert('수정되었습니다.')
+
+            });
+      }
+    });
+
+</script>
+</html>

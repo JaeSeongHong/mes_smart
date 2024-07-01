@@ -22,6 +22,7 @@ function api_login(username, password, done_callback) {
             document.cookie = "enterprise_manage=" + json.user.enterprise_manage + "; path=/;";
             document.cookie = "order_company=" + json.user.order_company + "; path=/;";
             document.cookie = "snd_auth=" + json.user.snd_auth + "; path=/;";
+            document.cookie = "location=" + json.location + "; path=/;";
             done_callback();
         })
         .fail(handle_error);
@@ -32,7 +33,7 @@ function api_gp(url, type, data, done_callback) {
     $.ajax({
         url: url, data: data, type: type, dataType: "json", headers: {
             "Authorization": get_token()     // TODO: improve when replace it with something other one
-        }
+        }, context: this
     })
         .done(function (json) {
             if (json == undefined) {
@@ -155,5 +156,98 @@ function setRowColor(obj, type){
 
      $(obj).siblings().css('background-color', '');
 }
+
+function formatData(results, re_column) {
+        //console.log(results);
+        //console.log("re_column  :"  + re_column);
+        return results.map((result, index) => {
+            let rowData = re_column.map(column => result[column]);
+            //console.log(index + "column =     result =  "+ result)
+            return rowData;
+        });
+
+    }
+
+function formatDataArray(results, re_column) {
+    return results.map((result, index) => {
+        let rowData = re_column.map(column => {
+          let value = result;
+          column.split('.').forEach(key => {
+            value = value ? value[key] : "";
+          });
+          //console.log(index + "column = " + column +"   value =  "+ value)
+          return value;
+        });
+
+        return rowData;
+  });
+}
+
+function setInput_api(data, re_column, re_name, hidden_name) {
+
+    let re_names = []
+    let hidden_names =[]
+    re_name.forEach(function(name) {
+
+        let index_name = re_column.indexOf(name);
+            re_names.push({
+                name : name,
+                index: index_name
+                })
+        });
+
+    hidden_name.forEach(function(item) {
+        let name = Object.keys(item)[0]; // hidden_name 배열의 이름 추출
+
+        let type_st = Object.values(item)[0];
+
+        let index_sh = re_column.indexOf(name); // re_column에서 일치하는 인덱스 검색
+
+        if (index_sh !== -1) {
+
+            hidden_names.push({
+                [type_st] : index_sh + 1
+                })
+            }
+        });
+
+    //input 요소
+    re_names.forEach((item) => {
+        /*let naming = item.name;
+        if (naming.includes(".")) {
+              naming = naming.substring(naming.lastIndexOf(".") + 1);
+            }*/
+        let tmp = "input[name='" + item.name.replace("'", "\\'") + "']";
+            $(tmp).val(data[item.index]);
+
+        });
+    // select 요소
+        if(hidden_names.length > 0){
+            let option;
+
+          const groupedArray = hidden_names.reduce((result, obj) => {
+          const key = Object.keys(obj)[0];
+          const value = obj[key];
+
+          if (result[key]) {
+            result[key].push(value);
+          } else {
+            result[key] = [value];
+          }
+
+          return result;
+        }, {});
+
+        for (const key in groupedArray) {
+          const value = groupedArray[key];
+          option = new Option(data[value[0]-1], data[value[1]-1], true, true);
+          $('#' + key).append(option).trigger("change");
+
+        }
+        }
+
+
+    }
+
 
 

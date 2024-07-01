@@ -136,6 +136,14 @@
     });
 
     /*================================
+    page refresh
+    ==================================*/
+    $('.refresh').on('click', function(){
+        location.reload();
+        //alert("AAAAA");
+    })
+
+    /*================================
     Owl Carousel
     ==================================*/
     function slider_area() {

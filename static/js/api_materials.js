@@ -48,8 +48,8 @@ function items_calculate_search(my_arr, done_callback) {
         "&item_division=" + my_arr[1] +
         "&code=" + my_arr[2] +
         "&name=" + my_arr[3] +
-        "&model=" + my_arr[4] +
-        "&type=" + my_arr[5]+
+        "&type=" + my_arr[4] +
+        "&model=" + my_arr[5]+
         //"&log_from=" + my_arr[6]+
         //"&log_to=" + my_arr[7],
         "&warehouse_keep_location__name=" + my_arr[6],
@@ -124,4 +124,31 @@ function items_rein_search(my_arr, done_callback) {
         })
        .fail(handle_error);
 }
+
+function validation_material_itemcode_check(type, formdata){
+        let valid = true;
+
+        let item_code_id
+
+        if (formdata.some(item => item.name === "item")) {
+              item_code_id = formdata.find(item => item.name === "item").value;
+            } else {
+              item_code_id = null;
+            }
+
+        if (type === "A"){
+            if(item_code_id == null){
+                alert("품목을 선택해주세요");
+                valid = false;
+            }/*else if(customer_id == null){
+                alert("거래처를 선택해주세요");
+                valid = false;
+            }*/
+        }else{
+
+        }
+
+
+        return valid;
+    }
 
